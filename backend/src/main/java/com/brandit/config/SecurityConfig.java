@@ -95,6 +95,9 @@ public class SecurityConfig {
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
             for (String origin : allowedOrigins.split(",")) {
                 String trimmed = origin.trim();
+                while (trimmed.endsWith("/")) {
+                    trimmed = trimmed.substring(0, trimmed.length() - 1);
+                }
                 if (!trimmed.isEmpty()) {
                     config.addAllowedOriginPattern(trimmed);
                 }
