@@ -10,6 +10,7 @@ const team = [
     phone: '+91 8264452182',
     avatar: 'RD',
     image: '/assets/team/raghav.jpg',
+    objectPosition: 'center 15%',
     bio: 'Drives technical infrastructure, strategic personal branding systems, and overall platform growth.',
     color: '#EFF6FF',
   },
@@ -19,6 +20,7 @@ const team = [
     phone: '+91 8708231539',
     avatar: 'HS',
     image: '/assets/team/hritika.jpg',
+    objectPosition: 'center 20%',
     bio: 'Expert in LinkedIn profile positioning, strategy-backed content calendars, and personal brand growth.',
     color: '#F0FDF4',
   },
@@ -28,6 +30,7 @@ const team = [
     phone: '+91 6284318951',
     avatar: 'KD',
     image: '/assets/team/kritika.jpg',
+    objectPosition: 'center 20%',
     bio: 'Spearheads client onboarding, cold outreach strategy, follow-ups, and operational excellence.',
     color: '#FFF7ED',
   },
@@ -37,6 +40,7 @@ const team = [
     phone: '+91 9015470950',
     avatar: 'SS',
     image: '/assets/team/stuti.jpg',
+    objectPosition: 'center 25%',
     bio: 'Manages team operations, organizational culture, and client experience standards.',
     color: '#F5F3FF',
   },
@@ -46,6 +50,7 @@ const team = [
     phone: '+91 9024469496',
     avatar: 'Y',
     image: '/assets/team/yash.jpg',
+    objectPosition: 'center 15%',
     bio: 'Handles financial planning, transaction transparency, and billing operations.',
     color: '#ECFDF5',
   },
@@ -98,16 +103,24 @@ export default function TeamSection({ backgroundColor = brandColors.background }
                     src={member.image}
                     alt={member.name}
                     sx={{
-                      width: 88,
-                      height: 88,
+                      width: 124,
+                      height: 124,
                       bgcolor: member.color,
                       color: brandColors.primary,
                       fontWeight: 700,
-                      fontSize: '1.4rem',
-                      mb: 2,
-                      border: `3px solid ${alpha(brandColors.primary, 0.2)}`,
-                      boxShadow: '0 6px 18px rgba(10, 102, 194, 0.12)',
-                      '& img': { objectFit: 'cover' },
+                      fontSize: '1.6rem',
+                      mb: 2.5,
+                      border: `4px solid #fff`,
+                      boxShadow: `0 8px 24px rgba(10, 102, 194, 0.18), 0 0 0 3px ${alpha(brandColors.primary, 0.35)}`,
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        boxShadow: `0 12px 30px rgba(10, 102, 194, 0.28), 0 0 0 4px ${brandColors.primary}`,
+                      },
+                      '& img': {
+                        objectFit: 'cover',
+                        objectPosition: member.objectPosition || 'center 20%',
+                      },
                     }}
                   >
                     {member.avatar}
