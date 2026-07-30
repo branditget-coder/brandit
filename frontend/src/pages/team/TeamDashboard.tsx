@@ -6,7 +6,7 @@ import {
 import { motion } from 'framer-motion'
 import {
   FiUsers, FiCalendar, FiBookOpen, FiClock, FiCheckCircle,
-  FiPhone, FiMail, FiExternalLink, FiFileText, FiShield
+  FiPhone, FiMail, FiExternalLink, FiFileText, FiShield, FiInbox
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -45,14 +45,10 @@ export default function TeamDashboard() {
     try {
       setLoading(true)
       const res = await api.get('/bookings')
-      setBookings(res.data)
+      setBookings(Array.isArray(res.data) ? res.data : [])
     } catch {
-      // Fallback sample data if backend endpoint restricted
-      setBookings([
-        { id: 101, clientName: 'Aarav Mehta', clientEmail: 'aarav@techventure.co', clientPhone: '+91 9876543210', servicePackage: 'Executive Personal Branding', preferredDate: '2026-08-02 11:00 AM', status: 'CONFIRMED', notes: 'Wants LinkedIn positioning & founder story strategy.' },
-        { id: 102, clientName: 'Priya Verma', clientEmail: 'priya@brandpulse.in', clientPhone: '+91 9123456789', servicePackage: 'LinkedIn Content Optimization', preferredDate: '2026-08-03 03:30 PM', status: 'PENDING', notes: 'Requires profile audit & headline overhaul.' },
-        { id: 103, clientName: 'Devansh Saxena', clientEmail: 'devansh@growthlabs.io', clientPhone: '+91 9988776655', servicePackage: 'Corporate Branding Package', preferredDate: '2026-08-05 02:00 PM', status: 'CONFIRMED', notes: 'Team onboarding consultation.' },
-      ])
+      // Empty state handling when no real data exists yet
+      setBookings([])
     } finally {
       setLoading(false)
     }
@@ -63,7 +59,6 @@ export default function TeamDashboard() {
       await api.patch(`/bookings/${id}/status`, { status: newStatus })
       fetchBookings()
     } catch {
-      // Local optimistic state update
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b))
     }
   }
@@ -91,43 +86,102 @@ export default function TeamDashboard() {
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        {/* Welcome Header */}
+        
+        {/* Modernized Welcome Header Banner with High-Contrast Text */}
         <Paper
           sx={{
-            p: { xs: 3, sm: 4 },
+            p: { xs: 3.5, sm: 4.5 },
             borderRadius: '24px',
-            background: `linear-gradient(135deg, ${brandColors.primary} 0%, #1E3A8A 100%)`,
-            color: '#fff',
+            background: 'linear-gradient(135deg, #0F172A 0%, #1E3E8A 55%, #2563EB 100%)',
+            color: '#FFFFFF',
             mb: 4,
-            boxShadow: '0 8px 30px rgba(10, 102, 194, 0.25)',
+            boxShadow: '0 12px 36px rgba(15, 23, 42, 0.35)',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <Chip label="BRANDIT TEAM WORKSPACE" size="small" sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 800, fontSize: '0.7rem' }} />
-                <Typography variant="caption" sx={{ opacity: 0.85, fontWeight: 600 }}>Internal Operations</Typography>
+          {/* Subtle Ambient Blur Accents */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: -60,
+              right: -60,
+              width: 220,
+              height: 220,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(0,0,0,0) 70%)',
+              filter: 'blur(30px)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2.5, position: 'relative', zIndex: 1 }}>
+            <Box sx={{ maxWidth: '720px' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5 }}>
+                <Chip
+                  label="BRANDIT TEAM WORKSPACE"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                    backdropFilter: 'blur(8px)',
+                    color: '#FFFFFF',
+                    fontWeight: 800,
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.04em',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                  }}
+                />
+                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600, letterSpacing: '0.02em' }}>
+                  Internal Operations
+                </Typography>
               </Box>
-              <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5 }}>
+
+              <Typography
+                variant="h3"
+                sx={{
+                  fontWeight: 800,
+                  mb: 1,
+                  color: '#FFFFFF !important',
+                  fontSize: { xs: '1.75rem', sm: '2.2rem' },
+                  letterSpacing: '-0.02em',
+                }}
+              >
                 Hello, {user?.firstName}!
               </Typography>
-              <Typography variant="body1" sx={{ opacity: 0.9 }}>
+
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.92) !important',
+                  fontSize: '1rem',
+                  lineHeight: 1.6,
+                  fontWeight: 400,
+                }}
+              >
                 Welcome to your BrandIt Team Workspace. Manage client consultations, team SOPs, and growth operations.
               </Typography>
             </Box>
+
             <Button
               component={RouterLink}
               to="/team/resources"
               variant="contained"
-              startIcon={<FiBookOpen />}
+              startIcon={<FiBookOpen size={18} />}
               sx={{
-                backgroundColor: '#fff',
-                color: brandColors.primary,
+                backgroundColor: '#FFFFFF',
+                color: '#1E3A8A',
                 fontWeight: 700,
-                borderRadius: '12px',
-                px: 3,
-                py: 1.2,
-                '&:hover': { backgroundColor: '#F3F4F6' },
+                borderRadius: '14px',
+                px: 3.5,
+                py: 1.4,
+                fontSize: '0.95rem',
+                textTransform: 'none',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                '&:hover': {
+                  backgroundColor: '#F8FAFC',
+                  color: '#0F172A',
+                  boxShadow: '0 6px 24px rgba(0, 0, 0, 0.3)',
+                },
               }}
             >
               Access Team SOPs
@@ -179,8 +233,20 @@ export default function TeamDashboard() {
                   <CircularProgress size={32} />
                 </Box>
               ) : bookings.length === 0 ? (
-                <Box sx={{ py: 6, textAlign: 'center' }}>
-                  <Typography variant="body1" sx={{ color: brandColors.muted }}>No client consultations assigned yet.</Typography>
+                /* Polished Empty State (No Mock Data) */
+                <Box sx={{ py: 6, px: 3, textAlign: 'center', backgroundColor: alpha(brandColors.primary, 0.02), borderRadius: '16px', border: `1px dashed ${brandColors.border}` }}>
+                  <Box sx={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
+                    <FiInbox size={28} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.5 }}>
+                    No Client Consultations Yet
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 460, mx: 'auto', mb: 2.5, lineHeight: 1.6 }}>
+                    No consultation bookings have been submitted by clients yet. As soon as clients schedule personal branding sessions, their details will appear here in real-time.
+                  </Typography>
+                  <Button component={RouterLink} to="/book" variant="outlined" size="small" sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700 }}>
+                    Test Client Booking Link
+                  </Button>
                 </Box>
               ) : (
                 <TableContainer>

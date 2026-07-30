@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box, Typography, Paper, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Chip, Button, TextField, InputAdornment, Stack,
   Tabs, Tab, alpha, CircularProgress, Tooltip
 } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiSearch, FiCalendar, FiPhone, FiMail, FiCheckCircle, FiClock, FiXCircle } from 'react-icons/fi'
+import { FiSearch, FiCalendar, FiPhone, FiMail, FiCheckCircle, FiClock, FiXCircle, FiInbox } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
 
@@ -34,15 +34,10 @@ export default function TeamConsultations() {
     try {
       setLoading(true)
       const res = await api.get('/bookings')
-      setBookings(res.data)
+      setBookings(Array.isArray(res.data) ? res.data : [])
     } catch {
-      // Fallback sample data
-      setBookings([
-        { id: 101, clientName: 'Aarav Mehta', clientEmail: 'aarav@techventure.co', clientPhone: '+91 9876543210', servicePackage: 'Executive Personal Branding', preferredDate: '2026-08-02 11:00 AM', status: 'CONFIRMED', notes: 'Wants LinkedIn positioning & founder story strategy.' },
-        { id: 102, clientName: 'Priya Verma', clientEmail: 'priya@brandpulse.in', clientPhone: '+91 9123456789', servicePackage: 'LinkedIn Content Optimization', preferredDate: '2026-08-03 03:30 PM', status: 'PENDING', notes: 'Requires profile audit & headline overhaul.' },
-        { id: 103, clientName: 'Devansh Saxena', clientEmail: 'devansh@growthlabs.io', clientPhone: '+91 9988776655', servicePackage: 'Corporate Branding Package', preferredDate: '2026-08-05 02:00 PM', status: 'CONFIRMED', notes: 'Team onboarding consultation.' },
-        { id: 104, clientName: 'Neha Kapoor', clientEmail: 'neha@capitalsystems.com', clientPhone: '+91 9811223344', servicePackage: 'Founder Presence Accelerator', preferredDate: '2026-08-06 10:00 AM', status: 'COMPLETED', notes: 'Follow-up strategy roadmap delivered.' },
-      ])
+      // Empty state handling when no real data exists yet
+      setBookings([])
     } finally {
       setLoading(false)
     }
@@ -128,10 +123,20 @@ export default function TeamConsultations() {
               <CircularProgress size={36} />
             </Box>
           ) : filteredBookings.length === 0 ? (
-            <Box sx={{ py: 8, textAlign: 'center' }}>
-              <FiCalendar size={40} color={brandColors.muted} style={{ marginBottom: 12 }} />
-              <Typography variant="h6" sx={{ color: brandColors.text, fontWeight: 700 }}>No consultations found</Typography>
-              <Typography variant="body2" sx={{ color: brandColors.muted }}>Try adjusting your search filter or selected status tab.</Typography>
+            /* Clean Empty State (No Mock Data) */
+            <Box sx={{ py: 8, px: 3, textAlign: 'center', backgroundColor: alpha(brandColors.primary, 0.02), borderRadius: '16px', border: `1px dashed ${brandColors.border}` }}>
+              <Box sx={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
+                <FiInbox size={32} />
+              </Box>
+              <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 800, mb: 1 }}>
+                No Consultations to Display
+              </Typography>
+              <Typography variant="body1" sx={{ color: brandColors.muted, maxWidth: 520, mx: 'auto', mb: 1.5, lineHeight: 1.6 }}>
+                There are currently no active or historical client consultation bookings matching this filter.
+              </Typography>
+              <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block' }}>
+                When clients fill out the booking form on BrandIt, sessions will automatically populate here in real-time.
+              </Typography>
             </Box>
           ) : (
             <TableContainer>
