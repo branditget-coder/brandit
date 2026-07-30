@@ -1,5 +1,6 @@
 package com.brandit.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,16 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -19,11 +30,19 @@ public class EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
+    @Value("${resend.api.key:${RESEND_API_KEY:}}")
+    private String resendApiKey;
+
     @Value("${app.mail.from:brandit.get@gmail.com}")
     private String fromEmail;
 
     @Value("${app.frontend.url:https://brandit-frontend.vercel.app}")
     private String frontendUrl;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
 
     /**
      * Common HTML Header layout wrapper
@@ -179,7 +198,7 @@ public class EmailService {
     }
 
     /**
-     * Core Dispatcher using MimeMessage (HTML) with SimpleMailMessage fallback
+     * Core Dispatcher: Prioritizes HTTPS REST API (Port 443 - Railway Unblocked), with SMTP Fallback
      */
     private void dispatchEmail(String to, String subject, String htmlBody) {
         log.info("================ EMAIL DISPATCH LOG ================");
@@ -187,34 +206,55 @@ public class EmailService {
         log.info("Subject: {}", subject);
         log.info("====================================================");
 
-        if (mailSender == null) {
-            log.warn("JavaMailSender is not initialized. Email log printed above.");
-            return;
-        }
-
-        java.util.concurrent.CompletableFuture.runAsync(() -> {
-            try {
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-                helper.setFrom(fromEmail);
-                helper.setTo(to);
-                helper.setSubject(subject);
-                helper.setText(htmlBody, true); // true = HTML format
-
-                mailSender.send(message);
-                log.info("HTML Email successfully dispatched to {}", to);
-            } catch (Exception e) {
-                log.warn("MimeMessage HTML dispatch failed ({}), attempting plain-text fallback...", e.getMessage());
+        CompletableFuture.runAsync(() -> {
+            // Method A: Resend HTTPS REST API (Port 443 - Never blocked on Railway)
+            if (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")) {
                 try {
-                    SimpleMailMessage plainMsg = new SimpleMailMessage();
-                    plainMsg.setFrom(fromEmail);
-                    plainMsg.setTo(to);
-                    plainMsg.setSubject(subject);
-                    plainMsg.setText(htmlBody.replaceAll("<[^>]*>", "")); // Strip tags for plain text
-                    mailSender.send(plainMsg);
-                    log.info("Fallback plain text email sent to {}", to);
-                } catch (Exception fallbackErr) {
-                    log.error("Failed to send fallback plain text email to {}: {}", to, fallbackErr.getMessage());
+                    String sender = "BrandIt <onboarding@resend.dev>"; // Official Resend test sender or custom domain
+                    
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("from", sender);
+                    payload.put("to", List.of(to));
+                    payload.put("subject", subject);
+                    payload.put("html", htmlBody);
+
+                    String jsonPayload = objectMapper.writeValueAsString(payload);
+
+                    HttpRequest httpRequest = HttpRequest.newBuilder()
+                            .uri(URI.create("https://api.resend.com/emails"))
+                            .header("Authorization", "Bearer " + resendApiKey.trim())
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                            .timeout(Duration.ofSeconds(5))
+                            .build();
+
+                    HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+                    if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                        log.info("Successfully sent email via Resend HTTPS REST API (HTTP {}) to {}", response.statusCode(), to);
+                        return;
+                    } else {
+                        log.warn("Resend HTTPS API returned status {}: {}", response.statusCode(), response.body());
+                    }
+                } catch (Exception e) {
+                    log.warn("Resend HTTPS API error: {}", e.getMessage());
+                }
+            }
+
+            // Method B: JavaMailSender SMTP (Fallback)
+            if (mailSender != null) {
+                try {
+                    MimeMessage message = mailSender.createMimeMessage();
+                    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                    helper.setFrom(fromEmail != null ? fromEmail : "brandit.get@gmail.com");
+                    helper.setTo(to);
+                    helper.setSubject(subject);
+                    helper.setText(htmlBody, true);
+
+                    mailSender.send(message);
+                    log.info("HTML Email sent via SMTP to {}", to);
+                } catch (Exception e) {
+                    log.warn("SMTP email dispatch failed (likely port blocked on Railway free tier): {}", e.getMessage());
                 }
             }
         });
