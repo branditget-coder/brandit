@@ -6,9 +6,10 @@ import { brandColors } from '../../theme'
 const team = [
   {
     name: 'Raghav Dhir',
-    role: 'Founder & Lead Tech Strategist',
-    phone: '+91 82644XXXXX',
+    role: 'Lead Tech Strategist',
+    phone: '+91 8264452182',
     avatar: 'RD',
+    image: '/assets/team/raghav.jpg',
     bio: 'Drives technical infrastructure, strategic personal branding systems, and overall platform growth.',
     color: '#EFF6FF',
   },
@@ -17,6 +18,7 @@ const team = [
     role: 'LinkedIn Manager and Consultant',
     phone: '+91 8708231539',
     avatar: 'HS',
+    image: '/assets/team/hritika.jpg',
     bio: 'Expert in LinkedIn profile positioning, strategy-backed content calendars, and personal brand growth.',
     color: '#F0FDF4',
   },
@@ -25,6 +27,7 @@ const team = [
     role: 'Customer Outreach & Operations',
     phone: '+91 6284318951',
     avatar: 'KD',
+    image: '/assets/team/kritika.jpg',
     bio: 'Spearheads client onboarding, cold outreach strategy, follow-ups, and operational excellence.',
     color: '#FFF7ED',
   },
@@ -33,22 +36,16 @@ const team = [
     role: 'Human Resource',
     phone: '+91 9015470950',
     avatar: 'SS',
+    image: '/assets/team/stuti.jpg',
     bio: 'Manages team operations, organizational culture, and client experience standards.',
     color: '#F5F3FF',
-  },
-  {
-    name: 'Parinoor',
-    role: 'Core Management',
-    phone: '+91 6284318951',
-    avatar: 'P',
-    bio: 'Oversees business development, strategic execution, and client success roadmaps.',
-    color: '#FFF1F2',
   },
   {
     name: 'Yash',
     role: 'Accounting and Finance',
     phone: '+91 9024469496',
     avatar: 'Y',
+    image: '/assets/team/yash.jpg',
     bio: 'Handles financial planning, transaction transparency, and billing operations.',
     color: '#ECFDF5',
   },
@@ -97,7 +94,22 @@ export default function TeamSection({ backgroundColor = brandColors.background }
                     },
                   }}
                 >
-                  <Avatar sx={{ width: 72, height: 72, bgcolor: member.color, color: brandColors.primary, fontWeight: 700, fontSize: '1.3rem', mb: 2, border: `2px solid ${alpha(brandColors.primary, 0.15)}` }}>
+                  <Avatar
+                    src={member.image}
+                    alt={member.name}
+                    sx={{
+                      width: 88,
+                      height: 88,
+                      bgcolor: member.color,
+                      color: brandColors.primary,
+                      fontWeight: 700,
+                      fontSize: '1.4rem',
+                      mb: 2,
+                      border: `3px solid ${alpha(brandColors.primary, 0.2)}`,
+                      boxShadow: '0 6px 18px rgba(10, 102, 194, 0.12)',
+                      '& img': { objectFit: 'cover' },
+                    }}
+                  >
                     {member.avatar}
                   </Avatar>
                   <Typography variant="h6" sx={{ color: brandColors.text, fontWeight: 700, mb: 0.5 }}>
