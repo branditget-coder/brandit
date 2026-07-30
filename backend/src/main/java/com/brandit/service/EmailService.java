@@ -201,7 +201,7 @@ public class EmailService {
     }
 
     /**
-     * Core Dispatcher: Supports Brevo & Resend HTTPS REST APIs (Port 443 - Railway Unblocked), with SMTP Fallback
+     * Core Dispatcher: Primary Resend HTTPS REST API (Port 443), with Brevo and SMTP Fallbacks
      */
     private void dispatchEmail(String to, String subject, String htmlBody) {
         log.info("================ EMAIL DISPATCH LOG ================");
@@ -210,7 +210,43 @@ public class EmailService {
         log.info("====================================================");
 
         CompletableFuture.runAsync(() -> {
-            // Option 1: Brevo HTTPS REST API (Free 300 emails/day to ANY address WITHOUT custom domain requirement)
+            // Option 1: Resend HTTPS REST API (Primary - resend.com over Port 443)
+            if (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")) {
+                try {
+                    String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("gmail.com"))
+                            ? fromEmail
+                            : "BrandIt Consulting <onboarding@resend.dev>";
+
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("from", sender);
+                    payload.put("to", List.of(to));
+                    payload.put("subject", subject);
+                    payload.put("html", htmlBody);
+
+                    String jsonPayload = objectMapper.writeValueAsString(payload);
+
+                    HttpRequest httpRequest = HttpRequest.newBuilder()
+                            .uri(URI.create("https://api.resend.com/emails"))
+                            .header("Authorization", "Bearer " + resendApiKey.trim())
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                            .timeout(Duration.ofSeconds(5))
+                            .build();
+
+                    HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+                    if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                        log.info("Successfully dispatched email via Resend HTTPS REST API (HTTP {}) to {}", response.statusCode(), to);
+                        return;
+                    } else {
+                        log.warn("Resend HTTPS API returned status {}: {}", response.statusCode(), response.body());
+                    }
+                } catch (Exception e) {
+                    log.warn("Resend HTTPS API error: {}", e.getMessage());
+                }
+            }
+
+            // Option 2: Brevo HTTPS REST API (Fallback over Port 443)
             if (brevoApiKey != null && !brevoApiKey.isBlank() && !brevoApiKey.contains("placeholder")) {
                 try {
                     Map<String, Object> senderMap = Map.of("name", "BrandIt Consulting", "email", fromEmail != null ? fromEmail : "brandit.get@gmail.com");
@@ -245,40 +281,6 @@ public class EmailService {
                 }
             }
 
-            // Option 2: Resend HTTPS REST API (Port 443)
-            if (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")) {
-                try {
-                    String sender = "BrandIt <onboarding@resend.dev>";
-                    
-                    Map<String, Object> payload = new HashMap<>();
-                    payload.put("from", sender);
-                    payload.put("to", List.of(to));
-                    payload.put("subject", subject);
-                    payload.put("html", htmlBody);
-
-                    String jsonPayload = objectMapper.writeValueAsString(payload);
-
-                    HttpRequest httpRequest = HttpRequest.newBuilder()
-                            .uri(URI.create("https://api.resend.com/emails"))
-                            .header("Authorization", "Bearer " + resendApiKey.trim())
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                            .timeout(Duration.ofSeconds(5))
-                            .build();
-
-                    HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-                    if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                        log.info("Successfully sent email via Resend HTTPS REST API (HTTP {}) to {}", response.statusCode(), to);
-                        return;
-                    } else {
-                        log.warn("Resend HTTPS API returned status {}: {}", response.statusCode(), response.body());
-                    }
-                } catch (Exception e) {
-                    log.warn("Resend HTTPS API error: {}", e.getMessage());
-                }
-            }
-
             // Option 3: JavaMailSender SMTP (Fallback)
             if (mailSender != null) {
                 try {
@@ -292,7 +294,7 @@ public class EmailService {
                     mailSender.send(message);
                     log.info("HTML Email sent via SMTP to {}", to);
                 } catch (Exception e) {
-                    log.warn("SMTP email dispatch failed (likely port blocked on Railway free tier): {}", e.getMessage());
+                    log.warn("SMTP email dispatch failed: {}", e.getMessage());
                 }
             }
         });
