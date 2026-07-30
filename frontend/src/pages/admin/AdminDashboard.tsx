@@ -43,18 +43,23 @@ export default function AdminDashboard() {
   }, [])
 
   const kpis = [
-    { label: 'Total Users', value: data ? String(data.totalUsers) : '0', change: '+Live', icon: FiUsers, color: '#EFF6FF', iconColor: brandColors.primary },
-    { label: 'Total Bookings', value: data ? String(data.totalBookings) : '0', change: '+Live', icon: FiCalendar, color: '#F0FDF4', iconColor: brandColors.success },
-    { label: 'Total Revenue', value: data ? `₹${(data.totalRevenue / 1000).toFixed(0)}k` : '₹0', change: '+18%', icon: FiDollarSign, color: '#FFF7ED', iconColor: '#F59E0B' },
-    { label: 'Satisfaction Rate', value: data ? `${data.satisfactionRate}%` : '96.5%', change: '+2%', icon: FiTrendingUp, color: '#F5F3FF', iconColor: '#7C3AED' },
+    { label: 'Registered Users', value: data ? String(data.totalUsers) : '1', change: 'Live Active', icon: FiUsers, color: '#EFF6FF', iconColor: brandColors.primary },
+    { label: 'Total Bookings', value: data ? String(data.totalBookings) : '0', change: 'Goal: 50/mo', icon: FiCalendar, color: '#F0FDF4', iconColor: brandColors.success },
+    { label: 'Projected Monthly Revenue', value: '₹1.8L Target', change: '+24% Forecast', icon: FiDollarSign, color: '#FFF7ED', iconColor: '#F59E0B' },
+    { label: 'Satisfaction Goal', value: '98.5%', change: 'Target Benchmark', icon: FiTrendingUp, color: '#F5F3FF', iconColor: '#7C3AED' },
   ]
 
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" sx={{ mb: 0.5 }}>Admin Dashboard</Typography>
-          <Typography variant="body1" sx={{ color: brandColors.muted }}>Overview of BrandIt platform activity.</Typography>
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography variant="h3" sx={{ mb: 0.5 }}>Admin Dashboard</Typography>
+            <Typography variant="body1" sx={{ color: brandColors.muted }}>Real-time platform activity and future growth projections.</Typography>
+          </Box>
+          <Box sx={{ px: 2, py: 0.75, borderRadius: '100px', backgroundColor: alpha(brandColors.primary, 0.08), border: `1px solid ${alpha(brandColors.primary, 0.2)}` }}>
+            <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700 }}>🚀 Growth Target Mode: Active</Typography>
+          </Box>
         </Box>
 
         {loading ? (
@@ -73,8 +78,8 @@ export default function AdminDashboard() {
                         <Box sx={{ width: 44, height: 44, borderRadius: '14px', backgroundColor: k.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <k.icon size={20} color={k.iconColor} />
                         </Box>
-                        <Box sx={{ px: 1.5, py: 0.5, borderRadius: '100px', backgroundColor: alpha(brandColors.success, 0.1), alignSelf: 'flex-start' }}>
-                          <Typography variant="caption" sx={{ color: '#059669', fontWeight: 700 }}>{k.change}</Typography>
+                        <Box sx={{ px: 1.5, py: 0.5, borderRadius: '100px', backgroundColor: alpha(brandColors.primary, 0.08), alignSelf: 'flex-start' }}>
+                          <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700 }}>{k.change}</Typography>
                         </Box>
                       </Box>
                       <Typography variant="h3" sx={{ color: brandColors.text, mb: 0.25 }}>{k.value}</Typography>
@@ -86,10 +91,18 @@ export default function AdminDashboard() {
             </Grid>
 
             <Grid container spacing={3}>
-              {/* Revenue Chart */}
+              {/* Projected Revenue Growth Chart */}
               <Grid item xs={12} lg={7}>
                 <Paper sx={{ p: 3.5, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
-                  <Typography variant="h6" sx={{ mb: 3, color: brandColors.text }}>Revenue Overview</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Box>
+                      <Typography variant="h6" sx={{ color: brandColors.text }}>Projected Revenue Trajectory</Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted }}>Forecasted platform revenue trajectory based on growth targets</Typography>
+                    </Box>
+                    <Box sx={{ px: 1.5, py: 0.5, borderRadius: '100px', backgroundColor: alpha(brandColors.success, 0.1) }}>
+                      <Typography variant="caption" sx={{ color: '#059669', fontWeight: 700 }}>Future Forecast</Typography>
+                    </Box>
+                  </Box>
                   <ResponsiveContainer width="100%" height={220}>
                     <AreaChart data={revenueData}>
                       <defs>
@@ -101,23 +114,28 @@ export default function AdminDashboard() {
                       <CartesianGrid strokeDasharray="3 3" stroke={brandColors.border} />
                       <XAxis dataKey="month" tick={{ fontSize: 12, fill: brandColors.muted }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fontSize: 12, fill: brandColors.muted }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
-                      <Tooltip formatter={(v: any) => [`₹${Number(v).toLocaleString()}`, 'Revenue']} />
-                      <Area type="monotone" dataKey="revenue" stroke={brandColors.primary} strokeWidth={2.5} fill="url(#colorRevenue)" dot={{ fill: brandColors.primary, r: 4 }} />
+                      <Tooltip formatter={(v: any) => [`₹${Number(v).toLocaleString()}`, 'Projected Revenue']} />
+                      <Area type="monotone" dataKey="revenue" stroke={brandColors.primary} strokeWidth={2.5} strokeDasharray="4 4" fill="url(#colorRevenue)" dot={{ fill: brandColors.primary, r: 4 }} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </Paper>
               </Grid>
 
-              {/* Booking Chart */}
+              {/* Projected Monthly Bookings Chart */}
               <Grid item xs={12} lg={5}>
                 <Paper sx={{ p: 3.5, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
-                  <Typography variant="h6" sx={{ mb: 3, color: brandColors.text }}>Monthly Bookings</Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Box>
+                      <Typography variant="h6" sx={{ color: brandColors.text }}>Projected Session Volume</Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted }}>Forecasted consultation bookings per month</Typography>
+                    </Box>
+                  </Box>
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={bookingData} barSize={24}>
                       <CartesianGrid strokeDasharray="3 3" stroke={brandColors.border} />
                       <XAxis dataKey="month" tick={{ fontSize: 12, fill: brandColors.muted }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fontSize: 12, fill: brandColors.muted }} axisLine={false} tickLine={false} />
-                      <Tooltip />
+                      <Tooltip formatter={(v: any) => [`${v} Sessions`, 'Projected Target']} />
                       <Bar dataKey="bookings" fill={brandColors.primary} radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>

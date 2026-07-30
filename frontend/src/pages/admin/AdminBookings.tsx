@@ -66,8 +66,15 @@ export default function AdminBookings() {
         ) : error ? (
           <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
         ) : bookings.length === 0 ? (
-          <Paper sx={{ p: 4, borderRadius: '20px', border: `1px solid ${brandColors.border}`, textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: brandColors.muted }}>No bookings found in the system.</Typography>
+          <Paper sx={{ p: 6, borderRadius: '24px', border: `1px dashed ${brandColors.border}`, textAlign: 'center', backgroundColor: alpha(brandColors.primary, 0.01) }}>
+            <Box sx={{ width: 56, height: 56, borderRadius: '18px', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>📅</Typography>
+            </Box>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: brandColors.text, mb: 1 }}>Consultation Pipeline Active</Typography>
+            <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 480, mx: 'auto', mb: 3, lineHeight: 1.6 }}>
+              No live user bookings are currently scheduled. As clients register and book personal branding consultations, session details, payments, and statuses will automatically populate here.
+            </Typography>
+            <Chip label="Target Pipeline: 50 Sessions / Mo" color="primary" variant="outlined" sx={{ fontWeight: 600 }} />
           </Paper>
         ) : (
           <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflow: 'hidden' }}>

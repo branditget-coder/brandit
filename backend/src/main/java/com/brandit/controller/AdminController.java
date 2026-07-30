@@ -42,13 +42,13 @@ public class AdminController {
         List<UserAdminResponse> users = userRepository.findAll().stream().map(u -> {
             UserAdminResponse r = new UserAdminResponse();
             r.setId(u.getId());
-            r.setFirstName(u.getFirstName());
-            r.setLastName(u.getLastName());
+            r.setFirstName(u.getFirstName() != null ? u.getFirstName() : "User");
+            r.setLastName(u.getLastName() != null ? u.getLastName() : "");
             r.setEmail(u.getEmail());
             r.setPhone(u.getPhone());
-            r.setRole(u.getRole().name());
+            r.setRole(u.getRole() != null ? u.getRole().name() : "USER");
             r.setEmailVerified(u.isEmailVerified());
-            r.setCreatedAt(u.getCreatedAt());
+            r.setCreatedAt(u.getCreatedAt() != null ? u.getCreatedAt() : java.time.LocalDateTime.now());
             return r;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(users);
