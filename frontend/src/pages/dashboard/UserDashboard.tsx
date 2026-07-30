@@ -68,17 +68,38 @@ export default function UserDashboard() {
           <Typography variant="body1" sx={{ color: brandColors.muted }}>Here's what's happening with your brand journey.</Typography>
         </Box>
 
-        {/* Profile Completion */}
-        <Paper sx={{ p: 3, mb: 4, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-            <Typography variant="body1" sx={{ fontWeight: 600, color: brandColors.text }}>Profile Completion</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.primary }}>{profilePercent}%</Typography>
-          </Box>
-          <LinearProgress variant="determinate" value={profilePercent} sx={{ height: 8, borderRadius: 4, backgroundColor: alpha(brandColors.primary, 0.1), '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${brandColors.primary}, ${brandColors.secondary})` } }} />
-          <Typography variant="caption" sx={{ color: brandColors.muted, mt: 1, display: 'block' }}>
-            {profilePercent < 100 ? 'Add your LinkedIn URL, phone, and bio in My Profile to reach 100%' : 'Your profile is 100% complete! Great job.'}
-          </Typography>
-        </Paper>
+        {/* Profile Completion & Growth Projection */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} md={7}>
+            <Paper sx={{ p: 3, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', height: '100%' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: brandColors.text }}>Profile Completion</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.primary }}>{profilePercent}%</Typography>
+              </Box>
+              <LinearProgress variant="determinate" value={profilePercent} sx={{ height: 8, borderRadius: 4, backgroundColor: alpha(brandColors.primary, 0.1), '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${brandColors.primary}, ${brandColors.secondary})` } }} />
+              <Typography variant="caption" sx={{ color: brandColors.muted, mt: 1.5, display: 'block' }}>
+                {profilePercent < 100 ? 'Add your LinkedIn URL, phone, and bio in My Profile to reach 100%' : 'Your profile is 100% complete! Great job.'}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={5}>
+            <Paper sx={{ p: 3, borderRadius: '20px', border: `1px solid ${brandColors.border}`, backgroundColor: alpha(brandColors.primary, 0.03), boxShadow: 'none', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.primary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Future Career Potential
+                </Typography>
+                <Chip label="+300% Forecast" size="small" sx={{ backgroundColor: alpha(brandColors.success, 0.12), color: '#059669', fontWeight: 700, fontSize: '0.7rem' }} />
+              </Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.5 }}>
+                {profilePercent >= 80 ? '3.8x More Recruiter Inquiries' : 'Unlock 3.8x Recruiter Inquiries'}
+              </Typography>
+              <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                Completing your profile & scheduling personal branding sessions unlocks estimated 4x higher profile reach and premium career opportunities.
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
 
         {/* Stats */}
         <Grid container spacing={2.5} sx={{ mb: 4 }}>
