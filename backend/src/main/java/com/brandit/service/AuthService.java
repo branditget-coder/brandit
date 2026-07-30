@@ -23,10 +23,15 @@ public class AuthService {
     private final JwtTokenProvider tokenProvider;
     private final UserActivityLogRepository activityLogRepository;
 
+    private String cleanEmail(String email) {
+        return email != null ? email.trim().toLowerCase() : "";
+    }
+
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email is already registered");
+        String email = cleanEmail(request.getEmail());
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new IllegalArgumentException("Email is already registered. Please sign in instead.");
         }
 
         User.Role assignedRole = request.getRole() != null ? request.getRole() : User.Role.USER;
@@ -35,9 +40,9 @@ public class AuthService {
         }
 
         User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
+                .firstName(request.getFirstName() != null ? request.getFirstName().trim() : "")
+                .lastName(request.getLastName() != null ? request.getLastName().trim() : "")
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .role(assignedRole)
@@ -64,8 +69,13 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        String email = cleanEmail(request.getEmail());
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (user.getPassword() == null) {
+            throw new IllegalArgumentException("This account was created via social sign-in. Please use social sign-in or reset your password.");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password");
@@ -88,8 +98,9 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse loginWithSocial(String email, String firstName, String lastName, User.AuthProvider provider, String providerId) {
-        User user = userRepository.findByEmail(email).orElseGet(() -> {
+    public AuthResponse loginWithSocial(String rawEmail, String firstName, String lastName, User.AuthProvider provider, String providerId) {
+        String email = cleanEmail(rawEmail);
+        User user = userRepository.findByEmailIgnoreCase(email).orElseGet(() -> {
             User newUser = User.builder()
                     .firstName(firstName != null ? firstName : "User")
                     .lastName(lastName != null ? lastName : "")
@@ -122,8 +133,8 @@ public class AuthService {
         if (!tokenProvider.validateToken(request.getRefreshToken())) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
-        String email = tokenProvider.getEmailFromToken(request.getRefreshToken());
-        User user = userRepository.findByEmail(email)
+        String email = cleanEmail(tokenProvider.getEmailFromToken(request.getRefreshToken()));
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         String newAccessToken = tokenProvider.generateAccessToken(email);
@@ -136,7 +147,8 @@ public class AuthService {
 
     @Transactional
     public void forgotPassword(ForgotPasswordRequest request) {
-        userRepository.findByEmail(request.getEmail()).ifPresent(user -> {
+        String email = cleanEmail(request.getEmail());
+        userRepository.findByEmailIgnoreCase(email).ifPresent(user -> {
             user.setResetPasswordToken(UUID.randomUUID().toString());
             user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1));
             userRepository.save(user);
@@ -170,15 +182,17 @@ public class AuthService {
                 .build());
     }
 
-    public UserDto getCurrentUserDto(String email) {
-        User user = userRepository.findByEmail(email)
+    public UserDto getCurrentUserDto(String rawEmail) {
+        String email = cleanEmail(rawEmail);
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return mapToUserDto(user);
     }
 
     @Transactional
-    public UserDto updateProfile(String email, UpdateProfileRequest request) {
-        User user = userRepository.findByEmail(email)
+    public UserDto updateProfile(String rawEmail, UpdateProfileRequest request) {
+        String email = cleanEmail(rawEmail);
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
@@ -201,8 +215,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void changePassword(String email, ChangePasswordRequest request) {
-        User user = userRepository.findByEmail(email)
+    public void changePassword(String rawEmail, ChangePasswordRequest request) {
+        String email = cleanEmail(rawEmail);
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (user.getPassword() != null && !passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {

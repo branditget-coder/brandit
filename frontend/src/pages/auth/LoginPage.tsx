@@ -51,13 +51,9 @@ export default function LoginPage() {
 
     setLoading(true)
     try {
-      await login(email, password)
-      // Admin redirect by email
-      if (email.toLowerCase() === 'raghavdhir1510@gmail.com') {
-        navigate('/admin')
-      } else {
-        navigate('/dashboard')
-      }
+      const loggedUser = await login(email, password)
+      const defaultRoute = loggedUser.role === 'ADMIN' ? '/admin' : loggedUser.role === 'TEAM' ? '/team' : '/dashboard'
+      navigate(defaultRoute)
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid email or password. Please try again.')
     } finally {

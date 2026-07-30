@@ -14,9 +14,6 @@ import java.net.URI;
  * Custom DataSource configuration that handles Railway's PostgreSQL URL format.
  * Railway provides DATABASE_URL as: postgresql://user:pass@host:port/db
  * JDBC requires:                    jdbc:postgresql://host:port/db (with separate user/pass)
- *
- * By NOT setting spring.datasource.url in application.properties, we prevent Spring
- * Boot's autoconfiguration from creating a broken DataSource bean before this one.
  */
 @Configuration
 @Slf4j
@@ -79,9 +76,9 @@ public class DatabaseConfig {
             }
 
         } else {
-            // ── Local H2 in-memory fallback ──
-            log.info("No DATABASE_URL set. Using H2 in-memory database for local development.");
-            ds.setJdbcUrl("jdbc:h2:mem:branditdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL");
+            // ── Local Persistent H2 fallback ──
+            log.warn("WARNING: No DATABASE_URL set. Using persistent file-based H2 database (./data/branditdb) for local development.");
+            ds.setJdbcUrl("jdbc:h2:file:./data/branditdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL");
             ds.setDriverClassName("org.h2.Driver");
             ds.setUsername("sa");
             ds.setPassword("");

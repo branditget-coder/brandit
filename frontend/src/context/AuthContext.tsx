@@ -21,8 +21,8 @@ interface AuthContextType {
   isAuthenticated: boolean
   isLoading: boolean
   isSessionExpired: boolean
-  login: (email: string, password: string) => Promise<void>
-  register: (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM') => Promise<void>
+  login: (email: string, password: string) => Promise<User>
+  register: (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM') => Promise<User>
   loginWithSocial: (provider: 'google', tokenOrCode: string) => Promise<void>
   logout: () => void
   updateProfile: (data: Partial<User>) => Promise<void>
@@ -129,13 +129,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     resetInactivityTimer()
   }
 
-  const login = async (email: string, password: string) => {
-    const res = await api.post('/auth/login', { email, password })
+  const login = async (email: string, password: string): Promise<User> => {
+    const cleanEmail = email ? email.trim().toLowerCase() : ''
+    const res = await api.post('/auth/login', { email: cleanEmail, password })
     saveAuthSession(res.data.accessToken, res.data.refreshToken, res.data.user)
+    return res.data.user
   }
 
-  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM') => {
-    await api.post('/auth/register', { firstName, lastName, email, password, phone, role })
+  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM'): Promise<User> => {
+    const cleanEmail = email ? email.trim().toLowerCase() : ''
+    const res = await api.post('/auth/register', { firstName, lastName, email: cleanEmail, password, phone, role })
+    saveAuthSession(res.data.accessToken, res.data.refreshToken, res.data.user)
+    return res.data.user
   }
 
   const loginWithSocial = async (provider: 'google', tokenOrCode: string) => {
