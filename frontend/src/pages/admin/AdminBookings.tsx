@@ -77,34 +77,36 @@ export default function AdminBookings() {
             <Chip label="Target Pipeline: 50 Sessions / Mo" color="primary" variant="outlined" sx={{ fontWeight: 600 }} />
           </Paper>
         ) : (
-          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflow: 'hidden' }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1.5fr 1fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
-              {['Client', 'Service', 'Date & Time', 'Status', 'Amount'].map(h => (
-                <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
+          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflowX: 'auto' }}>
+            <Box sx={{ minWidth: 650 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1.5fr 1fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
+                {['Client', 'Service', 'Date & Time', 'Status', 'Amount'].map(h => (
+                  <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
+                ))}
+              </Box>
+              {bookings.map((b, i) => (
+                <Box key={b.id} sx={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1.5fr 1fr', gap: 2, px: 3, py: 2.5, borderBottom: i < bookings.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) }, transition: 'background 0.15s' }}>
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{b.clientName || 'Client'}</Typography>
+                    <Typography variant="caption" sx={{ color: brandColors.muted }}>{b.clientEmail || ''}</Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: brandColors.muted }}>{b.serviceName}</Typography>
+                  <Typography variant="body2" sx={{ color: brandColors.muted }}>{b.preferredDate} {b.preferredTime ? `· ${b.preferredTime}` : ''}</Typography>
+                  <Select
+                    size="small"
+                    value={b.status || 'PENDING'}
+                    onChange={(e) => handleStatusChange(b.id, e.target.value)}
+                    sx={{ height: 32, fontSize: '0.75rem', fontWeight: 600 }}
+                  >
+                    <MenuItem value="PENDING">PENDING</MenuItem>
+                    <MenuItem value="CONFIRMED">CONFIRMED</MenuItem>
+                    <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+                    <MenuItem value="CANCELLED">CANCELLED</MenuItem>
+                  </Select>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text }}>₹{b.amountPaid || '99'}</Typography>
+                </Box>
               ))}
             </Box>
-            {bookings.map((b, i) => (
-              <Box key={b.id} sx={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1.5fr 1fr', gap: 2, px: 3, py: 2.5, borderBottom: i < bookings.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) }, transition: 'background 0.15s' }}>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{b.clientName || 'Client'}</Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.muted }}>{b.clientEmail || ''}</Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: brandColors.muted }}>{b.serviceName}</Typography>
-                <Typography variant="body2" sx={{ color: brandColors.muted }}>{b.preferredDate} {b.preferredTime ? `· ${b.preferredTime}` : ''}</Typography>
-                <Select
-                  size="small"
-                  value={b.status || 'PENDING'}
-                  onChange={(e) => handleStatusChange(b.id, e.target.value)}
-                  sx={{ height: 32, fontSize: '0.75rem', fontWeight: 600 }}
-                >
-                  <MenuItem value="PENDING">PENDING</MenuItem>
-                  <MenuItem value="CONFIRMED">CONFIRMED</MenuItem>
-                  <MenuItem value="COMPLETED">COMPLETED</MenuItem>
-                  <MenuItem value="CANCELLED">CANCELLED</MenuItem>
-                </Select>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text }}>₹{b.amountPaid || '99'}</Typography>
-              </Box>
-            ))}
           </Paper>
         )}
       </motion.div>

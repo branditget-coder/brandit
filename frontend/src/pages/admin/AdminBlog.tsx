@@ -101,30 +101,32 @@ export default function AdminBlog() {
             <Typography variant="body2" sx={{ color: brandColors.muted }}>No blog posts created yet.</Typography>
           </Paper>
         ) : (
-          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflow: 'hidden' }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '3fr 1.5fr 1fr 1fr 60px', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
-              {['Title', 'Category', 'Status', 'Date', ''].map(h => (
-                <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
-              ))}
-            </Box>
-            {posts.map((p, i) => {
-              const formattedDate = p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'
-              return (
-                <Box key={p.id} sx={{ display: 'grid', gridTemplateColumns: '3fr 1.5fr 1fr 1fr 60px', gap: 2, px: 3, py: 2.5, borderBottom: i < posts.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) } }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{p.title}</Typography>
-                  <Typography variant="body2" sx={{ color: brandColors.muted }}>{p.category || 'General'}</Typography>
-                  <Box sx={{ px: 1.5, py: 0.5, borderRadius: '100px', backgroundColor: p.published ? alpha(brandColors.success, 0.1) : alpha(brandColors.muted, 0.1), display: 'inline-flex', alignItems: 'center', width: 'fit-content' }}>
-                    <Typography variant="caption" sx={{ color: p.published ? '#059669' : brandColors.muted, fontWeight: 700 }}>{p.published ? 'Published' : 'Draft'}</Typography>
-                  </Box>
-                  <Typography variant="caption" sx={{ color: brandColors.muted }}>{formattedDate}</Typography>
-                  <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    <Box onClick={() => handleDelete(p.id)} sx={{ p: 0.75, borderRadius: '8px', cursor: 'pointer', '&:hover': { backgroundColor: alpha('#EF4444', 0.08) } }}>
-                      <FiTrash2 size={16} color="#EF4444" />
+          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflowX: 'auto' }}>
+            <Box sx={{ minWidth: 650 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '3fr 1.5fr 1fr 1fr 60px', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
+                {['Title', 'Category', 'Status', 'Date', ''].map(h => (
+                  <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
+                ))}
+              </Box>
+              {posts.map((p, i) => {
+                const formattedDate = p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'
+                return (
+                  <Box key={p.id} sx={{ display: 'grid', gridTemplateColumns: '3fr 1.5fr 1fr 1fr 60px', gap: 2, px: 3, py: 2.5, borderBottom: i < posts.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) } }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{p.title}</Typography>
+                    <Typography variant="body2" sx={{ color: brandColors.muted }}>{p.category || 'General'}</Typography>
+                    <Box sx={{ px: 1.5, py: 0.5, borderRadius: '100px', backgroundColor: p.published ? alpha(brandColors.success, 0.1) : alpha(brandColors.muted, 0.1), display: 'inline-flex', alignItems: 'center', width: 'fit-content' }}>
+                      <Typography variant="caption" sx={{ color: p.published ? '#059669' : brandColors.muted, fontWeight: 700 }}>{p.published ? 'Published' : 'Draft'}</Typography>
+                    </Box>
+                    <Typography variant="caption" sx={{ color: brandColors.muted }}>{formattedDate}</Typography>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <Box onClick={() => handleDelete(p.id)} sx={{ p: 0.75, borderRadius: '8px', cursor: 'pointer', '&:hover': { backgroundColor: alpha('#EF4444', 0.08) } }}>
+                        <FiTrash2 size={16} color="#EF4444" />
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              )
-            })}
+                )
+              })}
+            </Box>
           </Paper>
         )}
       </motion.div>

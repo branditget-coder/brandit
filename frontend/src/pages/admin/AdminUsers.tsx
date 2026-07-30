@@ -90,8 +90,9 @@ export default function AdminUsers() {
             <CircularProgress color="primary" />
           </Box>
         ) : (
-          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflow: 'hidden' }}>
-            {/* Header */}
+          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflowX: 'auto' }}>
+            <Box sx={{ minWidth: 650 }}>
+              {/* Header */}
             <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
               {['User', 'Email', 'Role', 'Joined', 'Status'].map(h => (
                 <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
@@ -127,6 +128,7 @@ export default function AdminUsers() {
                 )
               })
             )}
+            </Box>
           </Paper>
         )}
       </motion.div>
