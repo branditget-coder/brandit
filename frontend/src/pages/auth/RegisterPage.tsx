@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import {
-  Box, Typography, TextField, Button, Divider, Link, InputAdornment,
-  IconButton, alpha, CircularProgress, Grid, Alert, Dialog, DialogTitle,
-  DialogContent, DialogActions
+  Box, Typography, TextField, Button, Link, InputAdornment,
+  IconButton, alpha, CircularProgress, Grid, Alert, Chip
 } from '@mui/material'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { FiEye, FiEyeOff, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
-import { FcGoogle } from 'react-icons/fc'
+import { motion, AnimatePresence } from 'framer-motion'
+import { FiEye, FiEyeOff, FiArrowRight, FiBriefcase, FiUsers, FiCheckCircle } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
 import BrandLogo from '../../components/common/BrandLogo'
 
+type UserType = 'client' | 'team'
+
 export default function RegisterPage() {
+  // Step 1: role selection, Step 2: form
+  const [step, setStep] = useState<1 | 2>(1)
+  const [userType, setUserType] = useState<UserType | null>(null)
+
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -21,33 +25,22 @@ export default function RegisterPage() {
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Google Modal state
-  const [googleModal, setGoogleModal] = useState<boolean>(false)
-  const [socialEmail, setSocialEmail] = useState('')
-  const [socialFirstName, setSocialFirstName] = useState('')
-  const [socialLastName, setSocialLastName] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const navigate = useNavigate()
-  const { register, loginWithSocial } = useAuth()
+  const { register } = useAuth()
+
+  const handleSelectRole = (type: UserType) => {
+    setUserType(type)
+    setStep(2)
+    setError(null)
+  }
 
   const validateForm = () => {
-    if (!firstName.trim()) {
-      setError('First name is required.')
-      return false
-    }
-    if (!lastName.trim()) {
-      setError('Last name is required.')
-      return false
-    }
-    if (!email || !email.includes('@') || !email.includes('.')) {
-      setError('Please enter a valid email address.')
-      return false
-    }
-    if (!password || password.length < 8) {
-      setError('Password must be at least 8 characters long.')
-      return false
-    }
+    if (!firstName.trim()) { setError('First name is required.'); return false }
+    if (!lastName.trim()) { setError('Last name is required.'); return false }
+    if (!email || !email.includes('@') || !email.includes('.')) { setError('Please enter a valid email address.'); return false }
+    if (!password || password.length < 8) { setError('Password must be at least 8 characters.'); return false }
     return true
   }
 
@@ -59,11 +52,12 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       await register(firstName, lastName, email, password, phone)
-      if (email.toLowerCase() === 'raghavdhir1510@gmail.com') {
-        navigate('/admin')
-      } else {
-        navigate('/dashboard')
-      }
+      // After register, clear session data — user must log in manually
+      localStorage.removeItem('brandit_access_token')
+      localStorage.removeItem('brandit_refresh_token')
+      localStorage.removeItem('brandit_user')
+      setSuccess(true)
+      setTimeout(() => navigate('/login'), 2000)
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.')
     } finally {
@@ -71,237 +65,272 @@ export default function RegisterPage() {
     }
   }
 
-  const handleOpenGoogle = () => {
-    setGoogleModal(true)
-    setSocialEmail('newuser@gmail.com')
-    setSocialFirstName('Google')
-    setSocialLastName('User')
-  }
-
-  const handleConfirmGoogle = async () => {
-    setError(null)
-    setLoading(true)
-    try {
-      const mockToken = 'google_register_token_' + Date.now()
-      await loginWithSocial('google', mockToken)
-      setGoogleModal(false)
-      navigate('/dashboard')
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Google sign-up failed.')
-    } finally {
-      setLoading(false)
-    }
+  const roleConfig = {
+    client: {
+      icon: <FiBriefcase size={26} />,
+      title: 'I\'m a Client',
+      subtitle: 'Looking for branding, career coaching, or consulting services',
+      color: brandColors.primary,
+    },
+    team: {
+      icon: <FiUsers size={26} />,
+      title: 'I\'m a Team Member',
+      subtitle: 'Part of the BrandIt team — mentors, coaches, and specialists',
+      color: '#7C3AED',
+    },
   }
 
   return (
     <Box sx={{ width: '100%' }}>
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        {/* Logo & Slogan */}
         <Box sx={{ mb: 4 }}>
           <BrandLogo variant="dark" size="medium" showSlogan={true} />
         </Box>
 
-        <Box sx={{ p: { xs: 3, sm: 4 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.05)' }}>
-          <Typography variant="h3" sx={{ mb: 0.75 }}>Create your account</Typography>
-          <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>
-            Start building your personal brand and unlock career opportunities.
-          </Typography>
+        <Box sx={{
+          p: { xs: 3, sm: 4 },
+          borderRadius: '24px',
+          border: `1px solid ${brandColors.border}`,
+          backgroundColor: '#fff',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        }}>
+          <AnimatePresence mode="wait">
 
-          {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
-
-          {/* Prominent Google Sign Up Button */}
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={handleOpenGoogle}
-            startIcon={<FcGoogle size={22} />}
-            sx={{
-              py: 1.5,
-              mb: 3,
-              borderRadius: '12px',
-              borderColor: brandColors.border,
-              color: brandColors.text,
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              textTransform: 'none',
-              backgroundColor: '#fff',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              '&:hover': { backgroundColor: alpha(brandColors.primary, 0.04), borderColor: brandColors.primary },
-            }}
-          >
-            Sign up with Google
-          </Button>
-
-          <Divider sx={{ my: 3, fontSize: '0.75rem', color: brandColors.muted, '&::before, &::after': { borderColor: brandColors.border } }}>
-            OR REGISTER WITH EMAIL
-          </Divider>
-
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
-                  First Name *
+            {/* ── STEP 1: Role Selection ── */}
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Typography variant="h3" sx={{ mb: 0.75 }}>Create your account</Typography>
+                <Typography variant="body2" sx={{ color: brandColors.muted, mb: 4 }}>
+                  First, tell us who you are so we can personalise your experience.
                 </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="Hritika"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  variant="outlined"
-                  size="medium"
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
-                  Last Name *
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {(['client', 'team'] as UserType[]).map((type) => {
+                    const cfg = roleConfig[type]
+                    return (
+                      <Box
+                        key={type}
+                        id={`register-role-${type}`}
+                        onClick={() => handleSelectRole(type)}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 2,
+                          p: 2.5,
+                          borderRadius: '16px',
+                          border: `1.5px solid ${brandColors.border}`,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            borderColor: cfg.color,
+                            backgroundColor: alpha(cfg.color, 0.04),
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 8px 24px ${alpha(cfg.color, 0.12)}`,
+                          },
+                        }}
+                      >
+                        <Box sx={{
+                          width: 52, height: 52, borderRadius: '14px',
+                          backgroundColor: alpha(cfg.color, 0.1),
+                          color: cfg.color,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          {cfg.icon}
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: brandColors.text }}>
+                            {cfg.title}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block' }}>
+                            {cfg.subtitle}
+                          </Typography>
+                        </Box>
+                        <FiArrowRight size={18} color={brandColors.muted} />
+                      </Box>
+                    )
+                  })}
+                </Box>
+
+                <Typography variant="body2" sx={{ mt: 3, textAlign: 'center', color: brandColors.muted }}>
+                  Already have an account?{' '}
+                  <Link component={RouterLink} to="/login" underline="hover" sx={{ color: brandColors.primary, fontWeight: 700 }}>
+                    Sign in
+                  </Link>
                 </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="Seth"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  variant="outlined"
-                  size="medium"
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-                />
-              </Grid>
-            </Grid>
+              </motion.div>
+            )}
 
-            <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
-              Email Address *
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="you@domain.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              variant="outlined"
-              size="medium"
-              sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-            />
+            {/* ── STEP 2: Registration Form ── */}
+            {step === 2 && !success && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.75 }}>
+                  <Typography variant="h3">Create your account</Typography>
+                  <Chip
+                    label={userType === 'client' ? 'Client' : 'Team Member'}
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      backgroundColor: alpha(userType === 'team' ? '#7C3AED' : brandColors.primary, 0.1),
+                      color: userType === 'team' ? '#7C3AED' : brandColors.primary,
+                    }}
+                  />
+                </Box>
+                <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>
+                  Fill in your details to get started.{' '}
+                  <Box
+                    component="span"
+                    onClick={() => { setStep(1); setError(null) }}
+                    sx={{ color: brandColors.primary, cursor: 'pointer', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    Change role
+                  </Box>
+                </Typography>
 
-            <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
-              Phone Number (Optional)
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="+91 9876543210"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              variant="outlined"
-              size="medium"
-              sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-            />
+                {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
 
-            <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
-              Password (Min 8 characters) *
-            </Typography>
-            <TextField
-              fullWidth
-              type={showPwd ? 'text' : 'password'}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              variant="outlined"
-              size="medium"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton size="small" onClick={() => setShowPwd(!showPwd)} edge="end">
-                      {showPwd ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 3, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-            />
+                <Box component="form" onSubmit={handleSubmit}>
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
+                        First Name *
+                      </Typography>
+                      <TextField
+                        fullWidth id="register-first-name"
+                        placeholder="Hritika"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        variant="outlined" size="medium"
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
+                        Last Name *
+                      </Typography>
+                      <TextField
+                        fullWidth id="register-last-name"
+                        placeholder="Seth"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        variant="outlined" size="medium"
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                      />
+                    </Grid>
+                  </Grid>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-              endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <FiArrowRight size={18} />}
-              sx={{
-                py: 1.5,
-                borderRadius: '12px',
-                backgroundColor: brandColors.primary,
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                textTransform: 'none',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
-                '&:hover': { backgroundColor: alpha(brandColors.primary, 0.9) },
-              }}
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </Button>
-          </Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
+                    Email Address *
+                  </Typography>
+                  <TextField
+                    fullWidth id="register-email"
+                    placeholder="you@domain.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    variant="outlined" size="medium"
+                    sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
 
-          <Typography variant="body2" sx={{ mt: 3, textAlign: 'center', color: brandColors.muted }}>
-            Already have an account?{' '}
-            <Link component={RouterLink} to="/login" underline="hover" sx={{ color: brandColors.primary, fontWeight: 700 }}>
-              Sign in
-            </Link>
-          </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
+                    Phone Number (Optional)
+                  </Typography>
+                  <TextField
+                    fullWidth id="register-phone"
+                    placeholder="+91 9876543210"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    variant="outlined" size="medium"
+                    sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
+
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
+                    Password (Min 8 characters) *
+                  </Typography>
+                  <TextField
+                    fullWidth id="register-password"
+                    type={showPwd ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    variant="outlined" size="medium"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton size="small" onClick={() => setShowPwd(!showPwd)} edge="end">
+                            {showPwd ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ mb: 3, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                  />
+
+                  <Button
+                    id="register-submit"
+                    type="submit" fullWidth variant="contained" disabled={loading}
+                    endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <FiArrowRight size={18} />}
+                    sx={{
+                      py: 1.5, borderRadius: '12px',
+                      backgroundColor: brandColors.primary,
+                      fontWeight: 700, fontSize: '0.95rem', textTransform: 'none',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+                      '&:hover': { backgroundColor: alpha(brandColors.primary, 0.9) },
+                    }}
+                  >
+                    {loading ? 'Creating Account...' : 'Create Account'}
+                  </Button>
+                </Box>
+
+                <Typography variant="body2" sx={{ mt: 3, textAlign: 'center', color: brandColors.muted }}>
+                  Already have an account?{' '}
+                  <Link component={RouterLink} to="/login" underline="hover" sx={{ color: brandColors.primary, fontWeight: 700 }}>
+                    Sign in
+                  </Link>
+                </Typography>
+              </motion.div>
+            )}
+
+            {/* ── Success State ── */}
+            {success && (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Box sx={{
+                    width: 72, height: 72, borderRadius: '50%',
+                    backgroundColor: alpha('#10B981', 0.1),
+                    color: '#10B981',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    mx: 'auto', mb: 3,
+                  }}>
+                    <FiCheckCircle size={36} />
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>Account Created!</Typography>
+                  <Typography variant="body2" sx={{ color: brandColors.muted }}>
+                    Redirecting you to sign in...
+                  </Typography>
+                </Box>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
         </Box>
       </motion.div>
-
-      {/* Google OAuth Dialog */}
-      <Dialog open={googleModal} onClose={() => setGoogleModal(false)} PaperProps={{ style: { borderRadius: 20, padding: 8 } }}>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 700 }}>
-          <FcGoogle size={24} />
-          Register with Google
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ color: brandColors.muted, mb: 2 }}>
-            Confirm your details to create your BrandIt account via Google OAuth.
-          </Typography>
-          <TextField
-            fullWidth
-            label="Google Account Email"
-            value={socialEmail}
-            onChange={(e) => setSocialEmail(e.target.value)}
-            sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-          />
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="First Name"
-                value={socialFirstName}
-                onChange={(e) => setSocialFirstName(e.target.value)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Last Name"
-                value={socialLastName}
-                onChange={(e) => setSocialLastName(e.target.value)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setGoogleModal(false)} color="inherit">Cancel</Button>
-          <Button
-            onClick={handleConfirmGoogle}
-            variant="contained"
-            disabled={loading}
-            startIcon={<FiCheckCircle />}
-            sx={{
-              borderRadius: '12px',
-              backgroundColor: brandColors.primary,
-              fontWeight: 700,
-            }}
-          >
-            Create Account
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   )
 }

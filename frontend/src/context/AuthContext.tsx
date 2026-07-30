@@ -71,8 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string) => {
-    const res = await api.post('/auth/register', { firstName, lastName, email, password, phone })
-    saveAuthSession(res.data.accessToken, res.data.refreshToken, res.data.user)
+    // Register account — do NOT auto-login. User will be redirected to /login.
+    await api.post('/auth/register', { firstName, lastName, email, password, phone })
   }
 
   const loginWithSocial = async (provider: 'google', tokenOrCode: string) => {
