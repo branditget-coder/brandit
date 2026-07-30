@@ -11,15 +11,9 @@ const footerLinks = {
     { label: 'Branding + Network Growth (₹400/mo)', href: '/services#branding-network' },
     { label: 'LinkedIn Consulting (₹250/mo)', href: '/services#linkedin-consulting' },
   ],
-  'Blogs & Guides': [
-    { label: 'LinkedIn Tips & Growth', href: '/blogs?category=linkedin' },
-    { label: 'Interview Q&A Guide', href: '/blogs?category=interview' },
-    { label: 'Viral Posts & Copywriting', href: '/blogs?category=posts' },
-    { label: 'Entrepreneurship & Founders', href: '/blogs?category=entrepreneurship' },
-    { label: 'All Articles & Guides', href: '/blogs' },
-  ],
   Company: [
     { label: 'About Us & Team', href: '/about' },
+    { label: 'Blogs & Articles', href: '/blogs' },
     { label: 'Our Process', href: '/about#process' },
     { label: 'Pricing & Plans', href: '/pricing' },
     { label: 'Contact Us', href: '/contact' },
@@ -121,7 +115,7 @@ export default function Footer() {
 
           {/* Links Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
-            <Grid item xs={6} sm={3} md={2} key={title}>
+            <Grid item xs={6} sm={4} md={2.5} key={title}>
               <Typography
                 variant="caption"
                 sx={{ color: '#6B7280', display: 'block', mb: 2.5, letterSpacing: '0.08em', fontWeight: 700 }}
