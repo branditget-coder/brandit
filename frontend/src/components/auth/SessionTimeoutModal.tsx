@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, Typography, Button, Box, alpha } from '@mui/material'
 import { FiClock, FiLogIn } from 'react-icons/fi'
-import { useNavigate } from 'react-router-dom'
 import { brandColors } from '../../theme'
 
 interface SessionTimeoutModalProps {
@@ -9,11 +8,9 @@ interface SessionTimeoutModalProps {
 }
 
 export default function SessionTimeoutModal({ open, onClose }: SessionTimeoutModalProps) {
-  const navigate = useNavigate()
-
   const handleLoginAgain = () => {
     onClose()
-    navigate('/login')
+    window.location.href = '/login'
   }
 
   return (

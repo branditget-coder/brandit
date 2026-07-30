@@ -8,6 +8,8 @@ import { AuthProvider } from './context/AuthContext'
 
 import ErrorBoundary from './components/common/ErrorBoundary.tsx'
 
+import { BrowserRouter } from 'react-router-dom'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -23,9 +25,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <AuthProvider>
-            <App />
-          </AuthProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </BrowserRouter>
         </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
