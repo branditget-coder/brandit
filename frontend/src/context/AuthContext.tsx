@@ -35,8 +35,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('brandit_user')
-    return saved ? JSON.parse(saved) : null
+    try {
+      const saved = localStorage.getItem('brandit_user')
+      if (saved && saved !== 'undefined' && saved !== 'null') {
+        return JSON.parse(saved)
+      }
+    } catch (e) {
+      console.error('Failed to parse cached user:', e)
+      localStorage.removeItem('brandit_user')
+    }
+    return null
   })
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isSessionExpired, setIsSessionExpired] = useState<boolean>(false)
@@ -95,18 +103,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('brandit_access_token')
-      if (token) {
-        try {
+      try {
+        const token = localStorage.getItem('brandit_access_token')
+        if (token) {
           const res = await api.get<User>('/auth/me')
           setUser(res.data)
           localStorage.setItem('brandit_user', JSON.stringify(res.data))
-        } catch {
-          // Token invalid
-          logout()
         }
+      } catch (err) {
+        // Token invalid or network error
+        logout()
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
     checkAuthStatus()
   }, [logout])

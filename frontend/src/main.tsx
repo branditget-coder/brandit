@@ -6,6 +6,8 @@ import App from './App.tsx'
 import theme from './theme'
 import { AuthProvider } from './context/AuthContext'
 
+import ErrorBoundary from './components/common/ErrorBoundary.tsx'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -17,14 +19,16 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 )
 
