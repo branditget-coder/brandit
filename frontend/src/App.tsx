@@ -34,6 +34,9 @@ import AdminBookings from './pages/admin/AdminBookings'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
 import NotFoundPage from './pages/NotFoundPage'
 
+// Auth Guards
+import ProtectedRoute, { PublicOnlyRoute } from './components/auth/ProtectedRoute'
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -53,28 +56,34 @@ export default function App() {
             <Route path="/refund" element={<RefundPage />} />
           </Route>
 
-          {/* Auth Routes */}
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          {/* Auth Routes (Public Only - Redirects if already logged in) */}
+          <Route element={<PublicOnlyRoute />}>
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            </Route>
           </Route>
 
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<UserDashboard />} />
-            <Route path="bookings" element={<MyBookings />} />
-            <Route path="invoices" element={<MyInvoices />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="resume-builder" element={<ResumeBuilder />} />
+          {/* Protected Client Dashboard Routes (USER & ADMIN) */}
+          <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<UserDashboard />} />
+              <Route path="bookings" element={<MyBookings />} />
+              <Route path="invoices" element={<MyInvoices />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="resume-builder" element={<ResumeBuilder />} />
+            </Route>
           </Route>
 
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="bookings" element={<AdminBookings />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
+          {/* Strict Protected Admin Routes (ADMIN ONLY) */}
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="bookings" element={<AdminBookings />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
