@@ -45,6 +45,20 @@ public class PublicController {
         return ResponseEntity.ok(new MessageResponse("Thank you! Your message has been received. We will contact you within 24 hours."));
     }
 
+    @GetMapping("/test-email")
+    public ResponseEntity<MessageResponse> testEmail(@RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
+        emailService.sendBookingConfirmation(
+                to,
+                "Valued Client (Test)",
+                "Profile Setup + Branding (₹320/mo)",
+                java.time.LocalDate.now().plusDays(2).toString(),
+                "10:00 AM - 10:30 AM",
+                "₹320",
+                "TEST_PAY_" + System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(new MessageResponse("Test HTML email dispatched successfully to: " + to));
+    }
+
     @PostMapping("/newsletter")
     public ResponseEntity<MessageResponse> subscribeNewsletter(@Valid @RequestBody NewsletterRequest request) {
         if (newsletterRepository.existsByEmail(request.getEmail())) {
