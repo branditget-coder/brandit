@@ -142,7 +142,7 @@ export default function TeamConsultations() {
                     <TableCell sx={{ fontWeight: 700 }}>Service Package</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Preferred Date & Time</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: 700, textAlign: 'right' }}>Update Status</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700 }}>Update Status</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -182,7 +182,7 @@ export default function TeamConsultations() {
                       <TableCell>
                         {getStatusChip(booking.status)}
                       </TableCell>
-                      <TableCell textAlign="right">
+                      <TableCell align="right">
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
                           {booking.status === 'PENDING' && (
                             <Button size="small" variant="contained" color="success" onClick={() => handleStatusUpdate(booking.id, 'CONFIRMED')} sx={{ borderRadius: '8px', fontSize: '0.78rem', textTransform: 'none' }}>

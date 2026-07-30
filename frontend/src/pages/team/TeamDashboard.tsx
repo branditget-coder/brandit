@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   Box, Typography, Grid, Paper, Chip, Button, Stack, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, Avatar, alpha, CircularProgress, Tooltip
+  TableCell, TableContainer, TableHead, TableRow, Avatar, alpha, CircularProgress, Tooltip, IconButton
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import {
@@ -191,7 +191,7 @@ export default function TeamDashboard() {
                         <TableCell sx={{ fontWeight: 700 }}>Package</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Date & Time</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
-                        <TableCell sx={{ fontWeight: 700, textAlign: 'right' }}>Actions</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700 }}>Actions</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -224,7 +224,7 @@ export default function TeamDashboard() {
                           <TableCell>
                             {getStatusChip(booking.status)}
                           </TableCell>
-                          <TableCell textAlign="right">
+                          <TableCell align="right">
                             <Stack direction="row" spacing={1} justifyContent="flex-end">
                               {booking.status === 'PENDING' && (
                                 <Button size="small" variant="contained" color="success" onClick={() => handleStatusUpdate(booking.id, 'CONFIRMED')} sx={{ borderRadius: '8px', fontSize: '0.75rem', textTransform: 'none', py: 0.4, px: 1.2 }}>
