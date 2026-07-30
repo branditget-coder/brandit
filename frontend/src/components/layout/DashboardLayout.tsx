@@ -19,7 +19,6 @@ const navItems = [
   { label: 'Overview', href: '/dashboard', icon: FiHome },
   { label: 'My Bookings', href: '/dashboard/bookings', icon: FiCalendar },
   { label: 'Invoices', href: '/dashboard/invoices', icon: FiFileText },
-  { label: 'Resume Builder', href: '/dashboard/resume-builder', icon: FiBookOpen },
   { label: 'Profile', href: '/dashboard/profile', icon: FiUser },
 ]
 
@@ -94,7 +93,7 @@ export default function DashboardLayout() {
             border: `1px solid ${brandColors.border}`,
           }}
         >
-          <Avatar sx={{ width: 36, height: 36, bgcolor: brandColors.primary, fontSize: '0.875rem', fontWeight: 700 }}>
+          <Avatar src={user?.avatarUrl} sx={{ width: 36, height: 36, bgcolor: brandColors.primary, fontSize: '0.875rem', fontWeight: 700, '& img': { objectFit: 'cover' } }}>
             {userInitials}
           </Avatar>
           <Box sx={{ flex: 1, minWidth: 0 }}>

@@ -74,4 +74,11 @@ public class AuthController {
                                                  @RequestBody UpdateProfileRequest request) {
         return ResponseEntity.ok(authService.updateProfile(userDetails.getUsername(), request));
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<MessageResponse> changePassword(@AuthenticationPrincipal UserDetails userDetails,
+                                                          @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(userDetails.getUsername(), request);
+        return ResponseEntity.ok(new MessageResponse("Password has been changed successfully."));
+    }
 }

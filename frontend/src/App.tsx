@@ -25,7 +25,6 @@ import UserDashboard from './pages/dashboard/UserDashboard'
 import MyBookings from './pages/dashboard/MyBookings'
 import MyInvoices from './pages/dashboard/MyInvoices'
 import ProfilePage from './pages/dashboard/ProfilePage'
-import ResumeBuilder from './pages/dashboard/ResumeBuilder'
 
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -72,7 +71,6 @@ export default function App() {
               <Route path="bookings" element={<MyBookings />} />
               <Route path="invoices" element={<MyInvoices />} />
               <Route path="profile" element={<ProfilePage />} />
-              <Route path="resume-builder" element={<ResumeBuilder />} />
             </Route>
           </Route>
 

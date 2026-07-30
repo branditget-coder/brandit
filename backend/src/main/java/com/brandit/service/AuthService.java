@@ -182,6 +182,7 @@ public class AuthService {
         if (request.getLinkedinUrl() != null) user.setLinkedinUrl(request.getLinkedinUrl());
         if (request.getCurrentRole() != null) user.setCurrentRole(request.getCurrentRole());
         if (request.getBio() != null) user.setBio(request.getBio());
+        if (request.getAvatarUrl() != null) user.setAvatarUrl(request.getAvatarUrl());
 
         User updatedUser = userRepository.save(user);
 
@@ -192,6 +193,25 @@ public class AuthService {
                 .build());
 
         return mapToUserDto(updatedUser);
+    }
+
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (user.getPassword() != null && !passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        activityLogRepository.save(UserActivityLog.builder()
+                .user(user)
+                .action("CHANGE_PASSWORD_SUCCESS")
+                .metadataJson("Password updated from profile security settings")
+                .build());
     }
 
     public UserDto mapToUserDto(User user) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Grid, Typography, Paper, Chip, Button, Stack, LinearProgress, alpha, CircularProgress } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiCalendar, FiFileText, FiArrowRight, FiCheckCircle, FiClock } from 'react-icons/fi'
+import { FiCalendar, FiFileText, FiArrowRight, FiCheckCircle, FiClock, FiUser } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -161,8 +161,8 @@ export default function UserDashboard() {
               <Stack spacing={1.5}>
                 {[
                   { label: 'Book a Consultation', href: '/book', icon: FiCalendar },
-                  { label: 'Build My Resume', href: '/dashboard/resume-builder', icon: FiFileText },
-                  { label: 'View Invoices', href: '/dashboard/invoices', icon: FiFileText },
+                  { label: 'View My Invoices', href: '/dashboard/invoices', icon: FiFileText },
+                  { label: 'Update Profile & Security', href: '/dashboard/profile', icon: FiUser },
                 ].map(a => (
                   <Button key={a.label} component={RouterLink} to={a.href} variant="outlined" fullWidth startIcon={<a.icon size={16} />} sx={{ justifyContent: 'flex-start', px: 2.5, borderColor: brandColors.border, color: brandColors.text, '&:hover': { borderColor: brandColors.primary, color: brandColors.primary, backgroundColor: alpha(brandColors.primary, 0.04), boxShadow: 'none', transform: 'none' } }}>
                     {a.label}
