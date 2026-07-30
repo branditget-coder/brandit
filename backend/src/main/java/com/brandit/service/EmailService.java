@@ -33,6 +33,9 @@ public class EmailService {
     @Value("${resend.api.key:${RESEND_API_KEY:}}")
     private String resendApiKey;
 
+    @Value("${brevo.api.key:${BREVO_API_KEY:}}")
+    private String brevoApiKey;
+
     @Value("${app.mail.from:brandit.get@gmail.com}")
     private String fromEmail;
 
@@ -198,7 +201,7 @@ public class EmailService {
     }
 
     /**
-     * Core Dispatcher: Prioritizes HTTPS REST API (Port 443 - Railway Unblocked), with SMTP Fallback
+     * Core Dispatcher: Supports Brevo & Resend HTTPS REST APIs (Port 443 - Railway Unblocked), with SMTP Fallback
      */
     private void dispatchEmail(String to, String subject, String htmlBody) {
         log.info("================ EMAIL DISPATCH LOG ================");
@@ -207,10 +210,45 @@ public class EmailService {
         log.info("====================================================");
 
         CompletableFuture.runAsync(() -> {
-            // Method A: Resend HTTPS REST API (Port 443 - Never blocked on Railway)
+            // Option 1: Brevo HTTPS REST API (Free 300 emails/day to ANY address WITHOUT custom domain requirement)
+            if (brevoApiKey != null && !brevoApiKey.isBlank() && brevoApiKey.startsWith("xkeysib-")) {
+                try {
+                    Map<String, Object> senderMap = Map.of("name", "BrandIt Consulting", "email", fromEmail != null ? fromEmail : "brandit.get@gmail.com");
+                    Map<String, Object> recipientMap = Map.of("email", to);
+
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("sender", senderMap);
+                    payload.put("to", List.of(recipientMap));
+                    payload.put("subject", subject);
+                    payload.put("htmlContent", htmlBody);
+
+                    String jsonPayload = objectMapper.writeValueAsString(payload);
+
+                    HttpRequest httpRequest = HttpRequest.newBuilder()
+                            .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
+                            .header("api-key", brevoApiKey.trim())
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                            .timeout(Duration.ofSeconds(5))
+                            .build();
+
+                    HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+                    if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                        log.info("Successfully sent email via Brevo HTTPS REST API (HTTP {}) to {}", response.statusCode(), to);
+                        return;
+                    } else {
+                        log.warn("Brevo HTTPS API returned status {}: {}", response.statusCode(), response.body());
+                    }
+                } catch (Exception e) {
+                    log.warn("Brevo HTTPS API error: {}", e.getMessage());
+                }
+            }
+
+            // Option 2: Resend HTTPS REST API (Port 443)
             if (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")) {
                 try {
-                    String sender = "BrandIt <onboarding@resend.dev>"; // Official Resend test sender or custom domain
+                    String sender = "BrandIt <onboarding@resend.dev>";
                     
                     Map<String, Object> payload = new HashMap<>();
                     payload.put("from", sender);
@@ -241,7 +279,7 @@ public class EmailService {
                 }
             }
 
-            // Method B: JavaMailSender SMTP (Fallback)
+            // Option 3: JavaMailSender SMTP (Fallback)
             if (mailSender != null) {
                 try {
                     MimeMessage message = mailSender.createMimeMessage();
