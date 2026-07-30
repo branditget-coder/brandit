@@ -77,9 +77,9 @@ export default function AdminLayout() {
 
   const DrawerContent = () => (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ p: 3, pb: 2 }}>
+      <Box sx={{ p: 3, pb: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1.5 }}>
         <BrandLogo variant="dark" size="small" />
-        <Chip label="Official Admin" size="small" sx={{ mt: 1, bgcolor: alpha(brandColors.primary, 0.1), color: brandColors.primary, fontWeight: 700, fontSize: '0.7rem' }} />
+        <Chip label="Official Admin" size="small" sx={{ bgcolor: alpha(brandColors.primary, 0.1), color: brandColors.primary, fontWeight: 700, fontSize: '0.7rem' }} />
       </Box>
 
       <Divider sx={{ mx: 2, borderColor: brandColors.border }} />
@@ -118,17 +118,17 @@ export default function AdminLayout() {
       <Divider sx={{ mx: 2, borderColor: brandColors.border }} />
 
       <Box sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, borderRadius: '12px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}` }}>
-          <Avatar sx={{ width: 36, height: 36, bgcolor: brandColors.primary, color: '#fff', fontSize: '0.875rem', fontWeight: 700 }}>RD</Avatar>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.8rem' }} noWrap>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, p: 1.5, borderRadius: '14px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}`, width: '100%', overflow: 'hidden' }}>
+          <Avatar sx={{ width: 34, height: 34, flexShrink: 0, bgcolor: brandColors.primary, color: '#fff', fontSize: '0.8rem', fontWeight: 700 }}>RD</Avatar>
+          <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.78rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user ? `${user.firstName} ${user.lastName}` : 'Raghav Dhir'}
             </Typography>
-            <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.7rem' }} noWrap>
+            <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.65rem', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user ? user.email : 'raghavdhir1510@gmail.com'}
             </Typography>
           </Box>
-          <IconButton size="small" onClick={handleLogout} aria-label="Log out">
+          <IconButton size="small" onClick={handleLogout} aria-label="Log out" sx={{ flexShrink: 0, p: 0.5, '&:hover': { backgroundColor: alpha('#EF4444', 0.1) } }}>
             <FiLogOut size={15} color={brandColors.muted} />
           </IconButton>
         </Box>

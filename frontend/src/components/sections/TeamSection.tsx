@@ -5,12 +5,20 @@ import { brandColors } from '../../theme'
 
 const team = [
   {
+    name: 'Raghav Dhir',
+    role: 'Founder & Lead Tech Strategist',
+    phone: '+91 82644XXXXX',
+    avatar: 'RD',
+    bio: 'Drives technical infrastructure, strategic personal branding systems, and overall platform growth.',
+    color: '#EFF6FF',
+  },
+  {
     name: 'Hritika Seth',
     role: 'LinkedIn Manager and Consultant',
     phone: '+91 8708231539',
     avatar: 'HS',
     bio: 'Expert in LinkedIn profile positioning, strategy-backed content calendars, and personal brand growth.',
-    color: '#EFF6FF',
+    color: '#F0FDF4',
   },
   {
     name: 'Kritika Dhawan',
@@ -18,7 +26,7 @@ const team = [
     phone: '+91 6284318951',
     avatar: 'KD',
     bio: 'Spearheads client onboarding, cold outreach strategy, follow-ups, and operational excellence.',
-    color: '#F0FDF4',
+    color: '#FFF7ED',
   },
   {
     name: 'Stuti Sharma',
@@ -26,7 +34,7 @@ const team = [
     phone: '+91 9015470950',
     avatar: 'SS',
     bio: 'Manages team operations, organizational culture, and client experience standards.',
-    color: '#FFF7ED',
+    color: '#F5F3FF',
   },
   {
     name: 'Parinoor',
@@ -34,7 +42,7 @@ const team = [
     phone: '+91 6284318951',
     avatar: 'P',
     bio: 'Oversees business development, strategic execution, and client success roadmaps.',
-    color: '#F5F3FF',
+    color: '#FFF1F2',
   },
   {
     name: 'Yash',
@@ -42,14 +50,6 @@ const team = [
     phone: '+91 9024469496',
     avatar: 'Y',
     bio: 'Handles financial planning, transaction transparency, and billing operations.',
-    color: '#FFF1F2',
-  },
-  {
-    name: 'Raghav Dhir',
-    role: 'Tech Handler and Support',
-    phone: '+91 8264452182',
-    avatar: 'RD',
-    bio: 'Drives technical infrastructure, system security, and client platform support.',
     color: '#ECFDF5',
   },
 ]

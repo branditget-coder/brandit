@@ -112,18 +112,10 @@ export default function ContactPage() {
                         <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mb: 1, letterSpacing: '0.05em', fontWeight: 700 }}>DIRECT CONTACT PHONES</Typography>
 
                         <Box sx={{ mb: 1.5 }}>
-                          <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 700 }}>Hritika Seth</Typography>
-                          <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 0.25, fontWeight: 600 }}>LinkedIn Manager & Consultant</Typography>
-                          <Link href="tel:+918708231539" underline="hover" sx={{ color: brandColors.text, fontWeight: 600, fontSize: '0.9rem', '&:hover': { color: brandColors.primary } }}>
-                            +91 8708231539
-                          </Link>
-                        </Box>
-
-                        <Box sx={{ pt: 1, borderTop: `1px dashed ${brandColors.border}` }}>
-                          <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 700 }}>Kritika Dhawan</Typography>
-                          <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 0.25, fontWeight: 600 }}>Customer Outreach & Operations</Typography>
-                          <Link href="tel:+916284318951" underline="hover" sx={{ color: brandColors.text, fontWeight: 600, fontSize: '0.9rem', '&:hover': { color: brandColors.primary } }}>
-                            +91 6284318951
+                          <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 700 }}>Raghav Dhir</Typography>
+                          <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 0.25, fontWeight: 600 }}>Founder & Lead Brand Strategist</Typography>
+                          <Link href="tel:+9182644XXXXX" underline="hover" sx={{ color: brandColors.text, fontWeight: 600, fontSize: '0.9rem', '&:hover': { color: brandColors.primary } }}>
+                            +91 82644XXXXX
                           </Link>
                         </Box>
                       </Box>

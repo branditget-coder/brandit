@@ -125,13 +125,13 @@ export default function AdminAnalytics() {
           <Grid item xs={12} lg={5}>
             <Paper sx={{ p: 3.5, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
               <Typography variant="h6" sx={{ mb: 3, color: brandColors.text }}>Service Demand & Growth Share</Typography>
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
-                  <Pie data={serviceBreakdown} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ percent }: { percent?: number }) => `${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
+                  <Pie data={serviceBreakdown} cx="50%" cy="38%" outerRadius={68} dataKey="value" label={({ percent }: { percent?: number }) => `${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
                     {serviceBreakdown.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v: any) => [`${v}%`, 'Share']} />
-                  <Legend />
+                  <Legend verticalAlign="bottom" align="center" iconSize={10} wrapperStyle={{ fontSize: '0.75rem', paddingTop: '15px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </Paper>

@@ -217,7 +217,7 @@ export default function BookPage() {
               </Box>
 
               <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3, fontSize: '0.85rem' }}>
-                Our team (Hritika Seth / Kritika Dhawan) will reach out via Phone / WhatsApp prior to your scheduled consultation.
+                Our founder (Raghav Dhir) will reach out via Phone / WhatsApp prior to your scheduled consultation.
               </Typography>
 
               <Button
@@ -336,13 +336,13 @@ export default function BookPage() {
                     <Stack spacing={2.5}>
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                          <TextField label="Full Name *" fullWidth required value={selected.name} onChange={e => setSelected({ ...selected, name: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
+                          <TextField label="Full Name" fullWidth required value={selected.name} onChange={e => setSelected({ ...selected, name: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <TextField label="Email Address (For Confirmation) *" type="email" fullWidth required value={selected.email} onChange={e => setSelected({ ...selected, email: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
+                          <TextField label="Email Address (For Confirmation)" type="email" fullWidth required value={selected.email} onChange={e => setSelected({ ...selected, email: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                         </Grid>
                       </Grid>
-                      <TextField label="Phone / WhatsApp Number *" fullWidth value={selected.phone} onChange={e => setSelected({ ...selected, phone: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
+                      <TextField label="Phone / WhatsApp Number" fullWidth required value={selected.phone} onChange={e => setSelected({ ...selected, phone: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                       <TextField label="LinkedIn Profile URL or Special Requirements" multiline rows={3} fullWidth value={selected.notes} onChange={e => setSelected({ ...selected, notes: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                     </Stack>
                   </Box>

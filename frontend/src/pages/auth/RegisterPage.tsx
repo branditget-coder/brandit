@@ -209,7 +209,7 @@ export default function RegisterPage() {
                       </Typography>
                       <TextField
                         fullWidth id="register-first-name"
-                        placeholder="Hritika"
+                        placeholder="Raghav"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         variant="outlined" size="medium"
@@ -222,7 +222,7 @@ export default function RegisterPage() {
                       </Typography>
                       <TextField
                         fullWidth id="register-last-name"
-                        placeholder="Seth"
+                        placeholder="Dhir"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         variant="outlined" size="medium"
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                   </Typography>
                   <TextField
                     fullWidth id="register-email"
-                    placeholder="you@domain.com"
+                    placeholder="raghav@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     variant="outlined" size="medium"
@@ -248,7 +248,7 @@ export default function RegisterPage() {
                   </Typography>
                   <TextField
                     fullWidth id="register-phone"
-                    placeholder="+91 9876543210"
+                    placeholder="+91 82644XXXXX"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     variant="outlined" size="medium"
