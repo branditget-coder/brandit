@@ -10,55 +10,83 @@ import org.springframework.context.annotation.Primary;
 import javax.sql.DataSource;
 import java.net.URI;
 
+/**
+ * Custom DataSource configuration that handles Railway's PostgreSQL URL format.
+ * Railway provides DATABASE_URL as: postgresql://user:pass@host:port/db
+ * JDBC requires:                    jdbc:postgresql://host:port/db (with separate user/pass)
+ *
+ * By NOT setting spring.datasource.url in application.properties, we prevent Spring
+ * Boot's autoconfiguration from creating a broken DataSource bean before this one.
+ */
 @Configuration
 @Slf4j
 public class DatabaseConfig {
 
-    @Value("${DATABASE_URL:${spring.datasource.url:jdbc:h2:mem:branditdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL}}")
-    private String rawDatabaseUrl;
+    @Value("${DATABASE_URL:none}")
+    private String databaseUrl;
 
     @Bean
     @Primary
     public DataSource dataSource() {
-        HikariDataSource dataSource = new HikariDataSource();
+        HikariDataSource ds = new HikariDataSource();
 
-        String url = rawDatabaseUrl;
-        if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
-            log.info("Railway PostgreSQL database URL detected. Parsing connection parameters...");
+        if (!"none".equals(databaseUrl) && (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://"))) {
+            // ── Railway PostgreSQL path ──
+            log.info("Railway PostgreSQL DATABASE_URL detected. Parsing URI...");
             try {
-                URI uri = new URI(url);
+                URI uri = new URI(databaseUrl);
                 String host = uri.getHost();
                 int port = uri.getPort() == -1 ? 5432 : uri.getPort();
-                String path = uri.getPath();
+                String dbName = uri.getPath(); // e.g. "/railway"
 
-                String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + path;
-                dataSource.setJdbcUrl(jdbcUrl);
-                dataSource.setDriverClassName("org.postgresql.Driver");
+                String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + dbName;
+                ds.setJdbcUrl(jdbcUrl);
+                ds.setDriverClassName("org.postgresql.Driver");
 
                 if (uri.getUserInfo() != null) {
-                    String[] userInfo = uri.getUserInfo().split(":");
-                    if (userInfo.length > 0) {
-                        dataSource.setUsername(userInfo[0]);
-                    }
-                    if (userInfo.length > 1) {
-                        dataSource.setPassword(userInfo[1]);
+                    String[] parts = uri.getUserInfo().split(":", 2);
+                    ds.setUsername(parts[0]);
+                    if (parts.length > 1) {
+                        ds.setPassword(parts[1]);
                     }
                 }
-                log.info("Successfully configured PostgreSQL datasource for host: {}", host);
+
+                // Connection pool settings for Railway
+                ds.setMaximumPoolSize(5);
+                ds.setMinimumIdle(1);
+                ds.setConnectionTimeout(30000);
+                ds.setIdleTimeout(600000);
+                ds.setMaxLifetime(1800000);
+                ds.setConnectionTestQuery("SELECT 1");
+
+                log.info("PostgreSQL DataSource configured for host: {}:{}{}", host, port, dbName);
+
             } catch (Exception e) {
-                log.error("Error parsing DATABASE_URL URI, falling back to direct string replacement", e);
-                String formattedUrl = url.replaceFirst("^(postgres|postgresql)://", "jdbc:postgresql://");
-                dataSource.setJdbcUrl(formattedUrl);
-                dataSource.setDriverClassName("org.postgresql.Driver");
+                log.error("Failed to parse DATABASE_URL as URI: {}. Error: {}", databaseUrl, e.getMessage());
+                throw new RuntimeException("Invalid DATABASE_URL format: " + databaseUrl, e);
             }
+
+        } else if (!"none".equals(databaseUrl) && databaseUrl.startsWith("jdbc:")) {
+            // ── Standard JDBC URL (already formatted) ──
+            log.info("Standard JDBC URL detected: {}", databaseUrl);
+            ds.setJdbcUrl(databaseUrl);
+            if (databaseUrl.contains("postgresql")) {
+                ds.setDriverClassName("org.postgresql.Driver");
+            } else {
+                ds.setDriverClassName("org.h2.Driver");
+                ds.setUsername("sa");
+                ds.setPassword("");
+            }
+
         } else {
-            log.info("Using H2 or standard JDBC URL: {}", url);
-            dataSource.setJdbcUrl(url);
-            dataSource.setDriverClassName("org.h2.Driver");
-            dataSource.setUsername("sa");
-            dataSource.setPassword("");
+            // ── Local H2 in-memory fallback ──
+            log.info("No DATABASE_URL set. Using H2 in-memory database for local development.");
+            ds.setJdbcUrl("jdbc:h2:mem:branditdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL");
+            ds.setDriverClassName("org.h2.Driver");
+            ds.setUsername("sa");
+            ds.setPassword("");
         }
 
-        return dataSource;
+        return ds;
     }
 }
