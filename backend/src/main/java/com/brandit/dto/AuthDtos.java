@@ -25,6 +25,7 @@ public class AuthDtos {
         private String password;
 
         private String phone;
+        private User.Role role;
     }
 
     @Data

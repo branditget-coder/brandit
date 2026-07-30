@@ -70,7 +70,7 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public enum Role { USER, ADMIN }
+    public enum Role { USER, ADMIN, TEAM }
     public enum AuthProvider { LOCAL, GOOGLE, LINKEDIN }
 
     public String getFullName() {

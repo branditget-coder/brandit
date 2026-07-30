@@ -11,7 +11,7 @@ export interface User {
   linkedinUrl?: string
   currentRole?: string
   bio?: string
-  role: 'USER' | 'ADMIN'
+  role: 'USER' | 'ADMIN' | 'TEAM'
   emailVerified: boolean
   avatarUrl?: string
 }
@@ -22,7 +22,7 @@ interface AuthContextType {
   isLoading: boolean
   isSessionExpired: boolean
   login: (email: string, password: string) => Promise<void>
-  register: (firstName: string, lastName: string, email: string, password: string, phone?: string) => Promise<void>
+  register: (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM') => Promise<void>
   loginWithSocial: (provider: 'google', tokenOrCode: string) => Promise<void>
   logout: () => void
   updateProfile: (data: Partial<User>) => Promise<void>
@@ -134,8 +134,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     saveAuthSession(res.data.accessToken, res.data.refreshToken, res.data.user)
   }
 
-  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string) => {
-    await api.post('/auth/register', { firstName, lastName, email, password, phone })
+  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM') => {
+    await api.post('/auth/register', { firstName, lastName, email, password, phone, role })
   }
 
   const loginWithSocial = async (provider: 'google', tokenOrCode: string) => {

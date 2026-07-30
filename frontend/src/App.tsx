@@ -25,6 +25,12 @@ import MyBookings from './pages/dashboard/MyBookings'
 import MyInvoices from './pages/dashboard/MyInvoices'
 import ProfilePage from './pages/dashboard/ProfilePage'
 
+// Team Member Portal
+import TeamLayout from './components/layout/TeamLayout'
+import TeamDashboard from './pages/team/TeamDashboard'
+import TeamConsultations from './pages/team/TeamConsultations'
+import TeamResources from './pages/team/TeamResources'
+
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsers from './pages/admin/AdminUsers'
@@ -62,12 +68,22 @@ export default function App() {
           </Route>
         </Route>
 
-        {/* Protected Client Dashboard Routes (USER & ADMIN) */}
-        <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
+        {/* Protected Client Dashboard Routes (USER ONLY) */}
+        <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<UserDashboard />} />
             <Route path="bookings" element={<MyBookings />} />
             <Route path="invoices" element={<MyInvoices />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+
+        {/* Dedicated Team Member Workspace Routes (TEAM & ADMIN) */}
+        <Route element={<ProtectedRoute allowedRoles={['TEAM', 'ADMIN']} />}>
+          <Route path="/team" element={<TeamLayout />}>
+            <Route index element={<TeamDashboard />} />
+            <Route path="consultations" element={<TeamConsultations />} />
+            <Route path="resources" element={<TeamResources />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>

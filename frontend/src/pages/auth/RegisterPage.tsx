@@ -51,7 +51,7 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      await register(firstName, lastName, email, password, phone)
+      await register(firstName, lastName, email, password, phone, userType === 'team' ? 'TEAM' : 'USER')
       // After register, clear session data — user must log in manually
       localStorage.removeItem('brandit_access_token')
       localStorage.removeItem('brandit_refresh_token')

@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext'
 import { brandColors } from '../../theme'
 
 interface ProtectedRouteProps {
-  allowedRoles?: Array<'USER' | 'ADMIN'>
+  allowedRoles?: Array<'USER' | 'ADMIN' | 'TEAM'>
 }
 
 export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
@@ -32,6 +32,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
 
   // 3. Role-Based Access Control (RBAC) verification
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    const defaultRoute = user.role === 'ADMIN' ? '/admin' : user.role === 'TEAM' ? '/team' : '/dashboard'
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: brandColors.background, py: 8 }}>
         <Container maxWidth="sm">
@@ -43,15 +44,15 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
               403 Access Denied
             </Typography>
             <Typography variant="body1" sx={{ color: brandColors.muted, mb: 4, lineHeight: 1.6 }}>
-              You do not have administrative permissions to view this portal. Your current role is <strong>{user.role}</strong>.
+              You do not have permissions to view this portal. Your current role is <strong>{user.role}</strong>.
             </Typography>
             <Button
               variant="contained"
               startIcon={<FiArrowLeft />}
-              onClick={() => window.location.href = user.role === 'ADMIN' ? '/admin' : '/dashboard'}
+              onClick={() => window.location.href = defaultRoute}
               sx={{ py: 1.4, px: 4, borderRadius: '12px', fontWeight: 700, textTransform: 'none', backgroundColor: brandColors.primary }}
             >
-              Return to Authorized Dashboard
+              Return to Authorized Portal
             </Button>
           </Box>
         </Container>
@@ -72,8 +73,8 @@ export function PublicOnlyRoute() {
   }
 
   if (isAuthenticated && user) {
-    // Redirect logged-in user to appropriate portal based on role
-    return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/dashboard'} replace />
+    const defaultRoute = user.role === 'ADMIN' ? '/admin' : user.role === 'TEAM' ? '/team' : '/dashboard'
+    return <Navigate to={defaultRoute} replace />
   }
 
   return <Outlet />

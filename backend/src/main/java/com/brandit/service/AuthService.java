@@ -29,13 +29,18 @@ public class AuthService {
             throw new IllegalArgumentException("Email is already registered");
         }
 
+        User.Role assignedRole = request.getRole() != null ? request.getRole() : User.Role.USER;
+        if (assignedRole == User.Role.ADMIN) {
+            assignedRole = User.Role.USER;
+        }
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
-                .role(User.Role.USER)
+                .role(assignedRole)
                 .provider(User.AuthProvider.LOCAL)
                 .verificationToken(UUID.randomUUID().toString())
                 .build();
