@@ -192,29 +192,31 @@ public class EmailService {
             return;
         }
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlBody, true); // true = HTML format
-
-            mailSender.send(message);
-            log.info("HTML Email successfully dispatched to {}", to);
-        } catch (Exception e) {
-            log.warn("MimeMessage HTML dispatch failed ({}), attempting plain-text fallback...", e.getMessage());
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
             try {
-                SimpleMailMessage plainMsg = new SimpleMailMessage();
-                plainMsg.setFrom(fromEmail);
-                plainMsg.setTo(to);
-                plainMsg.setSubject(subject);
-                plainMsg.setText(htmlBody.replaceAll("<[^>]*>", "")); // Strip tags for plain text
-                mailSender.send(plainMsg);
-                log.info("Fallback plain text email sent to {}", to);
-            } catch (Exception fallbackErr) {
-                log.error("Failed to send fallback plain text email to {}: {}", to, fallbackErr.getMessage());
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                helper.setFrom(fromEmail);
+                helper.setTo(to);
+                helper.setSubject(subject);
+                helper.setText(htmlBody, true); // true = HTML format
+
+                mailSender.send(message);
+                log.info("HTML Email successfully dispatched to {}", to);
+            } catch (Exception e) {
+                log.warn("MimeMessage HTML dispatch failed ({}), attempting plain-text fallback...", e.getMessage());
+                try {
+                    SimpleMailMessage plainMsg = new SimpleMailMessage();
+                    plainMsg.setFrom(fromEmail);
+                    plainMsg.setTo(to);
+                    plainMsg.setSubject(subject);
+                    plainMsg.setText(htmlBody.replaceAll("<[^>]*>", "")); // Strip tags for plain text
+                    mailSender.send(plainMsg);
+                    log.info("Fallback plain text email sent to {}", to);
+                } catch (Exception fallbackErr) {
+                    log.error("Failed to send fallback plain text email to {}: {}", to, fallbackErr.getMessage());
+                }
             }
-        }
+        });
     }
 }
