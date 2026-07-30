@@ -12,6 +12,7 @@ import ServicesPage from './pages/Services/ServicesPage'
 import PricingPage from './pages/Pricing/PricingPage'
 import ContactPage from './pages/Contact/ContactPage'
 import BookPage from './pages/Book/BookPage'
+import BlogPage from './pages/Blog/BlogPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/blogs" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/book" element={<BookPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

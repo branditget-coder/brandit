@@ -12,6 +12,7 @@ import BrandLogo from './BrandLogo'
 const navLinks = [
   { label: 'Services', href: '/services' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Blogs & Guides', href: '/blogs' },
   { label: 'About & Team', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
