@@ -147,4 +147,17 @@ public class CommonDtos {
         private long totalRevenue;
         private double satisfactionRate;
     }
+
+    // Admin User Summary
+    @Data
+    public static class UserAdminResponse {
+        private Long id;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String phone;
+        private String role;
+        private boolean emailVerified;
+        private LocalDateTime createdAt;
+    }
 }

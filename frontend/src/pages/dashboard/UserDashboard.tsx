@@ -1,26 +1,63 @@
-import { Box, Grid, Typography, Paper, Chip, Button, Stack, LinearProgress, Avatar, alpha } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Box, Grid, Typography, Paper, Chip, Button, Stack, LinearProgress, alpha, CircularProgress } from '@mui/material'
 import { motion } from 'framer-motion'
 import { FiCalendar, FiFileText, FiArrowRight, FiCheckCircle, FiClock } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
-
 import { useAuth } from '../../context/AuthContext'
+import api from '../../services/api'
 
-const stats = [
-  { label: 'Active Services', value: '2', icon: FiCheckCircle, color: '#F0FDF4', iconColor: brandColors.success },
-  { label: 'Upcoming Sessions', value: '1', icon: FiCalendar, color: '#EFF6FF', iconColor: brandColors.primary },
-  { label: 'Documents', value: '5', icon: FiFileText, color: '#FFF7ED', iconColor: '#F59E0B' },
-  { label: 'Hours Saved', value: '12', icon: FiClock, color: '#F5F3FF', iconColor: '#7C3AED' },
-]
-
-const bookings = [
-  { service: 'Profile Setup + Personal Branding (₹320/mo)', date: 'Aug 5, 2025 · 10:00 AM', status: 'Upcoming', statusColor: brandColors.primary },
-  { service: 'Profile Setup & Advice (₹99)', date: 'Jul 28, 2025 · 3:00 PM', status: 'Completed', statusColor: brandColors.success },
-]
+interface BookingItem {
+  id: number
+  serviceName: string
+  preferredDate: string
+  preferredTime: string
+  status: string
+}
 
 export default function UserDashboard() {
   const { user } = useAuth()
   const name = user ? user.firstName : 'there'
+
+  const [bookings, setBookings] = useState<BookingItem[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const res = await api.get<BookingItem[]>('/bookings')
+        setBookings(res.data)
+      } catch (err) {
+        // quiet fallback
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDashboardData()
+  }, [])
+
+  // Calculate real profile completion
+  const profileFields = [
+    user?.firstName,
+    user?.lastName,
+    user?.email,
+    user?.phone,
+    user?.linkedinUrl,
+    user?.currentRole,
+    user?.bio,
+  ]
+  const filledFields = profileFields.filter(f => f && f.trim().length > 0).length
+  const profilePercent = Math.round((filledFields / profileFields.length) * 100)
+
+  const activeServicesCount = bookings.filter(b => b.status === 'CONFIRMED' || b.status === 'PENDING').length
+  const completedCount = bookings.filter(b => b.status === 'COMPLETED').length
+
+  const stats = [
+    { label: 'Active Services', value: String(activeServicesCount), icon: FiCheckCircle, color: '#F0FDF4', iconColor: brandColors.success },
+    { label: 'Upcoming Sessions', value: String(activeServicesCount), icon: FiCalendar, color: '#EFF6FF', iconColor: brandColors.primary },
+    { label: 'Completed Sessions', value: String(completedCount), icon: FiFileText, color: '#FFF7ED', iconColor: '#F59E0B' },
+    { label: 'Total Consultations', value: String(bookings.length), icon: FiClock, color: '#F5F3FF', iconColor: '#7C3AED' },
+  ]
 
   return (
     <Box>
@@ -35,10 +72,12 @@ export default function UserDashboard() {
         <Paper sx={{ p: 3, mb: 4, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
             <Typography variant="body1" sx={{ fontWeight: 600, color: brandColors.text }}>Profile Completion</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.primary }}>68%</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.primary }}>{profilePercent}%</Typography>
           </Box>
-          <LinearProgress variant="determinate" value={68} sx={{ height: 8, borderRadius: 4, backgroundColor: alpha(brandColors.primary, 0.1), '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${brandColors.primary}, ${brandColors.secondary})` } }} />
-          <Typography variant="caption" sx={{ color: brandColors.muted, mt: 1, display: 'block' }}>Add your LinkedIn URL and upload your resume to reach 100%</Typography>
+          <LinearProgress variant="determinate" value={profilePercent} sx={{ height: 8, borderRadius: 4, backgroundColor: alpha(brandColors.primary, 0.1), '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${brandColors.primary}, ${brandColors.secondary})` } }} />
+          <Typography variant="caption" sx={{ color: brandColors.muted, mt: 1, display: 'block' }}>
+            {profilePercent < 100 ? 'Add your LinkedIn URL, phone, and bio in My Profile to reach 100%' : 'Your profile is 100% complete! Great job.'}
+          </Typography>
         </Paper>
 
         {/* Stats */}
@@ -63,22 +102,34 @@ export default function UserDashboard() {
           <Grid item xs={12} md={7}>
             <Paper sx={{ p: 3, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', height: '100%' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6" sx={{ color: brandColors.text }}>Consultations</Typography>
+                <Typography variant="h6" sx={{ color: brandColors.text }}>Recent Consultations</Typography>
                 <Button component={RouterLink} to="/dashboard/bookings" size="small" endIcon={<FiArrowRight size={14} />} sx={{ color: brandColors.primary, '&:hover': { backgroundColor: alpha(brandColors.primary, 0.06), boxShadow: 'none', transform: 'none' } }}>
                   View all
                 </Button>
               </Box>
-              <Stack spacing={2}>
-                {bookings.map((b) => (
-                  <Box key={b.service} sx={{ p: 2.5, borderRadius: '14px', border: `1px solid ${brandColors.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.25 }}>{b.service}</Typography>
-                      <Typography variant="caption" sx={{ color: brandColors.muted }}>{b.date}</Typography>
+
+              {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress size={24} color="primary" />
+                </Box>
+              ) : bookings.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="body2" sx={{ color: brandColors.muted, mb: 2 }}>No consultation sessions booked yet.</Typography>
+                  <Button component={RouterLink} to="/book" variant="outlined" size="small">Book Now</Button>
+                </Box>
+              ) : (
+                <Stack spacing={2}>
+                  {bookings.slice(0, 3).map((b) => (
+                    <Box key={b.id} sx={{ p: 2.5, borderRadius: '14px', border: `1px solid ${brandColors.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.25 }}>{b.serviceName}</Typography>
+                        <Typography variant="caption" sx={{ color: brandColors.muted }}>{b.preferredDate} {b.preferredTime ? `· ${b.preferredTime}` : ''}</Typography>
+                      </Box>
+                      <Chip label={b.status} size="small" sx={{ backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, fontWeight: 600, fontSize: '0.72rem' }} />
                     </Box>
-                    <Chip label={b.status} size="small" sx={{ backgroundColor: alpha(b.statusColor, 0.1), color: b.statusColor, fontWeight: 600, fontSize: '0.72rem' }} />
-                  </Box>
-                ))}
-              </Stack>
+                  ))}
+                </Stack>
+              )}
             </Paper>
           </Grid>
 
