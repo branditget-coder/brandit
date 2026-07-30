@@ -23,6 +23,7 @@ public class PublicController {
     private final ContactRepository contactRepository;
     private final NewsletterRepository newsletterRepository;
     private final TestimonialRepository testimonialRepository;
+    private final com.brandit.service.EmailService emailService;
 
     @PostMapping("/contact")
     public ResponseEntity<MessageResponse> submitContact(@Valid @RequestBody ContactRequest request) {
@@ -36,6 +37,11 @@ public class PublicController {
                 .status(Contact.Status.NEW)
                 .build();
         contactRepository.save(contact);
+
+        // Dispatch notification email to BrandIt Team
+        String senderName = (request.getFirstName() != null ? request.getFirstName() : "") + " " + (request.getLastName() != null ? request.getLastName() : "");
+        emailService.sendContactNotification(senderName.trim(), request.getEmail(), request.getPhone(), request.getServiceInterested(), request.getMessage());
+
         return ResponseEntity.ok(new MessageResponse("Thank you! Your message has been received. We will contact you within 24 hours."));
     }
 

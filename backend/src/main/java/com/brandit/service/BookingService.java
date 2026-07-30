@@ -26,10 +26,11 @@ public class BookingService {
     @Transactional
     public BookingResponse createBooking(String userEmail, CreateBookingRequest request) {
         User user = null;
-        String emailToUse = (userEmail != null && !userEmail.isBlank()) ? userEmail : request.getClientEmail();
+        String rawEmail = (userEmail != null && !userEmail.isBlank()) ? userEmail : request.getClientEmail();
+        String emailToUse = rawEmail != null ? rawEmail.trim().toLowerCase() : null;
         
         if (emailToUse != null && !emailToUse.isBlank()) {
-            user = userRepository.findByEmail(emailToUse).orElse(null);
+            user = userRepository.findByEmailIgnoreCase(emailToUse).orElse(null);
             if (user == null) {
                 // Register a guest client user automatically so they have a database account!
                 String name = request.getClientName() != null ? request.getClientName() : "Valued Client";

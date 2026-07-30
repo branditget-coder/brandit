@@ -22,6 +22,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final UserActivityLogRepository activityLogRepository;
+    private final EmailService emailService;
 
     private String cleanEmail(String email) {
         return email != null ? email.trim().toLowerCase() : "";
@@ -57,6 +58,9 @@ public class AuthService {
                 .action("USER_REGISTER")
                 .metadataJson("Registered via local email: " + savedUser.getEmail())
                 .build());
+
+        // Dispatch HTML Welcome Email
+        emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFullName(), savedUser.getRole().name());
 
         String accessToken = tokenProvider.generateAccessToken(savedUser.getEmail());
         String refreshToken = tokenProvider.generateRefreshToken(savedUser.getEmail());
@@ -158,6 +162,9 @@ public class AuthService {
                     .action("FORGOT_PASSWORD_REQUEST")
                     .metadataJson("Password reset token generated")
                     .build());
+
+            // Dispatch HTML Password Reset Email
+            emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName(), user.getResetPasswordToken());
         });
     }
 
