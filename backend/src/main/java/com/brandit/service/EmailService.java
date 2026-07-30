@@ -211,7 +211,7 @@ public class EmailService {
 
         CompletableFuture.runAsync(() -> {
             // Option 1: Brevo HTTPS REST API (Free 300 emails/day to ANY address WITHOUT custom domain requirement)
-            if (brevoApiKey != null && !brevoApiKey.isBlank() && brevoApiKey.startsWith("xkeysib-")) {
+            if (brevoApiKey != null && !brevoApiKey.isBlank() && !brevoApiKey.contains("placeholder")) {
                 try {
                     Map<String, Object> senderMap = Map.of("name", "BrandIt Consulting", "email", fromEmail != null ? fromEmail : "brandit.get@gmail.com");
                     Map<String, Object> recipientMap = Map.of("email", to);
