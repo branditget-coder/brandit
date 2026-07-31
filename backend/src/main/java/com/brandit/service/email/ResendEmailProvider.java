@@ -42,6 +42,7 @@ public class ResendEmailProvider implements EmailProviderStrategy {
     public boolean send(String to, String subject, String htmlBody, String fromEmail) {
         if (!isConfigured()) return false;
         try {
+            // If fromEmail is valid and not resend.dev, use it; otherwise fallback to onboarding@resend.dev
             String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("resend.dev"))
                     ? "BrandIt Consulting <" + fromEmail + ">"
                     : "BrandIt Consulting <onboarding@resend.dev>";
@@ -53,7 +54,7 @@ public class ResendEmailProvider implements EmailProviderStrategy {
             payload.put("html", htmlBody);
 
             String jsonPayload = objectMapper.writeValueAsString(payload);
-            log.info("Attempting Resend API with sender: {}", sender);
+            log.info("Attempting email dispatch via Resend API to: {} (Sender: {})", to, sender);
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.resend.com/emails"))
@@ -66,13 +67,13 @@ public class ResendEmailProvider implements EmailProviderStrategy {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                log.info("✅ Successfully dispatched email via Resend API (HTTP {}) to {}", response.statusCode(), to);
+                log.info("✅ Successfully sent email via Resend API (HTTP {}) to {}", response.statusCode(), to);
                 return true;
             } else {
-                log.warn("❌ Resend API returned status {}: {}", response.statusCode(), response.body());
+                log.warn("⚠️ Resend API returned status {}: {}. Falling back to next provider...", response.statusCode(), response.body());
             }
         } catch (Exception e) {
-            log.warn("❌ Resend API exception: {}", e.getMessage(), e);
+            log.warn("❌ Resend API exception: {}", e.getMessage());
         }
         return false;
     }

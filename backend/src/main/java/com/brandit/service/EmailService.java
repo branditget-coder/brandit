@@ -2,12 +2,15 @@ package com.brandit.service;
 
 import com.brandit.service.email.EmailProviderStrategy;
 import com.brandit.service.email.EmailTemplateBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,6 +27,43 @@ public class EmailService {
     @Value("${app.frontend.url:https://brandit-eta.vercel.app}")
     private String frontendUrl;
 
+    @Data
+    @AllArgsConstructor
+    public static class EmailDispatchResult {
+        private boolean success;
+        private String providerUsed;
+        private List<String> logs;
+    }
+
+    /**
+     * Synchronous Dispatch for Diagnostics / Admin Testing
+     */
+    public EmailDispatchResult sendEmailSync(String to, String subject, String htmlBody) {
+        List<String> auditLogs = new ArrayList<>();
+        auditLogs.add("Starting dispatch to: " + to);
+        auditLogs.add("Subject: " + subject);
+        auditLogs.add("Total registered strategies: " + providerStrategies.size());
+
+        for (EmailProviderStrategy provider : providerStrategies) {
+            String name = provider.getProviderName();
+            boolean configured = provider.isConfigured();
+            auditLogs.add("Strategy '" + name + "' configured check: " + configured);
+
+            if (configured) {
+                auditLogs.add("Attempting send via strategy: " + name);
+                boolean sent = provider.send(to, subject, htmlBody, fromEmail);
+                if (sent) {
+                    auditLogs.add("SUCCESS: Email sent via " + name);
+                    return new EmailDispatchResult(true, name, auditLogs);
+                }
+                auditLogs.add("FAILED: Strategy " + name + " failed to send email. Trying next fallback...");
+            }
+        }
+
+        auditLogs.add("CRITICAL: All available email strategies failed or were not configured.");
+        return new EmailDispatchResult(false, "NONE", auditLogs);
+    }
+
     /**
      * 1. Send Welcome Email on Account Registration
      */
@@ -31,7 +71,7 @@ public class EmailService {
     public void sendWelcomeEmail(String toEmail, String clientName, String role) {
         String subject = "Welcome to BrandIt — Elevate Your Personal Brand!";
         String htmlBody = templateBuilder.buildWelcomeTemplate(clientName, toEmail, role, frontendUrl);
-        dispatchEmail(toEmail, subject, htmlBody);
+        sendEmailSync(toEmail, subject, htmlBody);
     }
 
     /**
@@ -42,7 +82,7 @@ public class EmailService {
                                          String bookingTime, String price, String paymentId) {
         String subject = "Booking Confirmed: " + serviceName + " — BrandIt";
         String htmlBody = templateBuilder.buildBookingTemplate(clientName, serviceName, bookingDate, bookingTime, price, paymentId, frontendUrl);
-        dispatchEmail(toEmail, subject, htmlBody);
+        sendEmailSync(toEmail, subject, htmlBody);
     }
 
     /**
@@ -52,7 +92,7 @@ public class EmailService {
     public void sendPasswordResetEmail(String toEmail, String clientName, String resetToken) {
         String subject = "Reset Your BrandIt Account Password";
         String htmlBody = templateBuilder.buildPasswordResetTemplate(clientName, toEmail, resetToken, frontendUrl);
-        dispatchEmail(toEmail, subject, htmlBody);
+        sendEmailSync(toEmail, subject, htmlBody);
     }
 
     /**
@@ -64,30 +104,6 @@ public class EmailService {
         String subject = "New Contact Inquiry from " + senderName + " — BrandIt";
         String adminEmail = "brandit.get@gmail.com";
         String htmlBody = templateBuilder.buildContactNotificationTemplate(senderName, senderEmail, phone, serviceInterested, messageText, frontendUrl);
-        dispatchEmail(adminEmail, subject, htmlBody);
-    }
-
-    /**
-     * Core Dispatcher using Strategy Chain Pattern
-     */
-    private void dispatchEmail(String to, String subject, String htmlBody) {
-        log.info("================ EMAIL DISPATCH LOG ================");
-        log.info("To: {}", to);
-        log.info("Subject: {}", subject);
-        log.info("Available Email Strategies: {}", providerStrategies.size());
-        log.info("====================================================");
-
-        for (EmailProviderStrategy provider : providerStrategies) {
-            if (provider.isConfigured()) {
-                log.info("Attempting dispatch via strategy: {}", provider.getProviderName());
-                boolean sent = provider.send(to, subject, htmlBody, fromEmail);
-                if (sent) {
-                    log.info("✅ Email successfully sent via {}", provider.getProviderName());
-                    return;
-                }
-                log.warn("⚠️ Strategy {} failed to send email. Falling back to next strategy...", provider.getProviderName());
-            }
-        }
-        log.error("❌ All email providers failed to send email to {}", to);
+        sendEmailSync(adminEmail, subject, htmlBody);
     }
 }

@@ -42,7 +42,12 @@ public class BrevoEmailProvider implements EmailProviderStrategy {
     public boolean send(String to, String subject, String htmlBody, String fromEmail) {
         if (!isConfigured()) return false;
         try {
-            Map<String, Object> senderMap = Map.of("name", "BrandIt Consulting", "email", fromEmail != null ? fromEmail : "brandit.get@gmail.com");
+            // Clean sender email for Brevo (Brevo requires real domain or brandit.get@gmail.com)
+            String senderEmail = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("resend.dev"))
+                    ? fromEmail
+                    : "brandit.get@gmail.com";
+
+            Map<String, Object> senderMap = Map.of("name", "BrandIt Consulting", "email", senderEmail);
             Map<String, Object> recipientMap = Map.of("email", to);
 
             Map<String, Object> payload = new HashMap<>();
@@ -52,25 +57,26 @@ public class BrevoEmailProvider implements EmailProviderStrategy {
             payload.put("htmlContent", htmlBody);
 
             String jsonPayload = objectMapper.writeValueAsString(payload);
+            log.info("Attempting email dispatch via Brevo API to: {} (Sender: {})", to, senderEmail);
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
                     .header("api-key", brevoApiKey.trim())
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                    .timeout(Duration.ofSeconds(5))
+                    .timeout(Duration.ofSeconds(15))
                     .build();
 
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                log.info("Successfully sent email via Brevo HTTPS REST API (HTTP {}) to {}", response.statusCode(), to);
+                log.info("✅ Successfully sent email via Brevo REST API (HTTP {}) to {}", response.statusCode(), to);
                 return true;
             } else {
-                log.warn("Brevo HTTPS API returned status {}: {}", response.statusCode(), response.body());
+                log.warn("⚠️ Brevo REST API returned status {}: {}. Falling back to next provider...", response.statusCode(), response.body());
             }
         } catch (Exception e) {
-            log.warn("Brevo HTTPS API error: {}", e.getMessage());
+            log.warn("❌ Brevo REST API exception: {}", e.getMessage());
         }
         return false;
     }
