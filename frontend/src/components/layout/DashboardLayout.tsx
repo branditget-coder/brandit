@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import {
   Box, Drawer, List, ListItem, ListItemButton, ListItemIcon,
-  ListItemText, Typography, Avatar, Divider, IconButton, Chip,
-  useMediaQuery, useTheme, alpha, AppBar, Toolbar, Menu, MenuItem,
-  Popover, Badge, Stack, Button
+  ListItemText, Typography, Avatar, Divider, IconButton,
+  useMediaQuery, useTheme, alpha, AppBar, Toolbar
 } from '@mui/material'
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   FiHome, FiCalendar, FiFileText, FiUser,
-  FiMenu, FiLogOut, FiBell, FiSettings, FiCheck, FiLock, FiShield
+  FiMenu, FiLogOut
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -23,15 +22,6 @@ const navItems = [
   { label: 'Profile', href: '/dashboard/profile', icon: FiUser },
 ]
 
-interface NotificationItem {
-  id: string
-  title: string
-  desc: string
-  time: string
-  read: boolean
-  link?: string
-}
-
 export default function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
@@ -40,65 +30,12 @@ export default function DashboardLayout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { user, logout } = useAuth()
 
-  // State for Notifications & Settings Popovers
-  const [notifAnchor, setNotifAnchor] = useState<HTMLButtonElement | null>(null)
-  const [settingsAnchor, setSettingsAnchor] = useState<HTMLButtonElement | null>(null)
-
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    {
-      id: '1',
-      title: 'Welcome to BrandIt Portal! 🎉',
-      desc: 'Your personal branding dashboard is ready. Explore consultation slots & invoices.',
-      time: '2 hours ago',
-      read: false,
-      link: '/dashboard'
-    },
-    {
-      id: '2',
-      title: 'Real-time Slot Blocking Active 🔒',
-      desc: 'Consultation dates and time slots are updated in real-time across all users.',
-      time: '1 day ago',
-      link: '/dashboard/bookings',
-      read: false
-    },
-    {
-      id: '3',
-      title: 'Security & Profile Settings 🛡️',
-      desc: 'You can update your avatar, phone number, and password anytime in your Profile.',
-      time: '2 days ago',
-      link: '/dashboard/profile',
-      read: true
-    }
-  ])
-
   const userName = user ? `${user.firstName} ${user.lastName}` : 'Professional'
   const userInitials = user ? `${user.firstName[0]}${user.lastName ? user.lastName[0] : ''}` : 'P'
-  const unreadCount = notifications.filter(n => !n.read).length
 
   const handleLogout = () => {
     logout()
     navigate('/login')
-  }
-
-  const handleMarkAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-  }
-
-  const handleNotificationClick = (link?: string) => {
-    setNotifAnchor(null)
-    if (link) {
-      navigate(link)
-    }
-  }
-
-  const handleSettingsClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    setSettingsAnchor(e.currentTarget)
-  }
-
-  const handleNotifClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    setNotifAnchor(e.currentTarget)
   }
 
   const DrawerContent = () => (
@@ -233,206 +170,8 @@ export default function DashboardLayout() {
               <FiMenu size={20} />
             </IconButton>
             <Box />
-            
-            {/* Header Right Actions: Bell & Settings */}
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              
-              {/* NOTIFICATION BELL BUTTON */}
-              <IconButton
-                id="notification-bell-btn"
-                size="small"
-                aria-label="Notifications"
-                onClick={handleNotifClick}
-                sx={{
-                  p: 1,
-                  borderRadius: '10px',
-                  backgroundColor: Boolean(notifAnchor) ? alpha(brandColors.primary, 0.12) : 'transparent',
-                  border: Boolean(notifAnchor) ? `1px solid ${alpha(brandColors.primary, 0.3)}` : '1px solid transparent',
-                  '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) }
-                }}
-              >
-                <Badge color="error" variant="dot" invisible={unreadCount === 0}>
-                  <FiBell size={20} color={Boolean(notifAnchor) ? brandColors.primary : brandColors.muted} />
-                </Badge>
-              </IconButton>
-
-              {/* SETTINGS GEAR BUTTON */}
-              <IconButton
-                id="settings-gear-btn"
-                size="small"
-                aria-label="Settings"
-                onClick={handleSettingsClick}
-                sx={{
-                  p: 1,
-                  borderRadius: '10px',
-                  backgroundColor: Boolean(settingsAnchor) ? alpha(brandColors.primary, 0.12) : 'transparent',
-                  border: Boolean(settingsAnchor) ? `1px solid ${alpha(brandColors.primary, 0.3)}` : '1px solid transparent',
-                  '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) }
-                }}
-              >
-                <FiSettings size={20} color={Boolean(settingsAnchor) ? brandColors.primary : brandColors.muted} />
-              </IconButton>
-
-            </Box>
           </Toolbar>
         </AppBar>
-
-        {/* NOTIFICATIONS POPOVER MENU */}
-        <Popover
-          id="notification-popover"
-          open={Boolean(notifAnchor)}
-          anchorEl={notifAnchor}
-          onClose={() => setNotifAnchor(null)}
-          disableScrollLock
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{
-            sx: {
-              width: { xs: 310, sm: 360 },
-              borderRadius: '18px',
-              mt: 1.5,
-              p: 0,
-              boxShadow: '0 16px 48px rgba(0,0,0,0.16)',
-              border: `1px solid ${brandColors.border}`,
-              overflow: 'hidden',
-              zIndex: 1600,
-            }
-          }}
-        >
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAFC', borderBottom: `1px solid ${brandColors.border}` }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text }}>Notifications</Typography>
-              {unreadCount > 0 && (
-                <Chip label={`${unreadCount} New`} size="small" color="primary" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
-              )}
-            </Box>
-            {unreadCount > 0 && (
-              <Button size="small" onClick={handleMarkAllRead} startIcon={<FiCheck size={12} />} sx={{ fontSize: '0.75rem', textTransform: 'none', fontWeight: 600 }}>
-                Mark all read
-              </Button>
-            )}
-          </Box>
-
-          <Stack spacing={0} sx={{ maxHeight: 360, overflowY: 'auto' }}>
-            {notifications.map(n => (
-              <Box
-                key={n.id}
-                onClick={() => handleNotificationClick(n.link)}
-                sx={{
-                  p: 2,
-                  borderBottom: `1px solid ${brandColors.border}`,
-                  cursor: 'pointer',
-                  backgroundColor: n.read ? '#fff' : alpha(brandColors.primary, 0.03),
-                  '&:hover': { backgroundColor: alpha(brandColors.primary, 0.06) },
-                  transition: 'background-color 0.2s',
-                  display: 'flex',
-                  gap: 1.5
-                }}
-              >
-                {!n.read && (
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: brandColors.primary, mt: 0.8, flexShrink: 0 }} />
-                )}
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="body2" sx={{ fontWeight: n.read ? 600 : 700, color: brandColors.text, fontSize: '0.825rem' }}>
-                    {n.title}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mt: 0.5, lineHeight: 1.4 }}>
-                    {n.desc}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem', mt: 0.8, display: 'block' }}>
-                    {n.time}
-                  </Typography>
-                </Box>
-              </Box>
-            ))}
-          </Stack>
-
-          <Box sx={{ p: 1.5, textAlign: 'center', backgroundColor: '#F8FAFC', borderTop: `1px solid ${brandColors.border}` }}>
-            <Button size="small" fullWidth onClick={() => { setNotifAnchor(null); navigate('/dashboard/bookings'); }} sx={{ fontSize: '0.8rem', textTransform: 'none', fontWeight: 700 }}>
-              View Consultation Bookings &rarr;
-            </Button>
-          </Box>
-        </Popover>
-
-        {/* SETTINGS MENU */}
-        <Menu
-          id="settings-menu"
-          anchorEl={settingsAnchor}
-          open={Boolean(settingsAnchor)}
-          onClose={() => setSettingsAnchor(null)}
-          disableScrollLock
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{
-            sx: {
-              width: 250,
-              borderRadius: '18px',
-              mt: 1.5,
-              p: 1,
-              boxShadow: '0 16px 48px rgba(0,0,0,0.16)',
-              border: `1px solid ${brandColors.border}`,
-              zIndex: 1600,
-            }
-          }}
-        >
-          <Box sx={{ px: 1.5, py: 1 }}>
-            <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em' }}>
-              SETTINGS & PREFERENCES
-            </Typography>
-          </Box>
-
-          <MenuItem
-            onClick={() => { setSettingsAnchor(null); navigate('/dashboard/profile'); }}
-            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
-          >
-            <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
-              <FiUser size={16} />
-            </ListItemIcon>
-            <ListItemText primary="Edit Profile & Details" primaryTypographyProps={{ fontSize: '0.85rem', fontWeight: 600 }} />
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => { setSettingsAnchor(null); navigate('/dashboard/profile'); }}
-            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
-          >
-            <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
-              <FiLock size={16} />
-            </ListItemIcon>
-            <ListItemText primary="Change Password & Security" primaryTypographyProps={{ fontSize: '0.85rem', fontWeight: 600 }} />
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => { setSettingsAnchor(null); navigate('/dashboard/bookings'); }}
-            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
-          >
-            <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
-              <FiCalendar size={16} />
-            </ListItemIcon>
-            <ListItemText primary="Booked Consultations" primaryTypographyProps={{ fontSize: '0.85rem', fontWeight: 600 }} />
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => { setSettingsAnchor(null); navigate('/dashboard/invoices'); }}
-            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
-          >
-            <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
-              <FiFileText size={16} />
-            </ListItemIcon>
-            <ListItemText primary="Invoices & Statements" primaryTypographyProps={{ fontSize: '0.85rem', fontWeight: 600 }} />
-          </MenuItem>
-
-          <Divider sx={{ my: 1, borderColor: brandColors.border }} />
-
-          <MenuItem
-            onClick={() => { setSettingsAnchor(null); handleLogout(); }}
-            sx={{ borderRadius: '10px', py: 1.2, px: 1.5, color: '#EF4444' }}
-          >
-            <ListItemIcon sx={{ minWidth: 32, color: '#EF4444' }}>
-              <FiLogOut size={16} />
-            </ListItemIcon>
-            <ListItemText primary="Log Out Account" primaryTypographyProps={{ fontSize: '0.85rem', fontWeight: 600 }} />
-          </MenuItem>
-        </Menu>
 
         <Box sx={{ p: { xs: 2, md: 4 } }}>
           <Outlet />
