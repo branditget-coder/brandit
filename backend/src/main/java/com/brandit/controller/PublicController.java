@@ -56,10 +56,13 @@ public class PublicController {
         contactRepository.save(contact);
 
         // Dispatch notification email to BrandIt Team
-        String senderName = (request.getFirstName() != null ? request.getFirstName() : "") + " " + (request.getLastName() != null ? request.getLastName() : "");
-        emailService.sendContactNotification(senderName.trim(), request.getEmail(), request.getPhone(), request.getServiceInterested(), request.getMessage());
+        String senderName = (request.getFirstName() != null ? request.getFirstName() : "") + " "
+                + (request.getLastName() != null ? request.getLastName() : "");
+        emailService.sendContactNotification(senderName.trim(), request.getEmail(), request.getPhone(),
+                request.getServiceInterested(), request.getMessage());
 
-        return ResponseEntity.ok(new MessageResponse("Thank you! Your message has been received. We will contact you within 24 hours."));
+        return ResponseEntity.ok(
+                new MessageResponse("Thank you! Your message has been received. We will contact you within 24 hours."));
     }
 
     @GetMapping("/health")
@@ -76,16 +79,26 @@ public class PublicController {
             health.put("status", "DB_ERROR");
             health.put("error", e.getMessage());
         }
-        health.put("resendConfigured", resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_"));
+        health.put("resendConfigured",
+                resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_"));
         health.put("mailFrom", fromEmail);
         return ResponseEntity.ok(health);
     }
 
     @GetMapping("/test-email")
-    public ResponseEntity<Map<String, Object>> testEmail(@RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
-        log.info("Test email requested synchronously to: {}", to);
-        Map<String, Object> result = emailService.testEmailDirect(to);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<MessageResponse> testEmail(
+            @RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
+        log.info("Test email requested to: {}", to);
+        emailService.sendBookingConfirmation(
+                to,
+                "Valued Client (Test)",
+                "Profile Setup + Branding (₹320/mo)",
+                java.time.LocalDate.now().plusDays(2).toString(),
+                "10:00 AM - 10:30 AM",
+                "₹320",
+                "TEST_PAY_" + System.currentTimeMillis());
+        return ResponseEntity.ok(new MessageResponse(
+                "Test HTML email dispatched. Check Railway logs for dispatch status. (To: " + to + ")"));
     }
 
     @PostMapping("/newsletter")

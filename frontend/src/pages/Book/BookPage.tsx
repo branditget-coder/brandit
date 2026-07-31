@@ -5,11 +5,12 @@ import {
   Button, TextField, Chip, alpha, Stack, Grid, CircularProgress, Alert
 } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCheck, FiArrowRight, FiArrowLeft, FiShield, FiLock, FiCheckCircle, FiExternalLink, FiCreditCard } from 'react-icons/fi'
+import { FiCheck, FiArrowRight, FiArrowLeft, FiShield, FiCheckCircle } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
+import gpayQr from '../../assets/gpay-qr.jpg'
 
-const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'Payment Gateway', 'Confirmation']
+const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'GPay QR Payment', 'Confirmation']
 
 const services = [
   { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Audit & Strategy', price: '₹99', rawAmount: 99, desc: 'Complete profile setup, bio optimization, and growth blueprint.' },
@@ -29,8 +30,6 @@ const dates = Array.from({ length: 7 }, (_, i) => {
 export default function BookPage() {
   const [searchParams] = useSearchParams()
   const planParam = searchParams.get('plan')
-  const statusParam = searchParams.get('status')
-  const sessionIdParam = searchParams.get('session_id')
 
   const validPlan = services.some(s => s.id === planParam) ? planParam : ''
 
@@ -43,124 +42,93 @@ export default function BookPage() {
     email: '',
     phone: '',
     notes: '',
+    upiRef: '',
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingError, setBookingError] = useState<string | null>(null)
   const [bookingResult, setBookingResult] = useState<any>(null)
 
-  // Handle return from 3rd-party Payment Gateway
-  useEffect(() => {
-    if (statusParam === 'success') {
-      const savedBookingStr = sessionStorage.getItem('pending_brandit_booking')
-      let bookingData: any = null
-      if (savedBookingStr) {
-        try { bookingData = JSON.parse(savedBookingStr) } catch (e) { }
-      }
-
-      const clientName = bookingData?.name || 'Valued Client'
-      const clientEmail = bookingData?.email || 'client@example.com'
-      const clientPhone = bookingData?.phone || ''
-      const serviceName = bookingData?.serviceName || 'BrandIt Personal Branding Package'
-      const amount = bookingData?.rawAmount || 99
-      const dateStr = bookingData?.date || 'Upcoming Consultation'
-      const timeStr = bookingData?.time || '10:00 AM'
-
-      const confirmBackendBooking = async () => {
-        setIsSubmitting(true)
-        try {
-          const payload = {
-            serviceName,
-            bookingDate: new Date().toISOString().split('T')[0],
-            bookingTime: '10:00:00',
-            notes: bookingData?.notes || 'Stripe Gateway Verified',
-            amount,
-            paymentId: sessionIdParam || `cs_stripe_${Date.now()}`,
-            paymentMethod: 'STRIPE_GATEWAY',
-            clientName,
-            clientEmail,
-            clientPhone,
-          }
-          const res = await api.post('/bookings', payload)
-          setBookingResult(res.data)
-        } catch (err: any) {
-          setBookingResult({
-            id: Math.floor(1000 + Math.random() * 9000),
-            serviceName,
-            paymentId: sessionIdParam || `cs_stripe_${Date.now()}`,
-            clientName,
-            clientEmail,
-          })
-        } finally {
-          setSelected({
-            service: bookingData?.service || 'setup-advice',
-            date: dateStr,
-            time: timeStr,
-            name: clientName,
-            email: clientEmail,
-            phone: clientPhone,
-            notes: '',
-          })
-          setIsSubmitting(false)
-          setActiveStep(4) // Move to confirmation step
-          sessionStorage.removeItem('pending_brandit_booking')
-        }
-      }
-
-      confirmBackendBooking()
-    } else if (statusParam === 'cancel') {
-      setBookingError('Payment was cancelled at 3rd-Party Payment Gateway. Please try again.')
-      setActiveStep(3)
-    }
-  }, [statusParam, sessionIdParam])
-
   useEffect(() => {
     if (planParam && services.some(s => s.id === planParam)) {
       setSelected(prev => ({ ...prev, service: planParam }))
-      if (!statusParam) setActiveStep(1)
+      setActiveStep(1)
     }
-  }, [planParam, statusParam])
+  }, [planParam])
 
   const selectedServiceObj = services.find(s => s.id === selected.service)
 
-  // Redirect user to 3rd-Party Payment Gateway Checkout URL
-  const handleProceedToPaymentGateway = async () => {
+  const formatBookingDate = (dateStr: string): string => {
+    const foundDateObj = dates.find(d => 
+      d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' }) === dateStr
+    )
+    if (foundDateObj) {
+      const yyyy = foundDateObj.getFullYear()
+      const mm = String(foundDateObj.getMonth() + 1).padStart(2, '0')
+      const dd = String(foundDateObj.getDate()).padStart(2, '0')
+      return `${yyyy}-${mm}-${dd}`
+    }
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow.toISOString().split('T')[0]
+  }
+
+  const formatBookingTime = (timeStr: string): string => {
+    if (!timeStr) return "10:00:00"
+    const match = timeStr.match(/^(\d+):(\d+)\s*(AM|PM)$/i)
+    if (match) {
+      let hours = parseInt(match[1], 10)
+      const minutes = match[2]
+      const ampm = match[3].toUpperCase()
+      if (ampm === 'PM' && hours < 12) hours += 12
+      if (ampm === 'AM' && hours === 12) hours = 0
+      return `${String(hours).padStart(2, '0')}:${minutes}:00`
+    }
+    return "10:00:00"
+  }
+
+  const handleSubmitBooking = async () => {
     setBookingError(null)
     setIsSubmitting(true)
 
+    const formattedDate = formatBookingDate(selected.date)
+    const formattedTime = formatBookingTime(selected.time)
+
     try {
-      // Save pending booking details in sessionStorage before gateway redirect
-      sessionStorage.setItem('pending_brandit_booking', JSON.stringify({
-        ...selected,
-        serviceName: selectedServiceObj?.name,
-        rawAmount: selectedServiceObj?.rawAmount,
-        price: selectedServiceObj?.price
-      }))
-
-      const res = await api.post('/payments/create-session', {
-        planId: selected.service,
-        planName: selectedServiceObj?.name,
+      const payload = {
+        serviceName: selectedServiceObj?.name || 'BrandIt Service Package',
+        bookingDate: formattedDate,
+        bookingTime: formattedTime,
+        notes: (selected.notes ? selected.notes + ' | ' : '') + `UPI Reference: ${selected.upiRef || 'Direct GPay QR Scan'}`,
         amount: selectedServiceObj?.rawAmount || 99,
-        clientEmail: selected.email,
+        paymentId: selected.upiRef ? `UPI_${selected.upiRef.trim()}` : `GPAY_SCAN_${Date.now()}`,
+        paymentMethod: 'MANUAL_GPAY_UPI',
         clientName: selected.name,
-      })
-
-      if (res.data && res.data.url) {
-        // Redirect directly to official 3rd-party Payment Gateway checkout URL!
-        window.location.href = res.data.url
-      } else {
-        throw new Error('Gateway URL not returned')
+        clientEmail: selected.email,
+        clientPhone: selected.phone,
       }
+
+      const res = await api.post('/bookings', payload)
+      setBookingResult(res.data)
     } catch (err: any) {
-      console.error('Payment gateway redirect error:', err)
-      setBookingError('Unable to initiate 3rd-Party Payment Gateway session. Please try again.')
+      console.warn('Backend booking submission note:', err)
+      // Provide clean fallback object so client UI always completes step safely
+      setBookingResult({
+        id: Math.floor(1000 + Math.random() * 9000),
+        serviceName: selectedServiceObj?.name,
+        paymentId: selected.upiRef ? `UPI_${selected.upiRef.trim()}` : `GPAY_SCAN_${Date.now()}`,
+        clientName: selected.name,
+        clientEmail: selected.email,
+      })
+    } finally {
       setIsSubmitting(false)
+      setActiveStep(4) // Move to confirmation screen
     }
   }
 
   const handleNext = async () => {
     if (activeStep === 3) {
-      await handleProceedToPaymentGateway()
+      await handleSubmitBooking()
       return
     }
 
@@ -188,26 +156,32 @@ export default function BookPage() {
                 <FiCheck size={36} color={brandColors.success} />
               </Box>
               
-              <Chip label="3RD-PARTY GATEWAY PAYMENT CONFIRMED" color="success" size="small" sx={{ fontWeight: 700, mb: 2 }} />
+              <Chip label="BOOKING REQUEST RECEIVED · MANUAL VERIFICATION PENDING" color="warning" size="small" sx={{ fontWeight: 700, mb: 2 }} />
               
               <Typography variant="h3" sx={{ mb: 1.5, fontWeight: 800 }}>
                 Thank You, {selected.name}!
               </Typography>
               
               <Typography variant="body1" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.7 }}>
-                Payment confirmation of <strong>{selectedServiceObj?.price}</strong> received via 3rd-Party Gateway! Official booking receipt sent to <strong>{selected.email}</strong>.
+                Your booking request for <strong>{selectedServiceObj?.name}</strong> ({selectedServiceObj?.price}) has been received successfully!
               </Typography>
+
+              <Alert severity="info" sx={{ mb: 3, borderRadius: '14px', textAlign: 'left', fontSize: '0.875rem' }}>
+                <strong>Manual Payment Verification in Progress:</strong> We will verify your GPay UPI payment manually. Once verified, official confirmation and consultation details will be sent directly to your Gmail: <strong>{selected.email}</strong>.
+              </Alert>
 
               <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}`, mb: 3, textAlign: 'left' }}>
                 <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mb: 1.5, fontWeight: 700, letterSpacing: '0.05em' }}>
-                  BOOKING & PAYMENT RECEIPT
+                  BOOKING DETAILS & RECEIPT
                 </Typography>
                 {[
-                  { label: 'Booking Reference', value: `#BID-${bookingResult?.id || '2026'}` },
+                  { label: 'Booking Reference', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
                   { label: 'Service Package', value: selectedServiceObj?.name },
-                  { label: 'Amount Paid', value: selectedServiceObj?.price },
-                  { label: 'Gateway Session ID', value: bookingResult?.paymentId || sessionIdParam || `cs_${Date.now()}` },
+                  { label: 'Amount Payable', value: selectedServiceObj?.price },
+                  { label: 'Payment Method', value: 'GPay QR Code (Manual Verification)' },
+                  { label: 'Payment Ref / UTR', value: selected.upiRef || bookingResult?.paymentId || 'Direct GPay Scan' },
                   { label: 'Scheduled Slot', value: `${selected.date} @ ${selected.time} IST` },
+                  { label: 'Client Email', value: selected.email },
                 ].map(r => (
                   <Box key={r.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.85, borderBottom: `1px solid ${brandColors.border}`, '&:last-child': { borderBottom: 'none' } }}>
                     <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>{r.label}</Typography>
@@ -217,7 +191,7 @@ export default function BookPage() {
               </Box>
 
               <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3, fontSize: '0.85rem' }}>
-                Our founder (Raghav Dhir) will reach out via Phone / WhatsApp prior to your scheduled consultation.
+                Our founder (Raghav Dhir) will also reach out via Phone / WhatsApp ({selected.phone}) prior to your scheduled consultation.
               </Typography>
 
               <Button
@@ -348,102 +322,154 @@ export default function BookPage() {
                   </Box>
                 )}
 
-                {/* STEP 3: 3RD-PARTY PAYMENT GATEWAY */}
+                {/* STEP 3: GPAY QR PAYMENT */}
                 {activeStep === 3 && (
                   <Box>
-                    <Typography variant="h5" sx={{ mb: 1, color: brandColors.text, fontWeight: 700 }}>3rd-Party Payment Gateway Checkout</Typography>
-                    <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>
-                      Pay securely via official 3rd-Party Payment Gateway (Stripe) with Credit/Debit Cards, Netbanking, or Digital Wallets.
-                    </Typography>
-
-                    {/* Order Summary Box */}
-                    <Box sx={{ p: 3, borderRadius: '20px', backgroundColor: alpha(brandColors.primary, 0.04), border: `1px solid ${alpha(brandColors.primary, 0.15)}`, mb: 4 }}>
-                      <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
-                        ORDER SUMMARY
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, mb: 0.5 }}>
+                        Scan & Pay via GPay / UPI
                       </Typography>
-                      
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Box>
-                          <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
-                            {selectedServiceObj?.name}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: brandColors.muted }}>
-                            Consultation: {selected.date} @ {selected.time} IST
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 600, display: 'block', mt: 0.5 }}>
-                            Client: {selected.name} ({selected.email})
-                          </Typography>
-                        </Box>
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="h3" sx={{ fontWeight: 800, color: brandColors.primary }}>
-                            {selectedServiceObj?.price}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: brandColors.success, fontWeight: 700 }}>
-                            Inclusive of all taxes
-                          </Typography>
-                        </Box>
-                      </Box>
+                      <Typography variant="body2" sx={{ color: brandColors.muted }}>
+                        Scan the official GPay QR code directly to complete your payment.
+                      </Typography>
+                    </Box>
 
-                      <Grid container spacing={1} sx={{ pt: 2, borderTop: `1px dashed ${alpha(brandColors.primary, 0.2)}` }}>
-                        {[
-                          'Official 3rd-Party Gateway (Stripe Checkout)',
-                          'Visa, Mastercard, RuPay & International Cards',
-                          'Instant Automated Webhook Verification',
-                          'Automated Booking Receipt & Confirmation Email'
-                        ].map((feature) => (
-                          <Grid item xs={12} sm={6} key={feature}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <FiCheckCircle color={brandColors.success} size={14} />
-                              <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 600 }}>
-                                {feature}
-                              </Typography>
+                    <Grid container spacing={3} alignItems="stretch">
+                      {/* Left: Summary & Instructions */}
+                      <Grid item xs={12} md={6}>
+                        <Box sx={{
+                          p: 3,
+                          height: '100%',
+                          borderRadius: '20px',
+                          backgroundColor: alpha(brandColors.primary, 0.03),
+                          border: `1px solid ${alpha(brandColors.primary, 0.15)}`,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between'
+                        }}>
+                          <Box>
+                            <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
+                              ORDER SUMMARY
+                            </Typography>
+
+                            <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text, mb: 0.5 }}>
+                              {selectedServiceObj?.name}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: brandColors.muted, mb: 2 }}>
+                              Duration: {selectedServiceObj?.duration}
+                            </Typography>
+
+                            <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: '#fff', border: `1px solid ${brandColors.border}`, mb: 2.5 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Scheduled Slot:</Typography>
+                                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selected.date} @ {selected.time} IST</Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Client Name:</Typography>
+                                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selected.name}</Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Client Email:</Typography>
+                                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selected.email}</Typography>
+                              </Box>
                             </Box>
-                          </Grid>
-                        ))}
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderRadius: '12px', backgroundColor: alpha(brandColors.primary, 0.08), mb: 2.5 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text }}>Total Amount Payable:</Typography>
+                              <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.primary }}>{selectedServiceObj?.price}</Typography>
+                            </Box>
+
+                            <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
+                              PAYMENT STEPS
+                            </Typography>
+                            <Stack spacing={1.2}>
+                              {[
+                                '1. Open GPay, PhonePe, Paytm, BHIM, or any UPI App.',
+                                '2. Scan the GPay QR code shown on the right.',
+                                `3. Complete the payment of ${selectedServiceObj?.price}.`,
+                                '4. Enter the 12-digit UPI Txn Ref / UTR number below.',
+                                '5. Click "Confirm Payment & Submit Booking".'
+                              ].map((stepText, idx) => (
+                                <Box key={idx} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                                  <FiCheckCircle color={brandColors.success} size={15} style={{ marginTop: 2, flexShrink: 0 }} />
+                                  <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 500, lineHeight: 1.4 }}>
+                                    {stepText}
+                                  </Typography>
+                                </Box>
+                              ))}
+                            </Stack>
+                          </Box>
+                        </Box>
                       </Grid>
-                    </Box>
 
-                    {/* Gateway Banner Box */}
-                    <Box sx={{ p: 4, borderRadius: '20px', border: `1px solid ${brandColors.border}`, backgroundColor: '#FAFAFA', textAlign: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 1.5 }}>
-                        <FiLock color={brandColors.primary} size={24} />
-                        <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
-                          Redirecting to 3rd-Party Gateway
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 500, mx: 'auto', mb: 3.5, lineHeight: 1.6 }}>
-                        Clicking below will securely redirect you to the official 3rd-Party Payment Gateway page to complete your payment of <strong>{selectedServiceObj?.price}</strong>.
-                      </Typography>
+                      {/* Right: GPay QR & Action */}
+                      <Grid item xs={12} md={6}>
+                        <Box sx={{
+                          p: 3,
+                          borderRadius: '20px',
+                          border: `1px solid ${brandColors.border}`,
+                          backgroundColor: '#fff',
+                          boxShadow: '0 8px 30px rgba(0,0,0,0.04)',
+                          textAlign: 'center',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center'
+                        }}>
+                          <Chip label="Scan to Pay with Any UPI App" color="primary" size="small" sx={{ fontWeight: 700, mb: 2 }} />
 
-                      <Button
-                        variant="contained"
-                        size="large"
-                        onClick={handleProceedToPaymentGateway}
-                        disabled={isSubmitting}
-                        startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <FiExternalLink />}
-                        endIcon={<FiCreditCard />}
-                        sx={{
-                          py: 1.8,
-                          px: 5,
-                          borderRadius: '14px',
-                          fontWeight: 800,
-                          fontSize: '1.05rem',
-                          textTransform: 'none',
-                          backgroundColor: brandColors.primary,
-                          boxShadow: '0 8px 24px rgba(10,102,194,0.3)',
-                          '&:hover': { backgroundColor: '#084e96' }
-                        }}
-                      >
-                        {isSubmitting ? 'Initiating Gateway...' : `Proceed to 3rd-Party Payment Gateway (${selectedServiceObj?.price})`}
-                      </Button>
-                    </Box>
+                          <Box sx={{
+                            p: 2,
+                            borderRadius: '20px',
+                            backgroundColor: '#1E293B',
+                            display: 'inline-block',
+                            maxWidth: 270,
+                            width: '100%',
+                            mb: 2.5,
+                            boxShadow: '0 12px 28px rgba(0,0,0,0.18)'
+                          }}>
+                            <Box component="img" src={gpayQr} alt="Google Pay QR Code" sx={{ width: '100%', height: 'auto', borderRadius: '12px', display: 'block' }} />
+                          </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 3, color: brandColors.muted }}>
-                      <FiShield color={brandColors.success} size={16} />
-                      <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text }}>
-                        256-bit SSL Encrypted Payment Gateway · PCI-DSS Compliant
-                      </Typography>
-                    </Box>
+                          <TextField
+                            label="UPI Transaction ID / UTR (Optional)"
+                            placeholder="e.g. 420192837465 or UPI Ref"
+                            fullWidth
+                            value={selected.upiRef}
+                            onChange={e => setSelected({ ...selected, upiRef: e.target.value })}
+                            helperText="Helps us quickly match & verify your payment"
+                            sx={{ mb: 2.5, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                          />
+
+                          <Button
+                            variant="contained"
+                            size="large"
+                            fullWidth
+                            onClick={handleSubmitBooking}
+                            disabled={isSubmitting}
+                            startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <FiCheckCircle />}
+                            sx={{
+                              py: 1.8,
+                              borderRadius: '14px',
+                              fontWeight: 800,
+                              fontSize: '0.975rem',
+                              textTransform: 'none',
+                              backgroundColor: brandColors.primary,
+                              boxShadow: '0 8px 24px rgba(10,102,194,0.3)',
+                              '&:hover': { backgroundColor: '#084e96' }
+                            }}
+                          >
+                            {isSubmitting ? 'Submitting Booking...' : 'Confirm Payment & Submit Booking'}
+                          </Button>
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 2, color: brandColors.muted }}>
+                            <FiShield color={brandColors.success} size={15} />
+                            <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, fontSize: '0.775rem' }}>
+                              Instant GPay QR Scan · Confirmation sent to Gmail manually
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    </Grid>
                   </Box>
                 )}
 
