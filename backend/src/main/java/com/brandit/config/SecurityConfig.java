@@ -95,6 +95,7 @@ public class SecurityConfig {
         // Use allowedOriginPatterns to support wildcards (required when allowCredentials = true)
         config.addAllowedOriginPattern("http://localhost:*");
         config.addAllowedOriginPattern("https://*.vercel.app");
+        config.addAllowedOriginPattern("https://*.up.railway.app");
         // Also add any explicitly configured origins
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
             for (String origin : allowedOrigins.split(",")) {

@@ -1,23 +1,25 @@
 import axios from 'axios'
 
 const getApiBaseUrl = () => {
-  let rawUrl = import.meta.env.VITE_API_URL || '/api'
-  if (rawUrl === '/api') return '/api'
-
-  // Prepend https:// if protocol is missing
-  if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
-    rawUrl = `https://${rawUrl}`
+  let rawUrl = import.meta.env.VITE_API_URL
+  if (rawUrl && rawUrl.trim() !== '' && rawUrl !== '/api') {
+    let clean = rawUrl.trim()
+    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+      clean = `https://${clean}`
+    }
+    clean = clean.replace(/\/+$/, '')
+    if (!clean.endsWith('/api')) {
+      clean = `${clean}/api`
+    }
+    return clean
   }
 
-  // Remove trailing slashes
-  rawUrl = rawUrl.replace(/\/+$/, '')
-
-  // Append /api if not present
-  if (!rawUrl.endsWith('/api')) {
-    rawUrl = `${rawUrl}/api`
+  // If in production browser environment (e.g. go-brandit.vercel.app), default to Railway production API endpoint
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://brandit-production-61bf.up.railway.app/api'
   }
 
-  return rawUrl
+  return '/api'
 }
 
 export const API_BASE_URL = getApiBaseUrl()
