@@ -8,7 +8,7 @@ import {
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   FiHome, FiCalendar, FiFileText, FiUser,
-  FiMenu, FiLogOut, FiBell, FiSettings, FiCheck, FiLock, FiChevronRight
+  FiMenu, FiLogOut, FiBell, FiSettings, FiCheck, FiLock, FiShield
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -41,8 +41,8 @@ export default function DashboardLayout() {
   const { user, logout } = useAuth()
 
   // State for Notifications & Settings Popovers
-  const [notifAnchor, setNotifAnchor] = useState<HTMLElement | null>(null)
-  const [settingsAnchor, setSettingsAnchor] = useState<HTMLElement | null>(null)
+  const [notifAnchor, setNotifAnchor] = useState<HTMLButtonElement | null>(null)
+  const [settingsAnchor, setSettingsAnchor] = useState<HTMLButtonElement | null>(null)
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
@@ -89,6 +89,16 @@ export default function DashboardLayout() {
     if (link) {
       navigate(link)
     }
+  }
+
+  const handleSettingsClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    setSettingsAnchor(e.currentTarget)
+  }
+
+  const handleNotifClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    setNotifAnchor(e.currentTarget)
   }
 
   const DrawerContent = () => (
@@ -211,6 +221,7 @@ export default function DashboardLayout() {
             backdropFilter: 'blur(20px)',
             borderBottom: `1px solid ${brandColors.border}`,
             color: brandColors.text,
+            zIndex: (t) => t.zIndex.drawer + 1,
           }}
         >
           <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 } }}>
@@ -228,34 +239,38 @@ export default function DashboardLayout() {
               
               {/* NOTIFICATION BELL BUTTON */}
               <IconButton
+                id="notification-bell-btn"
                 size="small"
                 aria-label="Notifications"
-                onClick={(e) => setNotifAnchor(e.currentTarget)}
+                onClick={handleNotifClick}
                 sx={{
                   p: 1,
                   borderRadius: '10px',
-                  backgroundColor: Boolean(notifAnchor) ? alpha(brandColors.primary, 0.1) : 'transparent',
+                  backgroundColor: Boolean(notifAnchor) ? alpha(brandColors.primary, 0.12) : 'transparent',
+                  border: Boolean(notifAnchor) ? `1px solid ${alpha(brandColors.primary, 0.3)}` : '1px solid transparent',
                   '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) }
                 }}
               >
                 <Badge color="error" variant="dot" invisible={unreadCount === 0}>
-                  <FiBell size={18} color={Boolean(notifAnchor) ? brandColors.primary : brandColors.muted} />
+                  <FiBell size={20} color={Boolean(notifAnchor) ? brandColors.primary : brandColors.muted} />
                 </Badge>
               </IconButton>
 
               {/* SETTINGS GEAR BUTTON */}
               <IconButton
+                id="settings-gear-btn"
                 size="small"
                 aria-label="Settings"
-                onClick={(e) => setSettingsAnchor(e.currentTarget)}
+                onClick={handleSettingsClick}
                 sx={{
                   p: 1,
                   borderRadius: '10px',
-                  backgroundColor: Boolean(settingsAnchor) ? alpha(brandColors.primary, 0.1) : 'transparent',
+                  backgroundColor: Boolean(settingsAnchor) ? alpha(brandColors.primary, 0.12) : 'transparent',
+                  border: Boolean(settingsAnchor) ? `1px solid ${alpha(brandColors.primary, 0.3)}` : '1px solid transparent',
                   '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) }
                 }}
               >
-                <FiSettings size={18} color={Boolean(settingsAnchor) ? brandColors.primary : brandColors.muted} />
+                <FiSettings size={20} color={Boolean(settingsAnchor) ? brandColors.primary : brandColors.muted} />
               </IconButton>
 
             </Box>
@@ -264,20 +279,23 @@ export default function DashboardLayout() {
 
         {/* NOTIFICATIONS POPOVER MENU */}
         <Popover
+          id="notification-popover"
           open={Boolean(notifAnchor)}
           anchorEl={notifAnchor}
           onClose={() => setNotifAnchor(null)}
+          disableScrollLock
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           PaperProps={{
             sx: {
-              width: { xs: 320, sm: 360 },
-              borderRadius: '16px',
+              width: { xs: 310, sm: 360 },
+              borderRadius: '18px',
               mt: 1.5,
               p: 0,
-              boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.16)',
               border: `1px solid ${brandColors.border}`,
-              overflow: 'hidden'
+              overflow: 'hidden',
+              zIndex: 1600,
             }
           }}
         >
@@ -338,19 +356,22 @@ export default function DashboardLayout() {
 
         {/* SETTINGS MENU */}
         <Menu
+          id="settings-menu"
           anchorEl={settingsAnchor}
           open={Boolean(settingsAnchor)}
           onClose={() => setSettingsAnchor(null)}
+          disableScrollLock
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           PaperProps={{
             sx: {
-              width: 240,
-              borderRadius: '16px',
+              width: 250,
+              borderRadius: '18px',
               mt: 1.5,
               p: 1,
-              boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
-              border: `1px solid ${brandColors.border}`
+              boxShadow: '0 16px 48px rgba(0,0,0,0.16)',
+              border: `1px solid ${brandColors.border}`,
+              zIndex: 1600,
             }
           }}
         >
@@ -362,7 +383,7 @@ export default function DashboardLayout() {
 
           <MenuItem
             onClick={() => { setSettingsAnchor(null); navigate('/dashboard/profile'); }}
-            sx={{ borderRadius: '10px', py: 1, px: 1.5 }}
+            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
           >
             <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
               <FiUser size={16} />
@@ -372,7 +393,7 @@ export default function DashboardLayout() {
 
           <MenuItem
             onClick={() => { setSettingsAnchor(null); navigate('/dashboard/profile'); }}
-            sx={{ borderRadius: '10px', py: 1, px: 1.5 }}
+            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
           >
             <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
               <FiLock size={16} />
@@ -382,7 +403,7 @@ export default function DashboardLayout() {
 
           <MenuItem
             onClick={() => { setSettingsAnchor(null); navigate('/dashboard/bookings'); }}
-            sx={{ borderRadius: '10px', py: 1, px: 1.5 }}
+            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
           >
             <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
               <FiCalendar size={16} />
@@ -392,7 +413,7 @@ export default function DashboardLayout() {
 
           <MenuItem
             onClick={() => { setSettingsAnchor(null); navigate('/dashboard/invoices'); }}
-            sx={{ borderRadius: '10px', py: 1, px: 1.5 }}
+            sx={{ borderRadius: '10px', py: 1.2, px: 1.5 }}
           >
             <ListItemIcon sx={{ minWidth: 32, color: brandColors.primary }}>
               <FiFileText size={16} />
@@ -404,7 +425,7 @@ export default function DashboardLayout() {
 
           <MenuItem
             onClick={() => { setSettingsAnchor(null); handleLogout(); }}
-            sx={{ borderRadius: '10px', py: 1, px: 1.5, color: '#EF4444' }}
+            sx={{ borderRadius: '10px', py: 1.2, px: 1.5, color: '#EF4444' }}
           >
             <ListItemIcon sx={{ minWidth: 32, color: '#EF4444' }}>
               <FiLogOut size={16} />
