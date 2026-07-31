@@ -7,23 +7,40 @@ import com.brandit.entity.Testimonial;
 import com.brandit.repository.ContactRepository;
 import com.brandit.repository.NewsletterRepository;
 import com.brandit.repository.TestimonialRepository;
+import com.brandit.repository.UserRepository;
+import com.brandit.service.EmailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class PublicController {
 
     private final ContactRepository contactRepository;
     private final NewsletterRepository newsletterRepository;
     private final TestimonialRepository testimonialRepository;
-    private final com.brandit.service.EmailService emailService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final DataSource dataSource;
+
+    @Value("${resend.api.key:}")
+    private String resendApiKey;
+
+    @Value("${app.mail.from:NOT_SET}")
+    private String fromEmail;
 
     @PostMapping("/contact")
     public ResponseEntity<MessageResponse> submitContact(@Valid @RequestBody ContactRequest request) {
@@ -45,8 +62,28 @@ public class PublicController {
         return ResponseEntity.ok(new MessageResponse("Thank you! Your message has been received. We will contact you within 24 hours."));
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        Map<String, Object> health = new HashMap<>();
+        try (Connection conn = dataSource.getConnection()) {
+            String dbUrl = conn.getMetaData().getURL();
+            String dbType = dbUrl.contains("postgresql") ? "PostgreSQL" : dbUrl.contains("h2") ? "H2" : "Unknown";
+            health.put("database", dbType);
+            health.put("databaseUrl", dbUrl.replaceAll("password=[^&]*", "password=***"));
+            health.put("userCount", userRepository.count());
+            health.put("status", "UP");
+        } catch (Exception e) {
+            health.put("status", "DB_ERROR");
+            health.put("error", e.getMessage());
+        }
+        health.put("resendConfigured", resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_"));
+        health.put("mailFrom", fromEmail);
+        return ResponseEntity.ok(health);
+    }
+
     @GetMapping("/test-email")
     public ResponseEntity<MessageResponse> testEmail(@RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
+        log.info("Test email requested to: {}", to);
         emailService.sendBookingConfirmation(
                 to,
                 "Valued Client (Test)",
@@ -56,7 +93,7 @@ public class PublicController {
                 "₹320",
                 "TEST_PAY_" + System.currentTimeMillis()
         );
-        return ResponseEntity.ok(new MessageResponse("Test HTML email dispatched successfully to: " + to));
+        return ResponseEntity.ok(new MessageResponse("Test HTML email dispatched. Check Railway logs for dispatch status. (To: " + to + ")"));
     }
 
     @PostMapping("/newsletter")

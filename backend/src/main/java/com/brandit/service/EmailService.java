@@ -30,21 +30,21 @@ public class EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
-    @Value("${resend.api.key:${RESEND_API_KEY:}}")
+    @Value("${resend.api.key:}")
     private String resendApiKey;
 
-    @Value("${brevo.api.key:${BREVO_API_KEY:}}")
+    @Value("${brevo.api.key:}")
     private String brevoApiKey;
 
-    @Value("${app.mail.from:brandit.get@gmail.com}")
+    @Value("${app.mail.from:onboarding@resend.dev}")
     private String fromEmail;
 
-    @Value("${app.frontend.url:https://brandit-frontend.vercel.app}")
+    @Value("${app.frontend.url:https://brandit-eta.vercel.app}")
     private String frontendUrl;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
+            .connectTimeout(Duration.ofSeconds(15))
             .build();
 
     /**
@@ -207,14 +207,18 @@ public class EmailService {
         log.info("================ EMAIL DISPATCH LOG ================");
         log.info("To: {}", to);
         log.info("Subject: {}", subject);
+        log.info("Resend API Key configured: {}", (resendApiKey != null && !resendApiKey.isBlank()) ? "YES (starts with: " + resendApiKey.substring(0, Math.min(5, resendApiKey.length())) + "...)" : "NO");
+        log.info("Brevo API Key configured: {}", (brevoApiKey != null && !brevoApiKey.isBlank()) ? "YES" : "NO");
+        log.info("JavaMailSender available: {}", mailSender != null ? "YES" : "NO");
         log.info("====================================================");
 
         CompletableFuture.runAsync(() -> {
             // Option 1: Resend HTTPS REST API (Primary - resend.com over Port 443)
             if (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")) {
                 try {
-                    String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("gmail.com"))
-                            ? fromEmail
+                    // Use verified domain sender if configured, otherwise fallback to resend sandbox
+                    String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("resend.dev"))
+                            ? "BrandIt Consulting <" + fromEmail + ">"
                             : "BrandIt Consulting <onboarding@resend.dev>";
 
                     Map<String, Object> payload = new HashMap<>();
@@ -224,26 +228,30 @@ public class EmailService {
                     payload.put("html", htmlBody);
 
                     String jsonPayload = objectMapper.writeValueAsString(payload);
+                    log.info("Attempting Resend API with sender: {}", sender);
 
                     HttpRequest httpRequest = HttpRequest.newBuilder()
                             .uri(URI.create("https://api.resend.com/emails"))
                             .header("Authorization", "Bearer " + resendApiKey.trim())
                             .header("Content-Type", "application/json")
                             .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                            .timeout(Duration.ofSeconds(5))
+                            .timeout(Duration.ofSeconds(15))
                             .build();
 
                     HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
                     if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                        log.info("Successfully dispatched email via Resend HTTPS REST API (HTTP {}) to {}", response.statusCode(), to);
+                        log.info("✅ Successfully dispatched email via Resend API (HTTP {}) to {}", response.statusCode(), to);
                         return;
                     } else {
-                        log.warn("Resend HTTPS API returned status {}: {}", response.statusCode(), response.body());
+                        log.warn("❌ Resend API returned status {}: {}", response.statusCode(), response.body());
                     }
                 } catch (Exception e) {
-                    log.warn("Resend HTTPS API error: {}", e.getMessage());
+                    log.warn("❌ Resend API exception: {}", e.getMessage(), e);
                 }
+            } else {
+                log.warn("⚠️ Skipping Resend: key is blank or does not start with 're_'. Key value: '{}'",
+                        resendApiKey != null ? resendApiKey.substring(0, Math.min(10, resendApiKey.length())) + "..." : "null");
             }
 
             // Option 2: Brevo HTTPS REST API (Fallback over Port 443)

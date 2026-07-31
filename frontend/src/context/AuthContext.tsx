@@ -29,7 +29,7 @@ interface AuthContextType {
   closeSessionExpiredModal: () => void
 }
 
-const SESSION_TIMEOUT_MS = 10 * 60 * 1000 // 10 minutes
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes (was 10, too aggressive for users)
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -105,14 +105,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAuthStatus = async () => {
       try {
         const token = localStorage.getItem('brandit_access_token')
-        if (token) {
+        if (!token) {
+          setIsLoading(false)
+          return
+        }
+
+        try {
           const res = await api.get<User>('/auth/me')
           setUser(res.data)
           localStorage.setItem('brandit_user', JSON.stringify(res.data))
+        } catch (err: any) {
+          const status = err?.response?.status
+          // Only hard-logout on explicit auth failures (401/403)
+          // On network error, 500, or Railway cold-start timeout: keep cached user
+          if (status === 401 || status === 403) {
+            // Try refresh token first before giving up
+            const refreshToken = localStorage.getItem('brandit_refresh_token')
+            if (refreshToken) {
+              try {
+                const refreshRes = await api.post('/auth/refresh', { refreshToken })
+                const newAccessToken = refreshRes.data.accessToken
+                localStorage.setItem('brandit_access_token', newAccessToken)
+                // Retry /me with new token
+                const retryRes = await api.get<User>('/auth/me')
+                setUser(retryRes.data)
+                localStorage.setItem('brandit_user', JSON.stringify(retryRes.data))
+              } catch (_refreshErr) {
+                // Refresh also failed — truly expired, log out
+                logout()
+              }
+            } else {
+              logout()
+            }
+          }
+          // For network errors / server errors: silently keep cached user state
         }
-      } catch (err) {
-        // Token invalid or network error
-        logout()
       } finally {
         setIsLoading(false)
       }
