@@ -142,50 +142,77 @@ export default function BookPage() {
   const canNext = () => {
     if (activeStep === 0) return !!selected.service
     if (activeStep === 1) return !!selected.date && !!selected.time
-    if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@')
+    if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@') && !!selected.phone
     return true
   }
 
   if (activeStep === 4) {
     return (
-      <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', py: 10, backgroundColor: brandColors.background }}>
-        <Container maxWidth="sm">
+      <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', py: { xs: 4, md: 10 }, backgroundColor: brandColors.background }}>
+        <Container maxWidth="sm" sx={{ px: { xs: 2, sm: 3 } }}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-            <Box sx={{ textAlign: 'center', p: { xs: 4, sm: 6 }, borderRadius: '28px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', boxShadow: '0 12px 36px rgba(0,0,0,0.05)' }}>
+            <Box sx={{ textAlign: 'center', p: { xs: 3, sm: 5, md: 6 }, borderRadius: '28px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', boxShadow: '0 12px 36px rgba(0,0,0,0.05)' }}>
               <Box sx={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: alpha(brandColors.success, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 3 }}>
                 <FiCheck size={36} color={brandColors.success} />
               </Box>
               
-              <Chip label="BOOKING REQUEST RECEIVED · MANUAL VERIFICATION PENDING" color="warning" size="small" sx={{ fontWeight: 700, mb: 2 }} />
+              <Chip label="BOOKING REQUEST RECEIVED · MANUAL VERIFICATION PENDING" color="warning" size="small" sx={{ fontWeight: 700, mb: 2, height: 'auto', py: 0.5, '& .MuiChip-label': { whiteSpace: 'normal', fontSize: '0.72rem' } }} />
               
-              <Typography variant="h3" sx={{ mb: 1.5, fontWeight: 800 }}>
+              <Typography variant="h3" sx={{ mb: 1.5, fontWeight: 800, fontSize: { xs: '1.6rem', sm: '2rem' } }}>
                 Thank You, {selected.name}!
               </Typography>
               
-              <Typography variant="body1" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.7 }}>
+              <Typography variant="body1" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.7, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                 Your booking request for <strong>{selectedServiceObj?.name}</strong> ({selectedServiceObj?.price}) has been received successfully!
               </Typography>
 
-              <Alert severity="info" sx={{ mb: 3, borderRadius: '14px', textAlign: 'left', fontSize: '0.875rem' }}>
-                <strong>Manual Payment Verification in Progress:</strong> We will verify your GPay UPI payment manually. Once verified, official confirmation and consultation details will be sent directly to your Gmail: <strong>{selected.email}</strong>.
+              <Alert severity="info" sx={{ mb: 3, borderRadius: '14px', textAlign: 'left', fontSize: '0.85rem' }}>
+                <strong>Manual Payment Verification in Progress:</strong> We will verify your GPay UPI payment manually. Once verified, official confirmation and consultation details will be sent directly to your Gmail: <span style={{ wordBreak: 'break-all' }}><strong>{selected.email}</strong></span>.
               </Alert>
 
-              <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}`, mb: 3, textAlign: 'left' }}>
+              {/* Responsive Receipt Box for Mobile & Desktop */}
+              <Box sx={{ p: { xs: 2, sm: 3 }, borderRadius: '16px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}`, mb: 3, textAlign: 'left' }}>
                 <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mb: 1.5, fontWeight: 700, letterSpacing: '0.05em' }}>
                   BOOKING DETAILS & RECEIPT
                 </Typography>
                 {[
-                  { label: 'Booking Reference', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
-                  { label: 'Service Package', value: selectedServiceObj?.name },
-                  { label: 'Amount Payable', value: selectedServiceObj?.price },
-                  { label: 'Payment Method', value: 'GPay QR Code (Manual Verification)' },
-                  { label: 'Payment Ref / UTR', value: selected.upiRef || bookingResult?.paymentId || 'Direct GPay Scan' },
-                  { label: 'Scheduled Slot', value: `${selected.date} @ ${selected.time} IST` },
-                  { label: 'Client Email', value: selected.email },
+                  { label: 'BOOKING REFERENCE', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
+                  { label: 'SERVICE PACKAGE', value: selectedServiceObj?.name },
+                  { label: 'AMOUNT PAYABLE', value: selectedServiceObj?.price },
+                  { label: 'PAYMENT METHOD', value: 'GPay QR Code (Manual Verification)' },
+                  { label: 'PAYMENT REF / UTR', value: selected.upiRef || bookingResult?.paymentId || 'Direct GPay Scan' },
+                  { label: 'SCHEDULED SLOT', value: `${selected.date} @ ${selected.time} IST` },
+                  { label: 'CLIENT EMAIL', value: selected.email },
                 ].map(r => (
-                  <Box key={r.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.85, borderBottom: `1px solid ${brandColors.border}`, '&:last-child': { borderBottom: 'none' } }}>
-                    <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>{r.label}</Typography>
-                    <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{r.value}</Typography>
+                  <Box
+                    key={r.label}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      justifyContent: 'space-between',
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      gap: { xs: 0.25, sm: 2 },
+                      py: 1,
+                      borderBottom: `1px solid ${brandColors.border}`,
+                      '&:last-child': { borderBottom: 'none' }
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, fontSize: '0.75rem', flexShrink: 0 }}>
+                      {r.label}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: brandColors.text,
+                        fontWeight: 700,
+                        fontSize: '0.825rem',
+                        textAlign: { xs: 'left', sm: 'right' },
+                        wordBreak: 'break-word',
+                        maxWidth: '100%'
+                      }}
+                    >
+                      {r.value}
+                    </Typography>
                   </Box>
                 ))}
               </Box>
@@ -197,7 +224,7 @@ export default function BookPage() {
               <Button
                 variant="contained"
                 onClick={() => window.location.href = '/'}
-                sx={{ py: 1.2, px: 4, borderRadius: '12px', fontWeight: 700, textTransform: 'none', backgroundColor: brandColors.primary }}
+                sx={{ py: 1.2, px: 4, borderRadius: '12px', fontWeight: 700, textTransform: 'none', backgroundColor: brandColors.primary, width: { xs: '100%', sm: 'auto' } }}
               >
                 Return to Homepage
               </Button>
@@ -209,19 +236,19 @@ export default function BookPage() {
   }
 
   return (
-    <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: brandColors.background }}>
-      <Container maxWidth="md">
+    <Box sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background }}>
+      <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 } }}>
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h2" sx={{ mb: 1.5 }}>
+          <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6 } }}>
+            <Typography variant="h2" sx={{ mb: 1.5, fontSize: { xs: '1.8rem', sm: '2.4rem', md: '2.8rem' } }}>
               {selectedServiceObj ? `Booking ${selectedServiceObj.name}` : 'Select Your BrandIt Package'}
             </Typography>
-            <Typography variant="body1" sx={{ color: brandColors.muted }}>
+            <Typography variant="body1" sx={{ color: brandColors.muted, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
               Transparent services tailored to build your career authority.
             </Typography>
           </Box>
 
-          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 5, '& .MuiStepLabel-label': { fontWeight: 500, fontSize: { xs: '0.7rem', sm: '0.85rem' } } }}>
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: { xs: 4, sm: 5 }, '& .MuiStepLabel-label': { fontWeight: 500, fontSize: { xs: '0.65rem', sm: '0.85rem' } } }}>
             {steps.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
@@ -229,7 +256,7 @@ export default function BookPage() {
             ))}
           </Stepper>
 
-          <Box sx={{ p: { xs: 3, md: 5 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', minHeight: 400, boxShadow: '0 4px 24px rgba(0,0,0,0.03)' }}>
+          <Box sx={{ p: { xs: 2.5, sm: 4, md: 5 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', minHeight: 400, boxShadow: '0 4px 24px rgba(0,0,0,0.03)' }}>
             
             {bookingError && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{bookingError}</Alert>}
 
@@ -239,19 +266,19 @@ export default function BookPage() {
                 {/* STEP 0: CHOOSE PLAN */}
                 {activeStep === 0 && (
                   <Box>
-                    <Typography variant="h5" sx={{ mb: 3, color: brandColors.text, fontWeight: 700 }}>Which service package do you need?</Typography>
+                    <Typography variant="h5" sx={{ mb: 3, color: brandColors.text, fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Which service package do you need?</Typography>
                     <Stack spacing={2}>
                       {services.map(s => (
                         <Box
                           key={s.id}
                           onClick={() => setSelected({ ...selected, service: s.id })}
                           sx={{
-                            p: 2.5, borderRadius: '16px', border: `2px solid ${selected.service === s.id ? brandColors.primary : brandColors.border}`,
+                            p: { xs: 2, sm: 2.5 }, borderRadius: '16px', border: `2px solid ${selected.service === s.id ? brandColors.primary : brandColors.border}`,
                             cursor: 'pointer', transition: 'all 0.2s', backgroundColor: selected.service === s.id ? alpha(brandColors.primary, 0.03) : '#fff',
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5
                           }}
                         >
-                          <Box sx={{ maxWidth: '70%' }}>
+                          <Box sx={{ maxWidth: { xs: '100%', sm: '70%' } }}>
                             <Typography variant="body1" sx={{ fontWeight: 700, color: brandColors.text }}>{s.name}</Typography>
                             <Typography variant="body2" sx={{ color: brandColors.muted, fontSize: '0.825rem', mt: 0.5 }}>{s.desc}</Typography>
                           </Box>
@@ -266,7 +293,7 @@ export default function BookPage() {
                 {activeStep === 1 && (
                   <Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
-                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700 }}>Choose consultation date & time</Typography>
+                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Choose consultation date & time</Typography>
                       {selectedServiceObj && (
                         <Chip
                           label={`Selected: ${selectedServiceObj.price}`}
@@ -303,22 +330,60 @@ export default function BookPage() {
                   </Box>
                 )}
 
-                {/* STEP 2: YOUR DETAILS */}
+                {/* STEP 2: YOUR DETAILS - FULLY ALIGNED GRID FORM */}
                 {activeStep === 2 && (
                   <Box>
-                    <Typography variant="h5" sx={{ mb: 3, color: brandColors.text, fontWeight: 700 }}>Your Contact & Profile Details</Typography>
-                    <Stack spacing={2.5}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField label="Full Name" fullWidth required value={selected.name} onChange={e => setSelected({ ...selected, name: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField label="Email Address (For Confirmation)" type="email" fullWidth required value={selected.email} onChange={e => setSelected({ ...selected, email: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                        </Grid>
+                    <Typography variant="h5" sx={{ mb: 3, color: brandColors.text, fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+                      Your Contact & Profile Details
+                    </Typography>
+
+                    <Grid container spacing={2.5}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          label="Full Name"
+                          fullWidth
+                          required
+                          value={selected.name}
+                          onChange={e => setSelected({ ...selected, name: e.target.value })}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
                       </Grid>
-                      <TextField label="Phone / WhatsApp Number" fullWidth required value={selected.phone} onChange={e => setSelected({ ...selected, phone: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                      <TextField label="LinkedIn Profile URL or Special Requirements" multiline rows={3} fullWidth value={selected.notes} onChange={e => setSelected({ ...selected, notes: e.target.value })} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                    </Stack>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          label="Email Address (For Confirmation)"
+                          type="email"
+                          fullWidth
+                          required
+                          value={selected.email}
+                          onChange={e => setSelected({ ...selected, email: e.target.value })}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextField
+                          label="Phone / WhatsApp Number"
+                          fullWidth
+                          required
+                          value={selected.phone}
+                          onChange={e => setSelected({ ...selected, phone: e.target.value })}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextField
+                          label="LinkedIn Profile URL or Special Requirements"
+                          multiline
+                          rows={3}
+                          fullWidth
+                          value={selected.notes}
+                          onChange={e => setSelected({ ...selected, notes: e.target.value })}
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
+                      </Grid>
+                    </Grid>
                   </Box>
                 )}
 
@@ -326,7 +391,7 @@ export default function BookPage() {
                 {activeStep === 3 && (
                   <Box>
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, mb: 0.5 }}>
+                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, mb: 0.5, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                         Scan & Pay via GPay / UPI
                       </Typography>
                       <Typography variant="body2" sx={{ color: brandColors.muted }}>
@@ -338,7 +403,7 @@ export default function BookPage() {
                       {/* Left: Summary & Instructions */}
                       <Grid item xs={12} md={6}>
                         <Box sx={{
-                          p: 3,
+                          p: { xs: 2.5, sm: 3 },
                           height: '100%',
                           borderRadius: '20px',
                           backgroundColor: alpha(brandColors.primary, 0.03),
@@ -360,23 +425,23 @@ export default function BookPage() {
                             </Typography>
 
                             <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: '#fff', border: `1px solid ${brandColors.border}`, mb: 2.5 }}>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', mb: 1, gap: 0.5 }}>
                                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Scheduled Slot:</Typography>
                                 <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selected.date} @ {selected.time} IST</Typography>
                               </Box>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', mb: 1, gap: 0.5 }}>
                                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Client Name:</Typography>
                                 <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selected.name}</Typography>
                               </Box>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', gap: 0.5 }}>
                                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Client Email:</Typography>
-                                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selected.email}</Typography>
+                                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700, wordBreak: 'break-all' }}>{selected.email}</Typography>
                               </Box>
                             </Box>
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderRadius: '12px', backgroundColor: alpha(brandColors.primary, 0.08), mb: 2.5 }}>
-                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text }}>Total Amount Payable:</Typography>
-                              <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.primary }}>{selectedServiceObj?.price}</Typography>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>Total Amount Payable:</Typography>
+                              <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.primary, fontSize: { xs: '1.5rem', sm: '2rem' } }}>{selectedServiceObj?.price}</Typography>
                             </Box>
 
                             <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
@@ -405,7 +470,7 @@ export default function BookPage() {
                       {/* Right: GPay QR & Action */}
                       <Grid item xs={12} md={6}>
                         <Box sx={{
-                          p: 3,
+                          p: { xs: 2.5, sm: 3 },
                           borderRadius: '20px',
                           border: `1px solid ${brandColors.border}`,
                           backgroundColor: '#fff',
@@ -451,7 +516,7 @@ export default function BookPage() {
                               py: 1.8,
                               borderRadius: '14px',
                               fontWeight: 800,
-                              fontSize: '0.975rem',
+                              fontSize: { xs: '0.875rem', sm: '0.975rem' },
                               textTransform: 'none',
                               backgroundColor: brandColors.primary,
                               boxShadow: '0 8px 24px rgba(10,102,194,0.3)',
@@ -463,7 +528,7 @@ export default function BookPage() {
 
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 2, color: brandColors.muted }}>
                             <FiShield color={brandColors.success} size={15} />
-                            <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, fontSize: '0.775rem' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, fontSize: '0.75rem' }}>
                               Instant GPay QR Scan · Confirmation sent to Gmail manually
                             </Typography>
                           </Box>

@@ -59,13 +59,28 @@ export default function UserDashboard() {
     { label: 'Total Consultations', value: String(bookings.length), icon: FiClock, color: '#F5F3FF', iconColor: '#7C3AED' },
   ]
 
+  const isNewUser = localStorage.getItem('brandit_is_new_user') === 'true'
+
+  useEffect(() => {
+    if (isNewUser) {
+      const timer = setTimeout(() => {
+        localStorage.removeItem('brandit_is_new_user')
+      }, 10000)
+      return () => clearTimeout(timer)
+    }
+  }, [isNewUser])
+
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" sx={{ mb: 0.5, fontSize: { xs: '1.5rem', sm: '2rem' } }}>Welcome back, {name} 👋</Typography>
-          <Typography variant="body1" sx={{ color: brandColors.muted }}>Here's what's happening with your brand journey.</Typography>
+          <Typography variant="h3" sx={{ mb: 0.5, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+            {isNewUser ? `Welcome to BrandIt, ${name} 🎉` : `Welcome back, ${name} 👋`}
+          </Typography>
+          <Typography variant="body1" sx={{ color: brandColors.muted }}>
+            {isNewUser ? 'We\'re thrilled to have you! Here is your brand growth dashboard.' : 'Here\'s what\'s happening with your brand journey.'}
+          </Typography>
         </Box>
 
         {/* Profile Completion & Growth Projection */}

@@ -51,13 +51,13 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      await register(firstName, lastName, email, password, phone, userType === 'team' ? 'TEAM' : 'USER')
-      // After register, clear session data — user must log in manually
-      localStorage.removeItem('brandit_access_token')
-      localStorage.removeItem('brandit_refresh_token')
-      localStorage.removeItem('brandit_user')
+      const newUser = await register(firstName, lastName, email, password, phone, userType === 'team' ? 'TEAM' : 'USER')
+      localStorage.setItem('brandit_is_new_user', 'true')
       setSuccess(true)
-      setTimeout(() => navigate('/login'), 2000)
+      setTimeout(() => {
+        const defaultRoute = newUser.role === 'ADMIN' ? '/admin' : newUser.role === 'TEAM' ? '/team' : '/dashboard'
+        navigate(defaultRoute)
+      }, 1500)
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.')
     } finally {
@@ -320,9 +320,9 @@ export default function RegisterPage() {
                   }}>
                     <FiCheckCircle size={36} />
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>Account Created!</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>Welcome to BrandIt!</Typography>
                   <Typography variant="body2" sx={{ color: brandColors.muted }}>
-                    Redirecting you to sign in...
+                    Setting up your account & redirecting to your dashboard...
                   </Typography>
                 </Box>
               </motion.div>
