@@ -118,4 +118,17 @@ public class EmailTemplateBuilder {
                 "  <p style='margin:0; white-space:pre-wrap;'>" + messageText + "</p>" +
                 "</div>", frontendUrl);
     }
+
+    public String buildContactUserReceiptTemplate(String senderName, String serviceInterested, String frontendUrl) {
+        return wrapHtmlTemplate("Inquiry Received — BrandIt",
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>We Received Your Inquiry, " + senderName + "! 📩</h2>" +
+                "<p>Thank you for reaching out to <strong>BrandIt Consulting</strong>. Our team has received your message regarding <strong>" + (serviceInterested != null ? serviceInterested : "Personal Branding Services") + "</strong>.</p>" +
+                "<div class='card' style='background-color:#F0F9FF; border-color:#BAE6FD;'>" +
+                "  <p style='margin:0;'><strong>Next Steps:</strong></p>" +
+                "  <p style='margin:4px 0 0 0;'>One of our branding consultants will review your request and contact you within <strong>24 hours</strong>.</p>" +
+                "</div>" +
+                "<div style='text-align:center;'>" +
+                "  <a href='" + frontendUrl + "' class='btn'>Visit BrandIt Portal &rarr;</a>" +
+                "</div>", frontendUrl);
+    }
 }

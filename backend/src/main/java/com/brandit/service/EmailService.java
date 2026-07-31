@@ -96,14 +96,22 @@ public class EmailService {
     }
 
     /**
-     * 4. Send Contact Form Submission Notification to BrandIt Team
+     * 4. Send Contact Form Submission Notification to BrandIt Team & User Auto-Reply
      */
     @Async
     public void sendContactNotification(String senderName, String senderEmail, String phone, String serviceInterested,
                                          String messageText) {
-        String subject = "New Contact Inquiry from " + senderName + " — BrandIt";
+        // Send alert to BrandIt Team Admin
+        String adminSubject = "New Contact Inquiry from " + senderName + " — BrandIt";
         String adminEmail = "brandit.get@gmail.com";
-        String htmlBody = templateBuilder.buildContactNotificationTemplate(senderName, senderEmail, phone, serviceInterested, messageText, frontendUrl);
-        sendEmailSync(adminEmail, subject, htmlBody);
+        String adminHtmlBody = templateBuilder.buildContactNotificationTemplate(senderName, senderEmail, phone, serviceInterested, messageText, frontendUrl);
+        sendEmailSync(adminEmail, adminSubject, adminHtmlBody);
+
+        // Also send instant receipt confirmation directly to user/visitor
+        if (senderEmail != null && senderEmail.contains("@")) {
+            String userSubject = "We Received Your Message — BrandIt Consulting";
+            String userHtmlBody = templateBuilder.buildContactUserReceiptTemplate(senderName, serviceInterested, frontendUrl);
+            sendEmailSync(senderEmail, userSubject, userHtmlBody);
+        }
     }
 }
