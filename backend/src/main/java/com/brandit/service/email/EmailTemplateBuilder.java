@@ -6,7 +6,22 @@ import java.time.Year;
 @Component
 public class EmailTemplateBuilder {
 
+    private String cleanUrl(String rawUrl) {
+        if (rawUrl == null || rawUrl.isBlank()) {
+            return "https://brandit-eta.vercel.app";
+        }
+        String clean = rawUrl.trim();
+        if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
+            clean = "https://" + clean;
+        }
+        while (clean.endsWith("/")) {
+            clean = clean.substring(0, clean.length() - 1);
+        }
+        return clean;
+    }
+
     public String wrapHtmlTemplate(String title, String bodyHtml, String frontendUrl) {
+        String baseUrl = cleanUrl(frontendUrl);
         return "<!DOCTYPE html>" +
                 "<html>" +
                 "<head>" +
@@ -22,7 +37,6 @@ public class EmailTemplateBuilder {
                 "  .tagline { margin:6px 0 0 0; font-size:13px; opacity:0.85; font-weight:500; letter-spacing:0.02em; }" +
                 "  .content { padding:32px 28px; line-height:1.65; color:#374151; font-size:15px; }" +
                 "  .card { background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:20px; margin:20px 0; }" +
-                "  .btn { display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; margin-top:16px; text-align:center; box-shadow:0 4px 14px rgba(10,102,194,0.3); }" +
                 "  .footer { background-color:#111827; padding:24px; text-align:center; color:#9CA3AF; font-size:12px; line-height:1.6; }" +
                 "  .footer a { color:#60A5FA; text-decoration:none; }" +
                 "</style>" +
@@ -40,7 +54,7 @@ public class EmailTemplateBuilder {
                 "  <div class='footer'>" +
                 "    <p style='margin:0 0 8px 0;'><strong>BrandIt Consulting & Personal Branding</strong></p>" +
                 "    <p style='margin:0 0 12px 0;'>Hritika Seth (Consultant) • Kritika Dhawan (Operations)</p>" +
-                "    <p style='margin:0;'>Email: <a href='mailto:brandit.get@gmail.com'>brandit.get@gmail.com</a> | Visit: <a href='" + frontendUrl + "'>BrandIt Portal</a></p>" +
+                "    <p style='margin:0;'>Email: <a href='mailto:brandit.get@gmail.com' style='color:#60A5FA; text-decoration:none;'>brandit.get@gmail.com</a> | Visit: <a href='" + baseUrl + "' target='_blank' rel='noopener noreferrer' style='color:#60A5FA; text-decoration:none;'>BrandIt Portal</a></p>" +
                 "    <p style='margin:12px 0 0 0; color:#6B7280;'>© " + Year.now().getValue() + " BrandIt. All rights reserved.</p>" +
                 "  </div>" +
                 "</div>" +
@@ -49,7 +63,7 @@ public class EmailTemplateBuilder {
     }
 
     public String buildWelcomeTemplate(String clientName, String toEmail, String role, String frontendUrl) {
-        String portalLink = frontendUrl + "/login";
+        String portalLink = cleanUrl(frontendUrl) + "/login";
         return wrapHtmlTemplate("Welcome to BrandIt",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome aboard, " + clientName + "! 🎉</h2>" +
                 "<p>Thank you for creating your account with <strong>BrandIt</strong>. We are thrilled to partner with you on your career and personal branding journey.</p>" +
@@ -59,13 +73,13 @@ public class EmailTemplateBuilder {
                 "  <p style='margin:4px 0;'>🔒 Account Role: <strong>" + role + " Portal Access</strong></p>" +
                 "</div>" +
                 "<p>Through your portal, you can view booked consultation slots, access invoices, track personal branding milestones, and change password & security settings anytime.</p>" +
-                "<div style='text-align:center;'>" +
-                "  <a href='" + portalLink + "' class='btn'>Access Your Portal &rarr;</a>" +
+                "<div style='text-align:center; margin-top:24px;'>" +
+                "  <a href='" + portalLink + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Access Your Portal &rarr;</a>" +
                 "</div>", frontendUrl);
     }
 
     public String buildBookingTemplate(String clientName, String serviceName, String bookingDate, String bookingTime, String price, String paymentId, String frontendUrl) {
-        String dashboardLink = frontendUrl + "/dashboard";
+        String dashboardLink = cleanUrl(frontendUrl) + "/dashboard";
         return wrapHtmlTemplate("Booking Confirmation",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Booking Confirmed, " + clientName + "! ✅</h2>" +
                 "<p>Your consultation booking with BrandIt has been successfully processed. Here is your official booking summary:</p>" +
@@ -86,19 +100,19 @@ public class EmailTemplateBuilder {
                 "  <p style='margin:4px 0 0 0;'>• Hritika Seth (Consultant): <a href='tel:+918708231539' style='color:#0A66C2;'>+91 8708231539</a></p>" +
                 "  <p style='margin:4px 0 0 0;'>• Kritika Dhawan (Operations): <a href='tel:+916284318951' style='color:#0A66C2;'>+91 6284318951</a></p>" +
                 "</div>" +
-                "<div style='text-align:center;'>" +
-                "  <a href='" + dashboardLink + "' class='btn'>View My Bookings &rarr;</a>" +
+                "<div style='text-align:center; margin-top:24px;'>" +
+                "  <a href='" + dashboardLink + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>View My Bookings &rarr;</a>" +
                 "</div>", frontendUrl);
     }
 
     public String buildPasswordResetTemplate(String clientName, String toEmail, String resetToken, String frontendUrl) {
-        String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
+        String resetLink = cleanUrl(frontendUrl) + "/reset-password?token=" + resetToken;
         return wrapHtmlTemplate("Password Reset Request",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Hello " + clientName + ",</h2>" +
                 "<p>We received a request to reset your password for your <strong>BrandIt</strong> account (" + toEmail + ").</p>" +
                 "<p>Click the button below to choose a new password. This link is valid for <strong>1 hour</strong>:</p>" +
                 "<div style='text-align:center; margin:28px 0;'>" +
-                "  <a href='" + resetLink + "' class='btn' style='background-color:#DC2626;'>Reset Password &rarr;</a>" +
+                "  <a href='" + resetLink + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#DC2626; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Reset Password &rarr;</a>" +
                 "</div>" +
                 "<div class='card' style='background-color:#FEF2F2; border-color:#FCA5A5; color:#991B1B; font-size:13px;'>" +
                 "  <p style='margin:0;'>⚠️ If you did not initiate this request, you can safely ignore this email. Your password will remain unchanged.</p>" +
@@ -120,6 +134,7 @@ public class EmailTemplateBuilder {
     }
 
     public String buildContactUserReceiptTemplate(String senderName, String serviceInterested, String frontendUrl) {
+        String baseUrl = cleanUrl(frontendUrl);
         return wrapHtmlTemplate("Inquiry Received — BrandIt",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>We Received Your Inquiry, " + senderName + "! 📩</h2>" +
                 "<p>Thank you for reaching out to <strong>BrandIt Consulting</strong>. Our team has received your message regarding <strong>" + (serviceInterested != null ? serviceInterested : "Personal Branding Services") + "</strong>.</p>" +
@@ -127,8 +142,8 @@ public class EmailTemplateBuilder {
                 "  <p style='margin:0;'><strong>Next Steps:</strong></p>" +
                 "  <p style='margin:4px 0 0 0;'>One of our branding consultants will review your request and contact you within <strong>24 hours</strong>.</p>" +
                 "</div>" +
-                "<div style='text-align:center;'>" +
-                "  <a href='" + frontendUrl + "' class='btn'>Visit BrandIt Portal &rarr;</a>" +
+                "<div style='text-align:center; margin-top:24px;'>" +
+                "  <a href='" + baseUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Visit BrandIt Portal &rarr;</a>" +
                 "</div>", frontendUrl);
     }
 }
