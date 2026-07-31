@@ -85,22 +85,6 @@ public class PublicController {
         return ResponseEntity.ok(health);
     }
 
-    @GetMapping("/test-email")
-    public ResponseEntity<MessageResponse> testEmail(
-            @RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
-        log.info("Test email requested to: {}", to);
-        emailService.sendBookingConfirmation(
-                to,
-                "Valued Client (Test)",
-                "Profile Setup + Branding (₹320/mo)",
-                java.time.LocalDate.now().plusDays(2).toString(),
-                "10:00 AM - 10:30 AM",
-                "₹320",
-                "TEST_PAY_" + System.currentTimeMillis());
-        return ResponseEntity.ok(new MessageResponse(
-                "Test HTML email dispatched. Check Railway logs for dispatch status. (To: " + to + ")"));
-    }
-
     @PostMapping("/newsletter")
     public ResponseEntity<MessageResponse> subscribeNewsletter(@Valid @RequestBody NewsletterRequest request) {
         if (newsletterRepository.existsByEmail(request.getEmail())) {
