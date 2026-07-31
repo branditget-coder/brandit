@@ -31,7 +31,7 @@ public class BookingService {
                     request.getBookingDate(), request.getBookingTime(), Booking.Status.CANCELLED
             );
             if (alreadyBooked) {
-                throw new IllegalArgumentException("This date and time slot (" + request.getBookingDate() + " at " + request.getBookingTime() + ") is already booked by another client. Please select a different slot.");
+                throw new com.brandit.exception.DuplicateResourceException("This date and time slot (" + request.getBookingDate() + " at " + request.getBookingTime() + ") is already booked by another client. Please select a different slot.");
             }
         }
 
