@@ -1,7 +1,7 @@
-import { Box, Container, Typography, Button, Stack, Chip, Grid, alpha } from '@mui/material'
+import { Box, Container, Typography, Button, Stack, Grid, alpha } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiArrowRight, FiCheckCircle, FiTrendingUp, FiTarget, FiAward, FiUsers } from 'react-icons/fi'
+import { FiArrowRight, FiCheckCircle, FiTrendingUp, FiTarget, FiUsers } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
 const featurePillars = [
@@ -27,7 +27,7 @@ export default function HeroSection() {
   return (
     <Box
       sx={{
-        pt: { xs: 8, sm: 10, md: 14 },
+        pt: { xs: 10, sm: 12, md: 14 },
         pb: { xs: 8, sm: 10, md: 14 },
         position: 'relative',
         overflow: 'hidden',
@@ -48,31 +48,37 @@ export default function HeroSection() {
         },
       }}
     >
-      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+      <Container maxWidth="lg" sx={{ px: { xs: 2.5, sm: 3, md: 4 } }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           <Grid item xs={12} md={6}>
-            {/* Badge */}
+            {/* Pill Badge - Optimized for Mobile Margins & Auto Height */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Chip
-                label="⚡ Your Profile, Your Brand, Your Opportunity — Plans From ₹99"
+              <Box
                 sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   mb: 3,
-                  px: 1,
-                  py: { xs: 2, sm: 2.5 },
-                  fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                  px: { xs: 2, sm: 2.5 },
+                  py: { xs: 1, sm: 1.25 },
+                  fontSize: { xs: '0.775rem', sm: '0.85rem' },
                   fontWeight: 700,
                   backgroundColor: alpha(brandColors.primary, 0.08),
                   color: brandColors.primary,
                   border: `1px solid ${alpha(brandColors.primary, 0.2)}`,
                   borderRadius: '100px',
                   maxWidth: '100%',
-                  '& .MuiChip-label': { px: 1, whiteSpace: 'normal' },
+                  lineHeight: 1.45,
+                  boxShadow: `0 2px 12px ${alpha(brandColors.primary, 0.06)}`,
+                  wordBreak: 'break-word',
+                  textAlign: 'left',
                 }}
-              />
+              >
+                ⚡ Your Profile, Your Brand, Your Opportunity — Plans From ₹99
+              </Box>
             </motion.div>
 
             {/* Headline */}

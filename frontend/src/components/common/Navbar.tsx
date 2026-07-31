@@ -176,7 +176,7 @@ export default function Navbar() {
       </AppBar>
 
       {/* Offset for fixed floating glass navbar */}
-      <Toolbar sx={{ height: { xs: 68, sm: 84 } }} />
+      <Toolbar sx={{ height: { xs: 76, sm: 88 } }} />
 
       {/* Mobile Glassmorphic Drawer */}
       <Drawer
