@@ -1,22 +1,30 @@
 import { useState } from 'react'
-import { Box, Container, Typography, TextField, Button, alpha, CircularProgress } from '@mui/material'
+import { Box, Container, Typography, TextField, Button, alpha, CircularProgress, Alert } from '@mui/material'
 import { motion } from 'framer-motion'
 import { FiArrowRight, FiMail } from 'react-icons/fi'
 import { brandColors } from '../../theme'
+import api from '../../services/api'
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 1200))
-    setLoading(false)
-    setSuccess(true)
-    setEmail('')
+    setError('')
+    try {
+      await api.post('/newsletter', { email })
+      setSuccess(true)
+      setEmail('')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to subscribe to newsletter. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -66,6 +74,8 @@ export default function NewsletterSection() {
               Get actionable LinkedIn tips, resume hacks, and career strategies — delivered every Tuesday. No spam, ever.
             </Typography>
 
+            {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
+
             {success ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -80,7 +90,7 @@ export default function NewsletterSection() {
                   }}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 600, color: '#059669' }}>
-                    You're in! Check your inbox for a welcome email.
+                    🎉 You're in! Check your inbox for your Weekly Career Insights welcome email.
                   </Typography>
                 </Box>
               </motion.div>

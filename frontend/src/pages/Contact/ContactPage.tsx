@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Box, Container, Typography, Grid, TextField, Button, MenuItem, Stack, alpha, CircularProgress, Link } from '@mui/material'
+import { Box, Container, Typography, Grid, TextField, Button, MenuItem, Stack, alpha, CircularProgress, Link, Alert } from '@mui/material'
 import { motion } from 'framer-motion'
 import { FiMail, FiPhone, FiSend, FiLinkedin, FiInstagram } from 'react-icons/fi'
 import { brandColors } from '../../theme'
+import api from '../../services/api'
 
 const services = [
   'Profile Setup + Account building advice (₹99)',
@@ -18,15 +19,36 @@ const socials = [
 ]
 
 export default function ContactPage() {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [serviceInterested, setServiceInterested] = useState('')
+  const [message, setMessage] = useState('')
+
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1200))
-    setLoading(false)
-    setSubmitted(true)
+    setError('')
+    try {
+      await api.post('/contact', {
+        firstName,
+        lastName,
+        email,
+        phone,
+        serviceInterested,
+        message,
+      })
+      setSubmitted(true)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to submit contact request. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -56,25 +78,71 @@ export default function ContactPage() {
                   <Box sx={{ p: 5, borderRadius: '24px', border: `1px solid ${alpha(brandColors.success, 0.3)}`, backgroundColor: alpha(brandColors.success, 0.04), textAlign: 'center' }}>
                     <Typography variant="h4" sx={{ mb: 1, color: brandColors.text, fontWeight: 700 }}>Message Sent!</Typography>
                     <Typography variant="body1" sx={{ color: brandColors.muted }}>
-                      Thank you for contacting BrandIt. Our team will get back to you shortly.
+                      Thank you for contacting BrandIt. A receipt email has been sent to <strong>{email}</strong>, and our team will get back to you within 24 hours.
                     </Typography>
                   </Box>
                 ) : (
                   <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, p: { xs: 3, sm: 4 }, borderRadius: '24px', backgroundColor: '#fff', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                    {error && <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>}
                     <Grid container spacing={2.5}>
                       <Grid item xs={12} sm={6}>
-                        <TextField label="First Name" fullWidth required sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
+                        <TextField
+                          label="First Name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          fullWidth
+                          required
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <TextField label="Last Name" fullWidth required sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
+                        <TextField
+                          label="Last Name"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          fullWidth
+                          required
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        />
                       </Grid>
                     </Grid>
-                    <TextField label="Email Address" type="email" fullWidth required sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                    <TextField label="Phone Number" fullWidth sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                    <TextField label="Service Interested In" select fullWidth sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}>
-                      {services.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                    <TextField
+                      label="Email Address"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      fullWidth
+                      required
+                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                    />
+                    <TextField
+                      label="Phone Number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      fullWidth
+                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                    />
+                    <TextField
+                      label="Service Interested In"
+                      select
+                      value={serviceInterested}
+                      onChange={(e) => setServiceInterested(e.target.value)}
+                      fullWidth
+                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                    >
+                      {services.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                     </TextField>
-                    <TextField label="Your Message" multiline rows={4} fullWidth required placeholder="How can we help build your brand?" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
+                    <TextField
+                      label="Your Message"
+                      multiline
+                      rows={4}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      fullWidth
+                      required
+                      placeholder="How can we help build your brand?"
+                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                    />
                     <Button type="submit" variant="contained" size="large" disabled={loading} endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <FiSend />} sx={{ alignSelf: 'flex-start', px: 5, py: 1.5, borderRadius: '12px', fontWeight: 700, textTransform: 'none' }}>
                       {loading ? 'Sending...' : 'Send Message'}
                     </Button>
@@ -112,10 +180,10 @@ export default function ContactPage() {
                         <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mb: 1, letterSpacing: '0.05em', fontWeight: 700 }}>DIRECT CONTACT PHONES</Typography>
 
                         <Box sx={{ mb: 1.5 }}>
-                          <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 700 }}>Raghav Dhir</Typography>
-                          <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 0.25, fontWeight: 600 }}>Founder & Lead Brand Strategist</Typography>
-                          <Link href="tel:+9182644XXXXX" underline="hover" sx={{ color: brandColors.text, fontWeight: 600, fontSize: '0.9rem', '&:hover': { color: brandColors.primary } }}>
-                            +91 82644XXXXX
+                          <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 700 }}>BrandIt Consulting</Typography>
+                          <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 0.25, fontWeight: 600 }}>Lead Brand Consultants</Typography>
+                          <Link href="tel:+918708231539" underline="hover" sx={{ color: brandColors.text, fontWeight: 600, fontSize: '0.9rem', '&:hover': { color: brandColors.primary } }}>
+                            +91 8708231539 / +91 6284318951
                           </Link>
                         </Box>
                       </Box>
