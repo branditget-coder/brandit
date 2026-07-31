@@ -25,6 +25,16 @@ public class BookingService {
 
     @Transactional
     public BookingResponse createBooking(String userEmail, CreateBookingRequest request) {
+        // Prevent double-booking for the exact same date & time slot
+        if (request.getBookingDate() != null && request.getBookingTime() != null) {
+            boolean alreadyBooked = bookingRepository.existsByBookingDateAndBookingTimeAndStatusNot(
+                    request.getBookingDate(), request.getBookingTime(), Booking.Status.CANCELLED
+            );
+            if (alreadyBooked) {
+                throw new IllegalArgumentException("This date and time slot (" + request.getBookingDate() + " at " + request.getBookingTime() + ") is already booked by another client. Please select a different slot.");
+            }
+        }
+
         User user = null;
         String rawEmail = (userEmail != null && !userEmail.isBlank()) ? userEmail : request.getClientEmail();
         String emailToUse = rawEmail != null ? rawEmail.trim().toLowerCase() : null;
@@ -88,6 +98,14 @@ public class BookingService {
         }
 
         return mapToResponse(saved);
+    }
+
+    public List<BookedSlotDto> getBookedSlots() {
+        return bookingRepository.findByStatusNot(Booking.Status.CANCELLED)
+                .stream()
+                .filter(b -> b.getBookingDate() != null && b.getBookingTime() != null)
+                .map(b -> new BookedSlotDto(b.getBookingDate(), b.getBookingTime()))
+                .collect(Collectors.toList());
     }
 
     public List<BookingResponse> getUserBookings(String userEmail) {

@@ -26,6 +26,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(email, request));
     }
 
+    @GetMapping("/public-slots")
+    public ResponseEntity<List<BookedSlotDto>> getBookedSlots() {
+        return ResponseEntity.ok(bookingService.getBookedSlots());
+    }
+
     @GetMapping
     public ResponseEntity<List<BookingResponse>> getUserBookings(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {

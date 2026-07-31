@@ -53,4 +53,15 @@ public class BookingDtos {
         private String status;
         private String meetingLink;
     }
+
+    @Data
+    public static class BookedSlotDto {
+        private LocalDate bookingDate;
+        private LocalTime bookingTime;
+
+        public BookedSlotDto(LocalDate bookingDate, LocalTime bookingTime) {
+            this.bookingDate = bookingDate;
+            this.bookingTime = bookingTime;
+        }
+    }
 }

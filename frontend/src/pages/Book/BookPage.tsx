@@ -5,7 +5,7 @@ import {
   Button, TextField, Chip, alpha, Stack, Grid, CircularProgress, Alert
 } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCheck, FiArrowRight, FiArrowLeft, FiShield, FiCheckCircle } from 'react-icons/fi'
+import { FiCheck, FiArrowRight, FiArrowLeft, FiShield, FiCheckCircle, FiLock } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
 import gpayQr from '../../assets/gpay-qr.jpg'
@@ -27,6 +27,11 @@ const dates = Array.from({ length: 7 }, (_, i) => {
   return d
 })
 
+interface BookedSlot {
+  bookingDate: string
+  bookingTime: string
+}
+
 export default function BookPage() {
   const [searchParams] = useSearchParams()
   const planParam = searchParams.get('plan')
@@ -45,9 +50,27 @@ export default function BookPage() {
     upiRef: '',
   })
 
+  const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([])
+  const [loadingSlots, setLoadingSlots] = useState<boolean>(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingError, setBookingError] = useState<string | null>(null)
   const [bookingResult, setBookingResult] = useState<any>(null)
+
+  // Fetch real-time booked slots across all users
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      try {
+        setLoadingSlots(true)
+        const res = await api.get<BookedSlot[]>('/bookings/public-slots')
+        setBookedSlots(res.data || [])
+      } catch (err) {
+        console.warn('Could not fetch public booked slots:', err)
+      } finally {
+        setLoadingSlots(false)
+      }
+    }
+    fetchBookedSlots()
+  }, [])
 
   useEffect(() => {
     if (planParam && services.some(s => s.id === planParam)) {
@@ -87,6 +110,36 @@ export default function BookPage() {
     return "10:00:00"
   }
 
+  const isSlotBooked = (dateStr: string, timeStr: string): boolean => {
+    if (!dateStr || !timeStr) return false
+    const formattedDate = formatBookingDate(dateStr)
+    const formattedTime = formatBookingTime(timeStr)
+    return bookedSlots.some(s => {
+      const sDate = s.bookingDate
+      const sTime = s.bookingTime ? (s.bookingTime.length === 5 ? `${s.bookingTime}:00` : s.bookingTime) : ''
+      return sDate === formattedDate && sTime === formattedTime
+    })
+  }
+
+  const isDateFullyBooked = (dateStr: string): boolean => {
+    return timeSlots.every(t => isSlotBooked(dateStr, t))
+  }
+
+  const handleSelectDate = (dateStr: string) => {
+    if (isDateFullyBooked(dateStr)) return
+    // If selecting a new date, check if currently selected time is booked on this date
+    let newTime = selected.time
+    if (newTime && isSlotBooked(dateStr, newTime)) {
+      newTime = ''
+    }
+    setSelected(prev => ({ ...prev, date: dateStr, time: newTime }))
+  }
+
+  const handleSelectTime = (timeStr: string) => {
+    if (isSlotBooked(selected.date, timeStr)) return
+    setSelected(prev => ({ ...prev, time: timeStr }))
+  }
+
   const handleSubmitBooking = async () => {
     setBookingError(null)
     setIsSubmitting(true)
@@ -110,9 +163,18 @@ export default function BookPage() {
 
       const res = await api.post('/bookings', payload)
       setBookingResult(res.data)
+      // Update local booked slots immediately so returning users see it as taken
+      setBookedSlots(prev => [...prev, { bookingDate: formattedDate, bookingTime: formattedTime }])
     } catch (err: any) {
       console.warn('Backend booking submission note:', err)
-      // Provide clean fallback object so client UI always completes step safely
+      const errorMsg = err.response?.data?.message
+      if (errorMsg && errorMsg.includes('already booked')) {
+        setBookingError(errorMsg)
+        setIsSubmitting(false)
+        setActiveStep(1) // Return user to step 1 to pick a new available slot
+        return
+      }
+      // Fallback response if offline/test mode
       setBookingResult({
         id: Math.floor(1000 + Math.random() * 9000),
         serviceName: selectedServiceObj?.name,
@@ -141,7 +203,7 @@ export default function BookPage() {
 
   const canNext = () => {
     if (activeStep === 0) return !!selected.service
-    if (activeStep === 1) return !!selected.date && !!selected.time
+    if (activeStep === 1) return !!selected.date && !!selected.time && !isSlotBooked(selected.date, selected.time)
     if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@') && !!selected.phone
     return true
   }
@@ -289,11 +351,13 @@ export default function BookPage() {
                   </Box>
                 )}
 
-                {/* STEP 1: PICK DATE & TIME */}
+                {/* STEP 1: PICK DATE & TIME WITH REAL-TIME SLOT BLOCKING */}
                 {activeStep === 1 && (
                   <Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
-                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Choose consultation date & time</Typography>
+                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+                        Choose consultation date & time
+                      </Typography>
                       {selectedServiceObj && (
                         <Chip
                           label={`Selected: ${selectedServiceObj.price}`}
@@ -302,30 +366,146 @@ export default function BookPage() {
                         />
                       )}
                     </Box>
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, mb: 1.5 }}>Available Dates</Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {dates.map(d => {
-                          const label = d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })
-                          return (
-                            <Box key={label} onClick={() => setSelected({ ...selected, date: label })}
-                              sx={{ px: 2, py: 1, borderRadius: '10px', border: `1.5px solid ${selected.date === label ? brandColors.primary : brandColors.border}`, cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, backgroundColor: selected.date === label ? alpha(brandColors.primary, 0.06) : '#fff', color: selected.date === label ? brandColors.primary : brandColors.text, transition: 'all 0.2s' }}>
-                              {label}
-                            </Box>
-                          )
-                        })}
-                      </Box>
+
+                    {/* Available Dates */}
+                    <Box sx={{ mb: 4 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, mb: 1.5 }}>
+                        Available Dates
+                      </Typography>
+                      {loadingSlots ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
+                          <CircularProgress size={18} color="primary" />
+                          <Typography variant="caption" sx={{ color: brandColors.muted }}>Checking live slot availability...</Typography>
+                        </Box>
+                      ) : (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2 }}>
+                          {dates.map(d => {
+                            const label = d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })
+                            const isFullyBooked = isDateFullyBooked(label)
+                            const isSelected = selected.date === label
+
+                            return (
+                              <Box
+                                key={label}
+                                onClick={() => handleSelectDate(label)}
+                                sx={{
+                                  px: 2,
+                                  py: 1,
+                                  borderRadius: '10px',
+                                  border: `1.5px solid ${
+                                    isFullyBooked
+                                      ? '#E2E8F0'
+                                      : isSelected
+                                      ? brandColors.primary
+                                      : brandColors.border
+                                  }`,
+                                  cursor: isFullyBooked ? 'not-allowed' : 'pointer',
+                                  fontSize: '0.85rem',
+                                  fontWeight: isSelected ? 700 : 500,
+                                  backgroundColor: isFullyBooked
+                                    ? '#F8FAFC'
+                                    : isSelected
+                                    ? alpha(brandColors.primary, 0.06)
+                                    : '#fff',
+                                  color: isFullyBooked
+                                    ? '#94A3B8'
+                                    : isSelected
+                                    ? brandColors.primary
+                                    : brandColors.text,
+                                  transition: 'all 0.2s',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.75,
+                                  opacity: isFullyBooked ? 0.6 : 1,
+                                }}
+                              >
+                                {isFullyBooked && <FiLock size={13} color="#94A3B8" />}
+                                <span>{label}</span>
+                                {isFullyBooked && (
+                                  <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#EF4444', fontWeight: 600 }}>
+                                    (Full)
+                                  </Typography>
+                                )}
+                              </Box>
+                            )
+                          })}
+                        </Box>
+                      )}
                     </Box>
+
+                    {/* Available Times (IST) */}
                     <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, mb: 1.5 }}>Available Times (IST)</Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {timeSlots.map(t => (
-                          <Box key={t} onClick={() => setSelected({ ...selected, time: t })}
-                            sx={{ px: 2.5, py: 1, borderRadius: '10px', border: `1.5px solid ${selected.time === t ? brandColors.primary : brandColors.border}`, cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, backgroundColor: selected.time === t ? alpha(brandColors.primary, 0.06) : '#fff', color: selected.time === t ? brandColors.primary : brandColors.text, transition: 'all 0.2s' }}>
-                            {t}
-                          </Box>
-                        ))}
-                      </Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, mb: 1.5 }}>
+                        Available Times (IST) {selected.date ? `for ${selected.date}` : ''}
+                      </Typography>
+
+                      {!selected.date ? (
+                        <Alert severity="info" sx={{ borderRadius: '12px', fontSize: '0.85rem' }}>
+                          Please select an available date above first to view time slots.
+                        </Alert>
+                      ) : (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2 }}>
+                          {timeSlots.map(t => {
+                            const isBooked = isSlotBooked(selected.date, t)
+                            const isSelected = selected.time === t
+
+                            return (
+                              <Box
+                                key={t}
+                                onClick={() => handleSelectTime(t)}
+                                sx={{
+                                  px: 2.5,
+                                  py: 1,
+                                  borderRadius: '10px',
+                                  border: `1.5px solid ${
+                                    isBooked
+                                      ? '#E2E8F0'
+                                      : isSelected
+                                      ? brandColors.primary
+                                      : brandColors.border
+                                  }`,
+                                  cursor: isBooked ? 'not-allowed' : 'pointer',
+                                  fontSize: '0.875rem',
+                                  fontWeight: isSelected ? 700 : 500,
+                                  backgroundColor: isBooked
+                                    ? '#F1F5F9'
+                                    : isSelected
+                                    ? alpha(brandColors.primary, 0.06)
+                                    : '#fff',
+                                  color: isBooked
+                                    ? '#94A3B8'
+                                    : isSelected
+                                    ? brandColors.primary
+                                    : brandColors.text,
+                                  textDecoration: isBooked ? 'line-through' : 'none',
+                                  transition: 'all 0.2s',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.75,
+                                  opacity: isBooked ? 0.65 : 1,
+                                }}
+                              >
+                                {isBooked && <FiLock size={13} color="#94A3B8" />}
+                                <span>{t}</span>
+                                {isBooked && (
+                                  <Chip
+                                    label="Booked"
+                                    size="small"
+                                    sx={{
+                                      height: 18,
+                                      fontSize: '0.65rem',
+                                      fontWeight: 700,
+                                      backgroundColor: '#EF4444',
+                                      color: '#fff',
+                                      ml: 0.5,
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                            )
+                          })}
+                        </Box>
+                      )}
                     </Box>
                   </Box>
                 )}
