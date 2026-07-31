@@ -82,18 +82,10 @@ public class PublicController {
     }
 
     @GetMapping("/test-email")
-    public ResponseEntity<MessageResponse> testEmail(@RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
-        log.info("Test email requested to: {}", to);
-        emailService.sendBookingConfirmation(
-                to,
-                "Valued Client (Test)",
-                "Profile Setup + Branding (₹320/mo)",
-                java.time.LocalDate.now().plusDays(2).toString(),
-                "10:00 AM - 10:30 AM",
-                "₹320",
-                "TEST_PAY_" + System.currentTimeMillis()
-        );
-        return ResponseEntity.ok(new MessageResponse("Test HTML email dispatched. Check Railway logs for dispatch status. (To: " + to + ")"));
+    public ResponseEntity<Map<String, Object>> testEmail(@RequestParam(defaultValue = "raghavdhir1510@gmail.com") String to) {
+        log.info("Test email requested synchronously to: {}", to);
+        Map<String, Object> result = emailService.testEmailDirect(to);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/newsletter")

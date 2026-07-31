@@ -200,9 +200,60 @@ public class EmailService {
         dispatchEmail(adminEmail, subject, htmlBody);
     }
 
-    /**
-     * Core Dispatcher: Primary Resend HTTPS REST API (Port 443), with Brevo and SMTP Fallbacks
-     */
+    private String determineResendSender() {
+        if (fromEmail == null || fromEmail.isBlank()) {
+            return "BrandIt Consulting <onboarding@resend.dev>";
+        }
+        String lower = fromEmail.trim().toLowerCase();
+        if (lower.endsWith("@gmail.com") || lower.endsWith("@yahoo.com") ||
+            lower.endsWith("@outlook.com") || lower.endsWith("@hotmail.com") ||
+            lower.endsWith("@icloud.com") || lower.contains("resend.dev")) {
+            return "BrandIt Consulting <onboarding@resend.dev>";
+        }
+        return "BrandIt Consulting <" + fromEmail.trim() + ">";
+    }
+
+    public Map<String, Object> testEmailDirect(String to) {
+        Map<String, Object> result = new HashMap<>();
+        String sender = determineResendSender();
+        result.put("to", to);
+        result.put("senderUsed", sender);
+        result.put("fromEmailConfigured", fromEmail);
+        result.put("resendKeyConfigured", (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")));
+
+        if (resendApiKey == null || resendApiKey.isBlank() || !resendApiKey.startsWith("re_")) {
+            result.put("success", false);
+            result.put("error", "RESEND_API_KEY is missing or invalid (must start with re_)");
+            return result;
+        }
+
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("from", sender);
+            payload.put("to", List.of(to));
+            payload.put("subject", "BrandIt Test Email - " + System.currentTimeMillis());
+            payload.put("html", "<h1>BrandIt Email Delivery Test</h1><p>If you see this email, Resend API integration is working perfectly!</p>");
+
+            String jsonPayload = objectMapper.writeValueAsString(payload);
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.resend.com/emails"))
+                    .header("Authorization", "Bearer " + resendApiKey.trim())
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .timeout(Duration.ofSeconds(15))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            result.put("statusCode", response.statusCode());
+            result.put("responseBody", response.body());
+            result.put("success", response.statusCode() >= 200 && response.statusCode() < 300);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("error", e.getMessage());
+        }
+        return result;
+    }
+
     private void dispatchEmail(String to, String subject, String htmlBody) {
         log.info("================ EMAIL DISPATCH LOG ================");
         log.info("To: {}", to);
@@ -216,10 +267,7 @@ public class EmailService {
             // Option 1: Resend HTTPS REST API (Primary - resend.com over Port 443)
             if (resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_")) {
                 try {
-                    // Use verified domain sender if configured, otherwise fallback to resend sandbox
-                    String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("resend.dev"))
-                            ? "BrandIt Consulting <" + fromEmail + ">"
-                            : "BrandIt Consulting <onboarding@resend.dev>";
+                    String sender = determineResendSender();
 
                     Map<String, Object> payload = new HashMap<>();
                     payload.put("from", sender);
