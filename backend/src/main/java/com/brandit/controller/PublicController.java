@@ -87,17 +87,18 @@ public class PublicController {
 
     @PostMapping("/newsletter")
     public ResponseEntity<MessageResponse> subscribeNewsletter(@Valid @RequestBody NewsletterRequest request) {
+        // Always dispatch Welcome email so user gets confirmation regardless of duplicate submission
+        emailService.sendNewsletterWelcomeEmail(request.getEmail());
+
         if (newsletterRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity.ok(new MessageResponse("You are already subscribed to our newsletter."));
+            return ResponseEntity.ok(new MessageResponse("Welcome back! Your newsletter confirmation email has been sent."));
         }
+
         Newsletter newsletter = Newsletter.builder()
                 .email(request.getEmail())
                 .active(true)
                 .build();
         newsletterRepository.save(newsletter);
-
-        // Dispatch Welcome email for Newsletter / Weekly Career Insights
-        emailService.sendNewsletterWelcomeEmail(request.getEmail());
 
         return ResponseEntity.ok(new MessageResponse("Successfully subscribed to the BrandIt newsletter!"));
     }
