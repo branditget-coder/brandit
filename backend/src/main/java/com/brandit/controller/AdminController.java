@@ -54,6 +54,12 @@ public class AdminController {
         return ResponseEntity.ok(users);
     }
 
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<MessageResponse> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok(new MessageResponse("User deleted successfully."));
+    }
+
     @GetMapping("/blog/all")
     public ResponseEntity<List<BlogPostResponse>> getAllBlogPosts() {
         List<BlogPostResponse> posts = blogPostRepository.findAllByOrderByCreatedAtDesc().stream().map(p -> {
