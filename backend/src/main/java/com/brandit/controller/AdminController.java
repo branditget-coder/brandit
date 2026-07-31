@@ -54,8 +54,10 @@ public class AdminController {
         return ResponseEntity.ok(users);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     @DeleteMapping("/users/{id}")
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable Long id) {
+        bookingRepository.deleteByUserId(id);
         userRepository.deleteById(id);
         return ResponseEntity.ok(new MessageResponse("User deleted successfully."));
     }
