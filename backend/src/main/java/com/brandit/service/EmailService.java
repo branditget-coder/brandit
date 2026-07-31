@@ -24,7 +24,7 @@ public class EmailService {
     @Value("${app.mail.from:onboarding@resend.dev}")
     private String fromEmail;
 
-    @Value("${app.frontend.url:https://brandit-eta.vercel.app}")
+    @Value("${app.frontend.url:https://brandit-frontend.vercel.app}")
     private String frontendUrl;
 
     @Data

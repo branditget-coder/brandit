@@ -8,7 +8,7 @@ public class EmailTemplateBuilder {
 
     private String cleanUrl(String rawUrl) {
         if (rawUrl == null || rawUrl.isBlank()) {
-            return "https://brandit-eta.vercel.app";
+            return "https://brandit-frontend.vercel.app";
         }
         String clean = rawUrl.trim();
         if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
