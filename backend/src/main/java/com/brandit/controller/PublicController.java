@@ -95,6 +95,10 @@ public class PublicController {
                 .active(true)
                 .build();
         newsletterRepository.save(newsletter);
+
+        // Dispatch Welcome email for Newsletter / Weekly Career Insights
+        emailService.sendNewsletterWelcomeEmail(request.getEmail());
+
         return ResponseEntity.ok(new MessageResponse("Successfully subscribed to the BrandIt newsletter!"));
     }
 

@@ -146,4 +146,18 @@ public class EmailTemplateBuilder {
                 "  <a href='" + baseUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Visit BrandIt Portal &rarr;</a>" +
                 "</div>", frontendUrl);
     }
+
+    public String buildNewsletterWelcomeTemplate(String subscriberEmail, String frontendUrl) {
+        String baseUrl = cleanUrl(frontendUrl);
+        return wrapHtmlTemplate("Subscribed to Weekly Career Insights",
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome to BrandIt Career Insights! 🚀</h2>" +
+                "<p>You are now subscribed to receive <strong>BrandIt Weekly Career Insights</strong>. Expect proven personal branding tactics, executive resume frameworks, and LinkedIn algorithm strategies right in your inbox.</p>" +
+                "<div class='card' style='background-color:#F0FDF4; border-color:#BBF7D0; color:#166534;'>" +
+                "  <p style='margin:0;'><strong>Subscription Email:</strong> " + subscriberEmail + "</p>" +
+                "  <p style='margin:6px 0 0 0; font-size:13px;'>Frequency: Weekly curated career & branding insights</p>" +
+                "</div>" +
+                "<div style='text-align:center; margin-top:24px;'>" +
+                "  <a href='" + baseUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Explore BrandIt Website &rarr;</a>" +
+                "</div>", frontendUrl);
+    }
 }

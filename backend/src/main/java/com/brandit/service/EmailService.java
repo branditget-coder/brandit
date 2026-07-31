@@ -101,17 +101,27 @@ public class EmailService {
     @Async
     public void sendContactNotification(String senderName, String senderEmail, String phone, String serviceInterested,
                                          String messageText) {
-        // Send alert to BrandIt Team Admin
-        String adminSubject = "New Contact Inquiry from " + senderName + " — BrandIt";
-        String adminEmail = "brandit.get@gmail.com";
-        String adminHtmlBody = templateBuilder.buildContactNotificationTemplate(senderName, senderEmail, phone, serviceInterested, messageText, frontendUrl);
-        sendEmailSync(adminEmail, adminSubject, adminHtmlBody);
-
-        // Also send instant receipt confirmation directly to user/visitor
+        // Send instant receipt confirmation directly to user/visitor FIRST
         if (senderEmail != null && senderEmail.contains("@")) {
             String userSubject = "We Received Your Message — BrandIt Consulting";
             String userHtmlBody = templateBuilder.buildContactUserReceiptTemplate(senderName, serviceInterested, frontendUrl);
             sendEmailSync(senderEmail, userSubject, userHtmlBody);
         }
+
+        // Send alert to BrandIt Team Admin
+        String adminSubject = "New Contact Inquiry from " + senderName + " — BrandIt";
+        String adminEmail = "brandit.get@gmail.com";
+        String adminHtmlBody = templateBuilder.buildContactNotificationTemplate(senderName, senderEmail, phone, serviceInterested, messageText, frontendUrl);
+        sendEmailSync(adminEmail, adminSubject, adminHtmlBody);
+    }
+
+    /**
+     * 5. Send Weekly Career Insights / Newsletter Welcome Email
+     */
+    @Async
+    public void sendNewsletterWelcomeEmail(String toEmail) {
+        String subject = "Welcome to BrandIt Career Insights! 🚀";
+        String htmlBody = templateBuilder.buildNewsletterWelcomeTemplate(toEmail, frontendUrl);
+        sendEmailSync(toEmail, subject, htmlBody);
     }
 }
