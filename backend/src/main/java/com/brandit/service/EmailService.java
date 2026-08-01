@@ -29,7 +29,7 @@ public class EmailService {
 
     public static final List<String> TEAM_NOTIFICATION_EMAILS = List.of(
             "brandit.get@gmail.com",
-            "raghavdhir.work@gmail.com",
+            "raghavdhir1510@gmail.com",    // Admin Personal Email
             "sethhritika@gmail.com",       // Hritika Seth (Customer Acquisition)
             "dhawankritika866@gmail.com",   // Kritika Dhawan (Customer Acquisition)
             "bhardwajstuti101@gmail.com"   // Stuti Sharma (HR)
