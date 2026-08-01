@@ -27,6 +27,14 @@ public class EmailService {
     @Value("${app.frontend.url:https://go-brandit.vercel.app}")
     private String frontendUrl;
 
+    public static final List<String> TEAM_NOTIFICATION_EMAILS = List.of(
+            "brandit.get@gmail.com",
+            "raghavdhir.work@gmail.com",
+            "sethhritika@gmail.com",       // Hritika Seth (Customer Acquisition)
+            "dhawankritika866@gmail.com",   // Kritika Dhawan (Customer Acquisition)
+            "bhardwajstuti101@gmail.com"   // Stuti Sharma (HR)
+    );
+
     @Data
     @AllArgsConstructor
     public static class EmailDispatchResult {
@@ -88,8 +96,12 @@ public class EmailService {
             sendEmailSync(toEmail, subject, htmlBody);
         }
 
-        // 2. Send copy to admin email
-        sendEmailSync("brandit.get@gmail.com", "[NEW BOOKING] " + subject, htmlBody);
+        // 2. Dispatch to Team (Customer Acquisition, HR, Admin)
+        for (String teamEmail : TEAM_NOTIFICATION_EMAILS) {
+            if (!teamEmail.equalsIgnoreCase(toEmail)) {
+                sendEmailSync(teamEmail, "[NEW BOOKING] " + subject, htmlBody);
+            }
+        }
     }
 
     /**
@@ -115,11 +127,12 @@ public class EmailService {
             sendEmailSync(senderEmail, userSubject, userHtmlBody);
         }
 
-        // Send alert to BrandIt Team Admin
+        // Send alert to Customer Acquisition, HR & Admin Team
         String adminSubject = "New Contact Inquiry from " + senderName + " — BrandIt";
-        String adminEmail = "brandit.get@gmail.com";
         String adminHtmlBody = templateBuilder.buildContactNotificationTemplate(senderName, senderEmail, phone, serviceInterested, messageText, frontendUrl);
-        sendEmailSync(adminEmail, adminSubject, adminHtmlBody);
+        for (String teamEmail : TEAM_NOTIFICATION_EMAILS) {
+            sendEmailSync(teamEmail, adminSubject, adminHtmlBody);
+        }
     }
 
     /**
@@ -133,7 +146,7 @@ public class EmailService {
     }
 
     /**
-     * 6. Send Payment Proof & UTR Reference Notification to BrandIt Official Email and Client
+     * 6. Send Payment Proof & UTR Reference Notification to BrandIt Team and Paying Client
      */
     @Async
     public void sendPaymentVerificationAdminNotification(String clientName, String clientEmail, String clientPhone,
@@ -144,12 +157,13 @@ public class EmailService {
                 clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, frontendUrl
         );
 
-        // 1. Send to official BrandIt admin email addresses
-        sendEmailSync("brandit.get@gmail.com", subject, htmlBody);
-        sendEmailSync("raghavdhir.work@gmail.com", subject, htmlBody);
+        // 1. Send to Customer Acquisition, HR, and Admin Team
+        for (String teamEmail : TEAM_NOTIFICATION_EMAILS) {
+            sendEmailSync(teamEmail, subject, htmlBody);
+        }
 
         // 2. Send copy to the client who pays as instant receipt
-        if (clientEmail != null && !clientEmail.isBlank() && !clientEmail.equalsIgnoreCase("brandit.get@gmail.com")) {
+        if (clientEmail != null && !clientEmail.isBlank() && TEAM_NOTIFICATION_EMAILS.stream().noneMatch(e -> e.equalsIgnoreCase(clientEmail))) {
             sendEmailSync(clientEmail, "Payment Submission Receipt — BrandIt (" + serviceName + ")", htmlBody);
         }
     }
