@@ -96,6 +96,7 @@ public class SecurityConfig {
         config.addAllowedOriginPattern("http://localhost:*");
         config.addAllowedOriginPattern("https://*.vercel.app");
         config.addAllowedOriginPattern("https://*.up.railway.app");
+        config.addAllowedOriginPattern("*");
         // Also add any explicitly configured origins
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
             for (String origin : allowedOrigins.split(",")) {

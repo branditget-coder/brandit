@@ -2,21 +2,36 @@ import axios from 'axios'
 
 const getApiBaseUrl = () => {
   let rawUrl = import.meta.env.VITE_API_URL
+
+  // If in deployed/production browser environment (e.g. brandit.vercel.app)
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    // Only use VITE_API_URL if it is a valid remote URL (not localhost / 127.0.0.1)
+    if (rawUrl && rawUrl.trim() !== '' && rawUrl !== '/api' && !rawUrl.includes('localhost') && !rawUrl.includes('127.0.0.1')) {
+      let clean = rawUrl.trim()
+      if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+        clean = `https://${clean}`
+      }
+      clean = clean.replace(/\/+$/, '')
+      if (!clean.endsWith('/api')) {
+        clean = `${clean}/api`
+      }
+      return clean
+    }
+    // Default to Railway production backend URL for deployed site
+    return 'https://brandit-production-61bf.up.railway.app/api'
+  }
+
+  // If running locally (localhost / 127.0.0.1)
   if (rawUrl && rawUrl.trim() !== '' && rawUrl !== '/api') {
     let clean = rawUrl.trim()
     if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
-      clean = `https://${clean}`
+      clean = `http://${clean}`
     }
     clean = clean.replace(/\/+$/, '')
     if (!clean.endsWith('/api')) {
       clean = `${clean}/api`
     }
     return clean
-  }
-
-  // If in production browser environment (e.g. go-brandit.vercel.app), default to Railway production API endpoint
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return 'https://brandit-production-61bf.up.railway.app/api'
   }
 
   return '/api'
