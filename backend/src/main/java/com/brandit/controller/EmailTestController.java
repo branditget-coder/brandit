@@ -86,4 +86,20 @@ public class EmailTestController {
 
         return ResponseEntity.ok("Successfully dispatched manual booking confirmation & payment verification emails for " + clientName + " (" + clientEmail + ")");
     }
+
+    @GetMapping({"/api/record-client-payment", "/api/admin/bookings/record-payment"})
+    public ResponseEntity<com.brandit.dto.BookingDtos.BookingResponse> recordClientPayment(
+            @RequestParam(defaultValue = "Ujwal Tripathi") String clientName,
+            @RequestParam(defaultValue = "ujwal.tripathi@gmail.com") String clientEmail,
+            @RequestParam(defaultValue = "N/A") String clientPhone,
+            @RequestParam(defaultValue = "Personal Branding & Career Consulting") String serviceName,
+            @RequestParam(defaultValue = "₹1,499") String price,
+            @RequestParam(defaultValue = "UPI-PAYMENT-VERIFIED") String upiRef,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate bookingDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.TIME) java.time.LocalTime bookingTime) {
+
+        return ResponseEntity.ok(bookingService.recordAndNotifyClientPayment(
+                clientName, clientEmail, clientPhone, serviceName, price, upiRef, bookingDate, bookingTime
+        ));
+    }
 }

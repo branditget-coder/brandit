@@ -81,6 +81,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/resend-booking-email").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/resend-latest-booking-email").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/send-manual-payment-email").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/record-client-payment").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/health").permitAll()

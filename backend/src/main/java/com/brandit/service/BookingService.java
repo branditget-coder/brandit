@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -194,6 +197,78 @@ public class BookingService {
         );
 
         return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + booking.getId() + " (" + booking.getServiceName() + ") to " + recipientEmail;
+    }
+
+    @Transactional
+    public BookingResponse recordAndNotifyClientPayment(String clientName, String clientEmail, String clientPhone,
+                                                        String serviceName, String priceStr, String upiRef,
+                                                        LocalDate bookingDate, LocalTime bookingTime) {
+        String emailToUse = (clientEmail != null && !clientEmail.isBlank())
+                ? clientEmail.trim().toLowerCase()
+                : "ujwal.tripathi@guest.com";
+
+        User user = userRepository.findByEmailIgnoreCase(emailToUse).orElse(null);
+        if (user == null) {
+            String name = (clientName != null && !clientName.isBlank()) ? clientName : "Ujwal Tripathi";
+            String[] parts = name.split(" ", 2);
+            String firstName = parts[0];
+            String lastName = parts.length > 1 ? parts[1] : "";
+
+            user = User.builder()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(emailToUse)
+                    .phone(clientPhone != null ? clientPhone : "N/A")
+                    .role(User.Role.USER)
+                    .build();
+            user = userRepository.save(user);
+        }
+
+        BigDecimal amount = null;
+        if (priceStr != null) {
+            try {
+                String cleanPrice = priceStr.replaceAll("[^0-9.]", "");
+                if (!cleanPrice.isBlank()) {
+                    amount = new BigDecimal(cleanPrice);
+                }
+            } catch (Exception ignored) {}
+        }
+
+        Booking booking = Booking.builder()
+                .user(user)
+                .serviceName(serviceName != null ? serviceName : "Personal Branding & Career Consulting")
+                .bookingDate(bookingDate != null ? bookingDate : LocalDate.now())
+                .bookingTime(bookingTime != null ? bookingTime : LocalTime.of(11, 0))
+                .amount(amount)
+                .paymentId(upiRef != null && !upiRef.isBlank() ? upiRef : "UTR_" + System.currentTimeMillis())
+                .status(Booking.Status.CONFIRMED)
+                .build();
+
+        Booking saved = bookingRepository.save(booking);
+
+        emailService.sendBookingConfirmation(
+                emailToUse,
+                user.getFullName(),
+                saved.getServiceName(),
+                saved.getBookingDate().toString(),
+                saved.getBookingTime().toString(),
+                priceStr != null ? priceStr : "₹1,499",
+                saved.getPaymentId()
+        );
+
+        emailService.sendPaymentVerificationAdminNotification(
+                user.getFullName(),
+                emailToUse,
+                user.getPhone() != null ? user.getPhone() : "N/A",
+                saved.getServiceName(),
+                saved.getBookingDate().toString(),
+                saved.getBookingTime().toString(),
+                priceStr != null ? priceStr : "₹1,499",
+                saved.getPaymentId(),
+                null
+        );
+
+        return mapToResponse(saved);
     }
 
     public List<BookedSlotDto> getBookedSlots() {
