@@ -38,30 +38,12 @@ public class BookingService {
             }
         }
 
-        User user = null;
-        String rawEmail = (userEmail != null && !userEmail.isBlank()) ? userEmail : request.getClientEmail();
-        String emailToUse = rawEmail != null ? rawEmail.trim().toLowerCase() : null;
-        
-        if (emailToUse != null && !emailToUse.isBlank()) {
-            user = userRepository.findByEmailIgnoreCase(emailToUse).orElse(null);
-            if (user == null) {
-                // Register a guest client user automatically so they have a database account!
-                String name = request.getClientName() != null ? request.getClientName() : "Valued Client";
-                String[] parts = name.split(" ", 2);
-                String firstName = parts[0];
-                String lastName = parts.length > 1 ? parts[1] : "";
-
-                user = User.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .email(emailToUse)
-                        .phone(request.getClientPhone())
-                        .role(User.Role.USER)
-                        .provider(User.AuthProvider.LOCAL)
-                        .build();
-                user = userRepository.save(user);
-            }
+        if (userEmail == null || userEmail.isBlank()) {
+            throw new IllegalArgumentException("Authentication required. Please log in to complete your booking.");
         }
+
+        User user = userRepository.findByEmailIgnoreCase(userEmail.trim())
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated user account not found. Please log in again."));
 
         Booking booking = Booking.builder()
                 .user(user)
@@ -71,18 +53,19 @@ public class BookingService {
                 .notes(request.getNotes())
                 .amount(request.getAmount())
                 .paymentId(request.getPaymentId() != null ? request.getPaymentId() : "PAY_" + System.currentTimeMillis())
+                .paymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : "MANUAL_GPAY_UPI")
+                .paymentScreenshot(request.getPaymentScreenshot())
                 .status(Booking.Status.CONFIRMED)
                 .build();
 
         Booking saved = bookingRepository.save(booking);
 
-        if (user != null) {
-            activityLogRepository.save(UserActivityLog.builder()
-                    .user(user)
-                    .action("BOOKING_CREATED_AND_PAID")
-                    .metadataJson("Paid: " + saved.getAmount() + " for " + saved.getServiceName() + " (Ref: " + saved.getPaymentId() + ")")
-                    .build());
-        }
+        boolean hasScreenshot = request.getPaymentScreenshot() != null && !request.getPaymentScreenshot().isBlank();
+        activityLogRepository.save(UserActivityLog.builder()
+                .user(user)
+                .action("BOOKING_CREATED_AND_PAID")
+                .metadataJson("Paid ₹" + saved.getAmount() + " for " + saved.getServiceName() + " | Ref: " + saved.getPaymentId() + " | Slot: " + saved.getBookingDate() + " at " + saved.getBookingTime() + " | Screenshot: " + (hasScreenshot ? "ATTACHED" : "NONE"))
+                .build());
 
         // Ensure recipientEmail correctly uses request.getClientEmail() first if provided
         String recipientEmail = (request.getClientEmail() != null && !request.getClientEmail().isBlank()) 
@@ -332,6 +315,8 @@ public class BookingService {
         res.setStatus(booking.getStatus().name());
         res.setAmount(booking.getAmount());
         res.setPaymentId(booking.getPaymentId());
+        res.setPaymentMethod(booking.getPaymentMethod());
+        res.setPaymentScreenshot(booking.getPaymentScreenshot());
         res.setCreatedAt(booking.getCreatedAt());
         if (booking.getUser() != null) {
             res.setClientName(booking.getUser().getFullName());

@@ -52,6 +52,11 @@ public class Booking {
 
     private String paymentId;
 
+    private String paymentMethod;
+
+    @Column(columnDefinition = "TEXT")
+    private String paymentScreenshot;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

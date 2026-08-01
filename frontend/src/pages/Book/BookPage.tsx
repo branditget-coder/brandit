@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Box, Container, Typography, Stepper, Step, StepLabel, Button, Alert } from '@mui/material'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Box, Container, Typography, Stepper, Step, StepLabel, Button, Alert, Paper } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiArrowRight, FiArrowLeft } from 'react-icons/fi'
+import { FiArrowRight, FiArrowLeft, FiLock, FiUserCheck, FiLogIn } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 
 import { StepChoosePlan, ServicePackage } from './components/StepChoosePlan'
 import { StepPickDateTime } from './components/StepPickDateTime'
@@ -35,6 +36,8 @@ interface BookedSlot {
 }
 
 export default function BookPage() {
+  const navigate = useNavigate()
+  const { user, isAuthenticated } = useAuth()
   const [searchParams] = useSearchParams()
   const planParam = searchParams.get('plan')
 
@@ -58,6 +61,20 @@ export default function BookPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingError, setBookingError] = useState<string | null>(null)
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
+  const [showAuthRequired, setShowAuthRequired] = useState(false)
+
+  // Pre-populate logged-in user profile details
+  useEffect(() => {
+    if (user) {
+      const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim()
+      setSelected(prev => ({
+        ...prev,
+        name: prev.name || fullName,
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || ''
+      }))
+    }
+  }, [user])
 
   // Fetch real-time booked slots across all users
   useEffect(() => {
@@ -78,9 +95,13 @@ export default function BookPage() {
   useEffect(() => {
     if (planParam && services.some(s => s.id === planParam)) {
       setSelected(prev => ({ ...prev, service: planParam }))
-      setActiveStep(1)
+      if (!isAuthenticated) {
+        setShowAuthRequired(true)
+      } else {
+        setActiveStep(1)
+      }
     }
-  }, [planParam])
+  }, [planParam, isAuthenticated])
 
   const selectedServiceObj = services.find(s => s.id === selected.service)
 
@@ -194,6 +215,11 @@ export default function BookPage() {
   }
 
   const handleNext = async () => {
+    if (!isAuthenticated) {
+      setShowAuthRequired(true)
+      return
+    }
+
     if (activeStep === 3) {
       await handleSubmitBooking()
       return
@@ -212,6 +238,44 @@ export default function BookPage() {
     if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@') && !!selected.phone
     if (activeStep === 3) return !!selected.upiRef && selected.upiRef.trim() !== '' && !!selected.paymentScreenshot
     return true
+  }
+
+  if (!isAuthenticated && (showAuthRequired || activeStep > 0)) {
+    return (
+      <Box sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background }}>
+        <Container maxWidth="sm">
+          <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: `1px solid ${brandColors.border}`, textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}>
+            <Box sx={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, color: brandColors.primary }}>
+              <FiLock size={32} />
+            </Box>
+            <Typography variant="h4" sx={{ fontWeight: 800, mb: 1.5, color: brandColors.text, fontSize: { xs: '1.5rem', sm: '1.8rem' } }}>
+              Registration Required
+            </Typography>
+            <Typography variant="body1" sx={{ color: brandColors.muted, mb: 4, fontSize: '0.95rem', lineHeight: 1.6 }}>
+              To enforce 100% security, verified booking records, and instant confirmation tracking, you must register or log in to your BrandIt account before booking a consultation.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexDirection: { xs: 'column', sm: 'row' } }}>
+              <Button
+                variant="contained"
+                startIcon={<FiUserCheck />}
+                onClick={() => navigate('/register?redirect=/book')}
+                sx={{ px: 3, py: 1.3, borderRadius: '12px', textTransform: 'none', fontWeight: 700, backgroundColor: brandColors.primary }}
+              >
+                Register Account
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<FiLogIn />}
+                onClick={() => navigate('/login?redirect=/book')}
+                sx={{ px: 3, py: 1.3, borderRadius: '12px', textTransform: 'none', fontWeight: 700 }}
+              >
+                Log In
+              </Button>
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
+    )
   }
 
   if (activeStep === 4) {

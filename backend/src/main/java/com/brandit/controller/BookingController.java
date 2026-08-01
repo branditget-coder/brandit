@@ -22,8 +22,10 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(@AuthenticationPrincipal UserDetails userDetails,
                                                          @Valid @RequestBody CreateBookingRequest request) {
-        String email = userDetails != null ? userDetails.getUsername() : null;
-        return ResponseEntity.ok(bookingService.createBooking(email, request));
+        if (userDetails == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(bookingService.createBooking(userDetails.getUsername(), request));
     }
 
     @GetMapping("/public-slots")

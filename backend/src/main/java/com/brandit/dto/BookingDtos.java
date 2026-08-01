@@ -43,6 +43,8 @@ public class BookingDtos {
         private String status;
         private BigDecimal amount;
         private String paymentId;
+        private String paymentMethod;
+        private String paymentScreenshot;
         private LocalDateTime createdAt;
         private String clientName;
         private String clientEmail;
