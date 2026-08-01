@@ -179,4 +179,36 @@ public class EmailTemplateBuilder {
                 "  <a href='" + baseUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Explore BrandIt Website &rarr;</a>" +
                 "</div>", frontendUrl);
     }
+
+    public String buildPaymentVerificationAdminTemplate(String clientName, String clientEmail, String clientPhone,
+                                                         String serviceName, String bookingDate, String bookingTime,
+                                                         String price, String upiRef, String screenshotBase64, String frontendUrl) {
+        String imageHtml = (screenshotBase64 != null && !screenshotBase64.isBlank())
+                ? "<div style='margin-top:16px; text-align:center;'>" +
+                  "  <p style='font-weight:700; color:#111827; margin-bottom:8px;'>Uploaded Payment Proof Screenshot:</p>" +
+                  "  <img src='" + screenshotBase64 + "' alt='Payment Screenshot Proof' style='max-width:100%; max-height:450px; border-radius:12px; border:2px solid #0A66C2; box-shadow:0 6px 16px rgba(0,0,0,0.12);' />" +
+                  "</div>"
+                : "<p style='color:#DC2626; font-weight:600;'>No screenshot image provided.</p>";
+
+        return wrapHtmlTemplate("New Payment Submitted for Verification",
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>💳 New Payment Submitted — Verification Required</h2>" +
+                "<p>A client has submitted GPay / UPI payment details for booking verification:</p>" +
+
+                "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
+                "  <h3 style='margin:0 0 12px 0; color:#0A66C2; font-size:16px; border-bottom:1px solid #E2E8F0; padding-bottom:8px;'>👤 Client Details</h3>" +
+                "  <p style='margin:4px 0;'><strong>Client Name:</strong> " + clientName + "</p>" +
+                "  <p style='margin:4px 0; word-break:break-all;'><strong>Client Email:</strong> " + clientEmail + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Client Phone:</strong> " + (clientPhone != null ? clientPhone : "N/A") + "</p>" +
+                "</div>" +
+
+                "<div class='card' style='background-color:#FEF3C7; border:1px solid #FCD34D; border-radius:12px; padding:18px 20px; margin:20px 0; color:#92400E; box-sizing:border-box; word-break:break-word;'>" +
+                "  <h3 style='margin:0 0 12px 0; color:#92400E; font-size:16px; border-bottom:1px solid #FDE68A; padding-bottom:8px;'>📌 Payment & Booking Info</h3>" +
+                "  <p style='margin:4px 0;'><strong>Service Package:</strong> " + serviceName + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Amount Paid:</strong> " + price + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Scheduled Slot:</strong> " + bookingDate + " @ " + bookingTime + " IST</p>" +
+                "  <p style='margin:8px 0 0 0; font-size:16px;'><strong>Transaction Ref / UTR ID:</strong> <span style='font-family:monospace; background-color:#FFFFFF; padding:4px 10px; border-radius:6px; border:1px solid #D97706; font-weight:800; color:#B45309; word-break:break-all;'>" + upiRef + "</span></p>" +
+                "</div>" +
+
+                imageHtml, frontendUrl);
+    }
 }

@@ -97,6 +97,20 @@ public class BookingService {
             );
         }
 
+        // Trigger payment verification alert email to official BrandIt team
+        String clientPhone = (user != null && user.getPhone() != null) ? user.getPhone() : request.getClientPhone();
+        emailService.sendPaymentVerificationAdminNotification(
+                recipientName,
+                recipientEmail,
+                clientPhone,
+                saved.getServiceName(),
+                saved.getBookingDate().toString(),
+                saved.getBookingTime().toString(),
+                priceStr,
+                saved.getPaymentId(),
+                request.getPaymentScreenshot()
+        );
+
         return mapToResponse(saved);
     }
 

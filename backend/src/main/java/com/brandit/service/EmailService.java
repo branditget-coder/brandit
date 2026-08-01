@@ -124,4 +124,21 @@ public class EmailService {
         String htmlBody = templateBuilder.buildNewsletterWelcomeTemplate(toEmail, frontendUrl);
         sendEmailSync(toEmail, subject, htmlBody);
     }
+
+    /**
+     * 6. Send Payment Proof & UTR Reference Notification to BrandIt Official Email
+     */
+    @Async
+    public void sendPaymentVerificationAdminNotification(String clientName, String clientEmail, String clientPhone,
+                                                          String serviceName, String bookingDate, String bookingTime,
+                                                          String price, String upiRef, String screenshotBase64) {
+        String subject = "💳 Payment Submitted: " + clientName + " (" + price + ") — Ref: " + upiRef;
+        String htmlBody = templateBuilder.buildPaymentVerificationAdminTemplate(
+                clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, frontendUrl
+        );
+
+        // Send to official BrandIt email addresses
+        sendEmailSync("brandit.get@gmail.com", subject, htmlBody);
+        sendEmailSync("raghavdhir.work@gmail.com", subject, htmlBody);
+    }
 }

@@ -29,6 +29,7 @@ public class BookingDtos {
         private String clientName;
         private String clientEmail;
         private String clientPhone;
+        private String paymentScreenshot;
     }
 
     @Data

@@ -50,6 +50,7 @@ export default function BookPage() {
     phone: '',
     notes: '',
     upiRef: '',
+    paymentScreenshot: '' as string | null,
   })
 
   const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([])
@@ -164,6 +165,7 @@ export default function BookPage() {
         clientName: selected.name,
         clientEmail: selected.email,
         clientPhone: selected.phone,
+        paymentScreenshot: selected.paymentScreenshot || undefined,
       }
 
       const res = await api.post('/bookings', payload)
@@ -208,6 +210,7 @@ export default function BookPage() {
     if (activeStep === 0) return !!selected.service
     if (activeStep === 1) return !!selected.date && !!selected.time && !isSlotBooked(selected.date, selected.time)
     if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@') && !!selected.phone
+    if (activeStep === 3) return !!selected.upiRef && selected.upiRef.trim() !== '' && !!selected.paymentScreenshot
     return true
   }
 
@@ -299,8 +302,10 @@ export default function BookPage() {
                     clientName={selected.name}
                     clientEmail={selected.email}
                     upiRef={selected.upiRef}
+                    paymentScreenshot={selected.paymentScreenshot}
                     isSubmitting={isSubmitting}
                     onChangeUpiRef={(val) => handleChangeField('upiRef', val)}
+                    onChangePaymentScreenshot={(val) => handleChangeField('paymentScreenshot', val || '')}
                     onSubmitBooking={handleSubmitBooking}
                   />
                 )}
