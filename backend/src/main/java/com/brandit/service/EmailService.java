@@ -32,7 +32,8 @@ public class EmailService {
             "raghavdhir1510@gmail.com",    // Admin Personal Email
             "sethhritika@gmail.com",       // Hritika Seth (Customer Acquisition)
             "dhawankritika866@gmail.com",   // Kritika Dhawan (Customer Acquisition)
-            "bhardwajstuti101@gmail.com"   // Stuti Sharma (HR)
+            "bhardwajstuti101@gmail.com",   // Stuti Sharma (HR)
+            "yashjainnn13@gmail.com"       // Yash Jain (Finance & Accounting)
     );
 
     @Data
