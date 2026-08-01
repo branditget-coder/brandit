@@ -80,9 +80,13 @@ public class BookingService {
                     .build());
         }
 
-        // Trigger confirmation email dispatch
-        String recipientEmail = (user != null) ? user.getEmail() : request.getClientEmail();
-        String recipientName = (user != null) ? user.getFullName() : (request.getClientName() != null ? request.getClientName() : "Client");
+        // Ensure recipientEmail correctly uses request.getClientEmail() first if provided
+        String recipientEmail = (request.getClientEmail() != null && !request.getClientEmail().isBlank()) 
+                ? request.getClientEmail().trim().toLowerCase() 
+                : (user != null ? user.getEmail() : null);
+        String recipientName = (request.getClientName() != null && !request.getClientName().isBlank()) 
+                ? request.getClientName().trim() 
+                : (user != null ? user.getFullName() : "Valued Client");
         String priceStr = request.getAmount() != null ? "₹" + request.getAmount() : "Confirmed Package";
 
         if (recipientEmail != null && !recipientEmail.isBlank()) {
@@ -97,8 +101,10 @@ public class BookingService {
             );
         }
 
-        // Trigger payment verification alert email to official BrandIt team
-        String clientPhone = (user != null && user.getPhone() != null) ? user.getPhone() : request.getClientPhone();
+        // Trigger payment verification alert email to official BrandIt team and client
+        String clientPhone = (request.getClientPhone() != null && !request.getClientPhone().isBlank()) 
+                ? request.getClientPhone() 
+                : (user != null ? user.getPhone() : null);
         emailService.sendPaymentVerificationAdminNotification(
                 recipientName,
                 recipientEmail,

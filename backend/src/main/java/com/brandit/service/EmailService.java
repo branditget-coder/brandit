@@ -82,7 +82,14 @@ public class EmailService {
                                          String bookingTime, String price, String paymentId) {
         String subject = "Booking Confirmed: " + serviceName + " — BrandIt";
         String htmlBody = templateBuilder.buildBookingTemplate(clientName, serviceName, bookingDate, bookingTime, price, paymentId, frontendUrl);
-        sendEmailSync(toEmail, subject, htmlBody);
+        
+        // 1. Send confirmation to the client who pays
+        if (toEmail != null && !toEmail.isBlank()) {
+            sendEmailSync(toEmail, subject, htmlBody);
+        }
+
+        // 2. Send copy to admin email
+        sendEmailSync("brandit.get@gmail.com", "[NEW BOOKING] " + subject, htmlBody);
     }
 
     /**
@@ -126,7 +133,7 @@ public class EmailService {
     }
 
     /**
-     * 6. Send Payment Proof & UTR Reference Notification to BrandIt Official Email
+     * 6. Send Payment Proof & UTR Reference Notification to BrandIt Official Email and Client
      */
     @Async
     public void sendPaymentVerificationAdminNotification(String clientName, String clientEmail, String clientPhone,
@@ -137,8 +144,13 @@ public class EmailService {
                 clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, frontendUrl
         );
 
-        // Send to official BrandIt email addresses
+        // 1. Send to official BrandIt admin email addresses
         sendEmailSync("brandit.get@gmail.com", subject, htmlBody);
         sendEmailSync("raghavdhir.work@gmail.com", subject, htmlBody);
+
+        // 2. Send copy to the client who pays as instant receipt
+        if (clientEmail != null && !clientEmail.isBlank() && !clientEmail.equalsIgnoreCase("brandit.get@gmail.com")) {
+            sendEmailSync(clientEmail, "Payment Submission Receipt — BrandIt (" + serviceName + ")", htmlBody);
+        }
     }
 }
