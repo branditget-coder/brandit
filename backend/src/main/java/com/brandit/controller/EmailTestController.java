@@ -1,5 +1,6 @@
 package com.brandit.controller;
 
+import com.brandit.service.BookingService;
 import com.brandit.service.EmailService;
 import com.brandit.service.EmailService.EmailDispatchResult;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmailTestController {
 
     private final EmailService emailService;
+    private final BookingService bookingService;
 
     @GetMapping({"/api/test-email", "/api/admin/email/test"})
     public ResponseEntity<EmailDispatchResult> testEmailDispatch(
@@ -30,5 +32,10 @@ public class EmailTestController {
 
         EmailDispatchResult result = emailService.sendEmailSync(to, testSubject, testBody);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping({"/api/resend-latest-booking-email", "/api/admin/bookings/resend-latest"})
+    public ResponseEntity<String> resendLatestBookingEmail() {
+        return ResponseEntity.ok(bookingService.resendLatestBookingEmails());
     }
 }

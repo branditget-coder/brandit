@@ -120,6 +120,44 @@ public class BookingService {
         return mapToResponse(saved);
     }
 
+    public String resendLatestBookingEmails() {
+        List<Booking> bookings = bookingRepository.findAllByOrderByCreatedAtDesc();
+        if (bookings.isEmpty()) {
+            return "No bookings found in database.";
+        }
+        Booking latest = bookings.get(0);
+
+        User user = latest.getUser();
+        String recipientEmail = (user != null && user.getEmail() != null) ? user.getEmail() : "client@brandit.com";
+        String recipientName = (user != null && user.getFullName() != null) ? user.getFullName() : "Valued Client";
+        String clientPhone = (user != null && user.getPhone() != null) ? user.getPhone() : "N/A";
+        String priceStr = latest.getAmount() != null ? "₹" + latest.getAmount() : "Confirmed Package";
+
+        emailService.sendBookingConfirmation(
+                recipientEmail,
+                recipientName,
+                latest.getServiceName(),
+                latest.getBookingDate() != null ? latest.getBookingDate().toString() : "TBD",
+                latest.getBookingTime() != null ? latest.getBookingTime().toString() : "TBD",
+                priceStr,
+                latest.getPaymentId()
+        );
+
+        emailService.sendPaymentVerificationAdminNotification(
+                recipientName,
+                recipientEmail,
+                clientPhone,
+                latest.getServiceName(),
+                latest.getBookingDate() != null ? latest.getBookingDate().toString() : "TBD",
+                latest.getBookingTime() != null ? latest.getBookingTime().toString() : "TBD",
+                priceStr,
+                latest.getPaymentId(),
+                null
+        );
+
+        return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + latest.getId() + " (" + latest.getServiceName() + ")";
+    }
+
     public List<BookedSlotDto> getBookedSlots() {
         return bookingRepository.findByStatusNot(Booking.Status.CANCELLED)
                 .stream()
