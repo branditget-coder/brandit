@@ -77,7 +77,10 @@ public class SecurityConfig {
                 // Diagnostics - publicly accessible for Railway health checks
                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/test-email").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/list-bookings").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/resend-booking-email").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/resend-latest-booking-email").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/send-manual-payment-email").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/health").permitAll()

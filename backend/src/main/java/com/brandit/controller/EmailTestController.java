@@ -1,14 +1,19 @@
 package com.brandit.controller;
 
+import com.brandit.entity.Booking;
+import com.brandit.repository.BookingRepository;
 import com.brandit.service.BookingService;
 import com.brandit.service.EmailService;
 import com.brandit.service.EmailService.EmailDispatchResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,6 +21,7 @@ public class EmailTestController {
 
     private final EmailService emailService;
     private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
 
     @GetMapping({"/api/test-email", "/api/admin/email/test"})
     public ResponseEntity<EmailDispatchResult> testEmailDispatch(
@@ -34,8 +40,50 @@ public class EmailTestController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping({"/api/resend-latest-booking-email", "/api/admin/bookings/resend-latest"})
-    public ResponseEntity<String> resendLatestBookingEmail() {
-        return ResponseEntity.ok(bookingService.resendLatestBookingEmails());
+    @GetMapping({"/api/list-bookings", "/api/admin/bookings/list-all"})
+    public ResponseEntity<List<Map<String, Object>>> listAllBookingsForDiagnostics() {
+        List<Booking> bookings = bookingRepository.findAllByOrderByCreatedAtDesc();
+        List<Map<String, Object>> result = bookings.stream().map(b -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("bookingId", b.getId());
+            map.put("serviceName", b.getServiceName());
+            map.put("clientName", b.getUser() != null ? b.getUser().getFullName() : "Guest Client");
+            map.put("clientEmail", b.getUser() != null ? b.getUser().getEmail() : "N/A");
+            map.put("clientPhone", b.getUser() != null ? b.getUser().getPhone() : "N/A");
+            map.put("amount", b.getAmount());
+            map.put("paymentId", b.getPaymentId());
+            map.put("bookingDate", b.getBookingDate());
+            map.put("bookingTime", b.getBookingTime());
+            map.put("createdAt", b.getCreatedAt());
+            map.put("resendUrl", "https://brandit-production-61bf.up.railway.app/api/resend-booking-email?id=" + b.getId());
+            return map;
+        }).toList();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping({"/api/resend-booking-email", "/api/resend-latest-booking-email"})
+    public ResponseEntity<String> resendBookingEmail(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String customEmail) {
+        if (id == null) {
+            return ResponseEntity.ok(bookingService.resendLatestBookingEmails());
+        }
+        return ResponseEntity.ok(bookingService.resendBookingEmailsById(id, customEmail));
+    }
+
+    @GetMapping("/api/send-manual-payment-email")
+    public ResponseEntity<String> sendManualPaymentEmail(
+            @RequestParam(defaultValue = "Valued Client") String clientName,
+            @RequestParam(defaultValue = "client@brandit.com") String clientEmail,
+            @RequestParam(defaultValue = "Career Consulting Session") String serviceName,
+            @RequestParam(defaultValue = "₹1,499") String price,
+            @RequestParam(defaultValue = "UPI-TRANSACTION-REF") String upiRef,
+            @RequestParam(defaultValue = "TBD") String bookingDate,
+            @RequestParam(defaultValue = "TBD") String bookingTime) {
+
+        emailService.sendBookingConfirmation(clientEmail, clientName, serviceName, bookingDate, bookingTime, price, upiRef);
+        emailService.sendPaymentVerificationAdminNotification(clientName, clientEmail, "N/A", serviceName, bookingDate, bookingTime, price, upiRef, null);
+
+        return ResponseEntity.ok("Successfully dispatched manual booking confirmation & payment verification emails for " + clientName + " (" + clientEmail + ")");
     }
 }

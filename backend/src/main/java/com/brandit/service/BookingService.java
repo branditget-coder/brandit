@@ -158,6 +158,44 @@ public class BookingService {
         return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + latest.getId() + " (" + latest.getServiceName() + ")";
     }
 
+    public String resendBookingEmailsById(Long bookingId, String customToEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking with ID #" + bookingId + " not found"));
+
+        User user = booking.getUser();
+        String recipientEmail = (customToEmail != null && !customToEmail.isBlank())
+                ? customToEmail
+                : (user != null && user.getEmail() != null) ? user.getEmail() : "client@brandit.com";
+
+        String recipientName = (user != null && user.getFullName() != null) ? user.getFullName() : "Valued Client";
+        String clientPhone = (user != null && user.getPhone() != null) ? user.getPhone() : "N/A";
+        String priceStr = booking.getAmount() != null ? "₹" + booking.getAmount() : "Confirmed Package";
+
+        emailService.sendBookingConfirmation(
+                recipientEmail,
+                recipientName,
+                booking.getServiceName(),
+                booking.getBookingDate() != null ? booking.getBookingDate().toString() : "TBD",
+                booking.getBookingTime() != null ? booking.getBookingTime().toString() : "TBD",
+                priceStr,
+                booking.getPaymentId()
+        );
+
+        emailService.sendPaymentVerificationAdminNotification(
+                recipientName,
+                recipientEmail,
+                clientPhone,
+                booking.getServiceName(),
+                booking.getBookingDate() != null ? booking.getBookingDate().toString() : "TBD",
+                booking.getBookingTime() != null ? booking.getBookingTime().toString() : "TBD",
+                priceStr,
+                booking.getPaymentId(),
+                null
+        );
+
+        return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + booking.getId() + " (" + booking.getServiceName() + ") to " + recipientEmail;
+    }
+
     public List<BookedSlotDto> getBookedSlots() {
         return bookingRepository.findByStatusNot(Booking.Status.CANCELLED)
                 .stream()
