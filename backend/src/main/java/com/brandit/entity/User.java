@@ -42,10 +42,12 @@ public class User {
 
     private String bio;
 
+    @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+    @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthProvider provider = AuthProvider.LOCAL;

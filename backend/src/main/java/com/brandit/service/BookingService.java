@@ -57,6 +57,7 @@ public class BookingService {
                         .email(emailToUse)
                         .phone(request.getClientPhone())
                         .role(User.Role.USER)
+                        .provider(User.AuthProvider.LOCAL)
                         .build();
                 user = userRepository.save(user);
             }
@@ -220,6 +221,7 @@ public class BookingService {
                     .email(emailToUse)
                     .phone(clientPhone != null ? clientPhone : "N/A")
                     .role(User.Role.USER)
+                    .provider(User.AuthProvider.LOCAL)
                     .build();
             user = userRepository.save(user);
         }
