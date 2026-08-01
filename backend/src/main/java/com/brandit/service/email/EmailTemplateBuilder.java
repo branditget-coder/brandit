@@ -183,11 +183,18 @@ public class EmailTemplateBuilder {
     public String buildPaymentVerificationAdminTemplate(String clientName, String clientEmail, String clientPhone,
                                                          String serviceName, String bookingDate, String bookingTime,
                                                          String price, String upiRef, String screenshotBase64, String frontendUrl) {
-        String imageHtml = (screenshotBase64 != null && !screenshotBase64.isBlank())
+        String safeScreenshot = screenshotBase64;
+        if (safeScreenshot != null && safeScreenshot.length() > 250000) {
+            safeScreenshot = null; // Prevent oversized payload from failing email API requests
+        }
+
+        String imageHtml = (safeScreenshot != null && !safeScreenshot.isBlank())
                 ? "<div style='margin-top:16px; text-align:center;'>" +
                   "  <p style='font-weight:700; color:#111827; margin-bottom:8px;'>Uploaded Payment Proof Screenshot:</p>" +
-                  "  <img src='" + screenshotBase64 + "' alt='Payment Screenshot Proof' style='max-width:100%; max-height:450px; border-radius:12px; border:2px solid #0A66C2; box-shadow:0 6px 16px rgba(0,0,0,0.12);' />" +
+                  "  <img src='" + safeScreenshot + "' alt='Payment Screenshot Proof' style='max-width:100%; max-height:450px; border-radius:12px; border:2px solid #0A66C2; box-shadow:0 6px 16px rgba(0,0,0,0.12);' />" +
                   "</div>"
+                : (screenshotBase64 != null && !screenshotBase64.isBlank())
+                ? "<div style='margin-top:16px; p:12px; background:#F1F5F9; border-radius:8px; text-align:center;'><p style='color:#0A66C2; font-weight:700; margin:0;'>✓ Payment Screenshot Uploaded by Client (Ref: " + upiRef + ")</p></div>"
                 : "<p style='color:#DC2626; font-weight:600;'>No screenshot image provided.</p>";
 
         return wrapHtmlTemplate("New Payment Submitted for Verification",

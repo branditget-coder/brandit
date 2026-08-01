@@ -51,8 +51,8 @@ export function StepPaymentGPay({
     reader.onload = (e) => {
       const img = new Image()
       img.onload = () => {
-        const MAX_WIDTH = 1200
-        const MAX_HEIGHT = 1200
+        const MAX_WIDTH = 600
+        const MAX_HEIGHT = 600
         let width = img.width
         let height = img.height
 
@@ -72,7 +72,7 @@ export function StepPaymentGPay({
         const ctx = canvas.getContext('2d')
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height)
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6)
           onChangePaymentScreenshot(compressedDataUrl)
         } else {
           onChangePaymentScreenshot(e.target?.result as string)

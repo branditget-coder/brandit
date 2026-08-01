@@ -42,8 +42,8 @@ public class ResendEmailProvider implements EmailProviderStrategy {
     public boolean send(String to, String subject, String htmlBody, String fromEmail) {
         if (!isConfigured()) return false;
         try {
-            // If fromEmail is valid and not resend.dev, use it; otherwise fallback to onboarding@resend.dev
-            String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("resend.dev"))
+            // Resend API free/testing tier requires onboarding@resend.dev as sender unless a custom verified domain is configured
+            String sender = (fromEmail != null && fromEmail.endsWith("@go-brandit.com"))
                     ? "BrandIt Consulting <" + fromEmail + ">"
                     : "BrandIt Consulting <onboarding@resend.dev>";
 
