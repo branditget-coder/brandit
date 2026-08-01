@@ -340,4 +340,11 @@ export function StepPaymentGPay({
               <FiShield color={brandColors.success} size={15} />
               <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, fontSize: '0.75rem' }}>
                 Screenshot sent to brandit.get@gmail.com for instant verification
- 
+              </Typography>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  )
+}
