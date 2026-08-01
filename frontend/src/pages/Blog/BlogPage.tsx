@@ -1,12 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Box, Container, Typography, Grid, Paper, Chip, Button, InputAdornment, TextField,
-  Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, alpha, Divider
+  Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, alpha, Divider,
+  Snackbar, Alert
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import {
   FiSearch, FiClock, FiArrowRight, FiX, FiShare2, FiBookOpen,
-  FiTrendingUp, FiBriefcase, FiFeather, FiCheckCircle
+  FiTrendingUp, FiBriefcase, FiFeather, FiCheckCircle, FiCheck
 } from 'react-icons/fi'
 import { useSearchParams, Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
@@ -199,6 +200,63 @@ export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState<string>(categoryFilterParam)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedArticle, setSelectedArticle] = useState<BlogPost | null>(null)
+  const [copiedArticleId, setCopiedArticleId] = useState<string | null>(null)
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMsg, setSnackbarMsg] = useState('')
+
+  useEffect(() => {
+    const articleId = searchParams.get('article')
+    if (articleId) {
+      const found = blogPosts.find((p) => p.id === articleId)
+      if (found) {
+        setSelectedArticle(found)
+      }
+    }
+  }, [searchParams])
+
+  const handleShareArticle = async (post: BlogPost, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation()
+    }
+    const shareUrl = `${window.location.origin}/blog?article=${post.id}`
+    const shareData = {
+      title: post.title,
+      text: post.excerpt,
+      url: shareUrl,
+    }
+
+    let sharedViaNative = false
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData)
+        sharedViaNative = true
+      } catch (err) {
+        // User cancelled share dialog or native share not allowed
+      }
+    }
+
+    if (!sharedViaNative) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrl)
+        } else {
+          const dummy = document.createElement('input')
+          document.body.appendChild(dummy)
+          dummy.value = shareUrl
+          dummy.select()
+          document.execCommand('copy')
+          document.body.removeChild(dummy)
+        }
+        setCopiedArticleId(post.id)
+        setSnackbarMsg('Article link copied to clipboard!')
+        setSnackbarOpen(true)
+        setTimeout(() => setCopiedArticleId(null), 2500)
+      } catch (err) {
+        setSnackbarMsg('Failed to copy article link.')
+        setSnackbarOpen(true)
+      }
+    }
+  }
 
   const categories = [
     { label: 'All Articles', key: 'all', icon: FiBookOpen },
@@ -383,20 +441,33 @@ export default function BlogPage() {
                           </Box>
                         </Box>
 
-                        <Button
-                          variant="text"
-                          onClick={() => setSelectedArticle(post)}
-                          endIcon={<FiArrowRight size={16} />}
-                          sx={{
-                            color: post.accentColor,
-                            fontWeight: 800,
-                            textTransform: 'none',
-                            fontSize: '0.9rem',
-                            '&:hover': { backgroundColor: alpha(post.accentColor, 0.08) },
-                          }}
-                        >
-                          Read Article
-                        </Button>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <IconButton
+                            onClick={(e) => handleShareArticle(post, e)}
+                            size="small"
+                            title="Share Article"
+                            sx={{
+                              color: copiedArticleId === post.id ? '#10B981' : brandColors.muted,
+                              '&:hover': { color: post.accentColor, backgroundColor: alpha(post.accentColor, 0.08) },
+                            }}
+                          >
+                            {copiedArticleId === post.id ? <FiCheck size={18} /> : <FiShare2 size={18} />}
+                          </IconButton>
+                          <Button
+                            variant="text"
+                            onClick={() => setSelectedArticle(post)}
+                            endIcon={<FiArrowRight size={16} />}
+                            sx={{
+                              color: post.accentColor,
+                              fontWeight: 800,
+                              textTransform: 'none',
+                              fontSize: '0.9rem',
+                              '&:hover': { backgroundColor: alpha(post.accentColor, 0.08) },
+                            }}
+                          >
+                            Read Article
+                          </Button>
+                        </Stack>
                       </Box>
                     </Box>
                   </Paper>
@@ -538,9 +609,19 @@ export default function BlogPage() {
                 </Stack>
               </DialogContent>
 
-              <DialogActions sx={{ pt: 2, px: 3, justifyContent: 'space-between' }}>
-                <Button startIcon={<FiShare2 />} size="small" sx={{ textTransform: 'none', color: brandColors.muted }}>
-                  Share Article
+              <DialogActions sx={{ pt: 2, px: 3, justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+                <Button
+                  startIcon={copiedArticleId === selectedArticle.id ? <FiCheck color="#10B981" /> : <FiShare2 />}
+                  onClick={(e) => handleShareArticle(selectedArticle, e)}
+                  size="small"
+                  sx={{
+                    textTransform: 'none',
+                    color: copiedArticleId === selectedArticle.id ? '#10B981' : brandColors.muted,
+                    fontWeight: 700,
+                    '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) },
+                  }}
+                >
+                  {copiedArticleId === selectedArticle.id ? 'Link Copied!' : 'Share Article'}
                 </Button>
                 <Button
                   component={RouterLink}
@@ -554,6 +635,18 @@ export default function BlogPage() {
             </>
           )}
         </Dialog>
+
+        {/* Share Toast Notification */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%', borderRadius: '12px', fontWeight: 600 }}>
+            {snackbarMsg}
+          </Alert>
+        </Snackbar>
       </Container>
     </Box>
   )
