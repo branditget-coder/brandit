@@ -4,7 +4,9 @@ import { motion } from 'framer-motion'
 import { FiFileText, FiDownload, FiRefreshCw } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
+import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
+import InvoiceModal, { InvoiceDetails } from '../../components/common/InvoiceModal'
 
 interface InvoiceItem {
   id: number
@@ -13,14 +15,18 @@ interface InvoiceItem {
   preferredDate?: string
   amount?: number
   amountPaid?: number
-  paymentStatus?: string
+  paymentMethod?: string
+  paymentId?: string
   status: string
 }
 
 export default function MyInvoices() {
+  const { user } = useAuth()
   const [invoices, setInvoices] = useState<InvoiceItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<boolean>(false)
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDetails | null>(null)
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true)
@@ -28,7 +34,6 @@ export default function MyInvoices() {
     try {
       const res = await api.get<InvoiceItem[]>('/bookings')
       const data = Array.isArray(res.data) ? res.data : []
-      // Filter paid/confirmed sessions for invoices
       setInvoices(data.filter(b => b.amount || b.amountPaid || b.status === 'CONFIRMED' || b.status === 'COMPLETED'))
     } catch (err: any) {
       setError(true)
@@ -41,12 +46,21 @@ export default function MyInvoices() {
     fetchInvoices()
   }, [fetchInvoices])
 
+  const handleOpenReceipt = (inv: InvoiceItem) => {
+    setSelectedInvoice({
+      ...inv,
+      clientName: user ? `${user.firstName} ${user.lastName}`.trim() : 'Valued Client',
+      clientEmail: user?.email || 'client@domain.com',
+    })
+    setModalOpen(true)
+  }
+
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h3" sx={{ mb: 0.5 }}>Invoices</Typography>
-          <Typography variant="body1" sx={{ color: brandColors.muted }}>Download your payment receipts and invoices.</Typography>
+          <Typography variant="body1" sx={{ color: brandColors.muted }}>Download your official tax invoices and payment receipts.</Typography>
         </Box>
 
         {loading ? (
@@ -78,21 +92,28 @@ export default function MyInvoices() {
             {invoices.map(inv => {
               const displayDate = inv.bookingDate || inv.preferredDate || 'Confirmed'
               const displayAmount = inv.amount || inv.amountPaid || 1499
+              const formattedInvNo = `INV-2026-${String(inv.id).padStart(4, '0')}`
               return (
                 <Paper key={inv.id} sx={{ p: 3, borderRadius: '18px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                     <Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-                        <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>INV-00{inv.id}</Typography>
-                        <Chip label="Paid" size="small" sx={{ backgroundColor: alpha(brandColors.success, 0.08), color: '#059669', fontWeight: 600, fontSize: '0.7rem' }} />
+                        <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700 }}>{formattedInvNo}</Typography>
+                        <Chip label="Paid" size="small" sx={{ backgroundColor: alpha(brandColors.success, 0.08), color: '#059669', fontWeight: 700, fontSize: '0.7rem' }} />
                       </Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.25 }}>{inv.serviceName}</Typography>
-                      <Typography variant="caption" sx={{ color: brandColors.muted }}>{displayDate}</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.25 }}>{inv.serviceName}</Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted }}>Date: {displayDate}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography variant="h5" sx={{ color: brandColors.text }}>₹{displayAmount.toLocaleString()}</Typography>
-                      <Button size="small" variant="outlined" startIcon={<FiDownload size={14} />} onClick={() => window.print()} sx={{ borderRadius: '10px' }}>
-                        Receipt
+                      <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700 }}>₹{displayAmount.toLocaleString()}</Typography>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        startIcon={<FiDownload size={14} />}
+                        onClick={() => handleOpenReceipt(inv)}
+                        sx={{ borderRadius: '10px', px: 2.5, fontWeight: 700 }}
+                      >
+                        Download Tax Invoice
                       </Button>
                     </Box>
                   </Box>
@@ -102,6 +123,13 @@ export default function MyInvoices() {
           </Stack>
         )}
       </motion.div>
+
+      {/* Official Tax Invoice & PDF Print Modal */}
+      <InvoiceModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        invoice={selectedInvoice}
+      />
     </Box>
   )
 }
