@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   Dialog, DialogContent, Box, Typography, Button, Divider, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Stack, alpha
+  TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Stack, alpha, useMediaQuery, useTheme
 } from '@mui/material'
 import { FiPrinter, FiX, FiCheckCircle, FiShield } from 'react-icons/fi'
 import { brandColors } from '../../theme'
@@ -27,6 +27,9 @@ interface InvoiceModalProps {
 }
 
 export default function InvoiceModal({ open, onClose, invoice }: InvoiceModalProps) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
   if (!invoice) return null
 
   const displayDate = invoice.bookingDate || invoice.preferredDate || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -45,10 +48,11 @@ export default function InvoiceModal({ open, onClose, invoice }: InvoiceModalPro
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          borderRadius: '24px',
-          p: 1,
+          borderRadius: { xs: 0, sm: '24px' },
+          p: { xs: 0, sm: 1 },
           '@media print': {
             boxShadow: 'none',
             border: 'none',
@@ -59,17 +63,17 @@ export default function InvoiceModal({ open, onClose, invoice }: InvoiceModalPro
         },
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 3, pt: 2, pb: 1, '@media print': { display: 'none' } }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: { xs: 2.5, sm: 3 }, pt: 2, pb: 1, '@media print': { display: 'none' } }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.muted }}>
           Official Tax Invoice & Payment Receipt
         </Typography>
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Button
             variant="contained"
             size="small"
             startIcon={<FiPrinter size={16} />}
             onClick={handlePrint}
-            sx={{ borderRadius: '10px', px: 2.5, fontWeight: 700 }}
+            sx={{ borderRadius: '10px', px: { xs: 1.5, sm: 2.5 }, fontWeight: 700, fontSize: { xs: '0.78rem', sm: '0.85rem' } }}
           >
             Print / Save as PDF
           </Button>
@@ -77,7 +81,7 @@ export default function InvoiceModal({ open, onClose, invoice }: InvoiceModalPro
             variant="outlined"
             size="small"
             onClick={onClose}
-            sx={{ borderRadius: '10px', minWidth: 40, p: 1 }}
+            sx={{ borderRadius: '10px', minWidth: 38, p: 0.8 }}
           >
             <FiX size={18} />
           </Button>
@@ -86,12 +90,12 @@ export default function InvoiceModal({ open, onClose, invoice }: InvoiceModalPro
 
       <Divider sx={{ '@media print': { display: 'none' } }} />
 
-      <DialogContent sx={{ p: { xs: 3, sm: 5 } }}>
+      <DialogContent sx={{ p: { xs: 2, sm: 4 } }}>
         {/* Printable Invoice Container */}
         <Box id="printable-invoice" sx={{ backgroundColor: '#fff', borderRadius: '16px', color: '#1F2937' }}>
           
           {/* Top Header: BrandIt Logo & Invoice Meta */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 3, mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
             <Box>
               <BrandLogo variant="dark" size="medium" showSlogan={false} />
               <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mt: 1, lineHeight: 1.4 }}>
@@ -150,8 +154,8 @@ export default function InvoiceModal({ open, onClose, invoice }: InvoiceModalPro
           </Box>
 
           {/* Itemized Table */}
-          <TableContainer sx={{ mb: 4, borderRadius: '12px', border: `1px solid ${brandColors.border}` }}>
-            <Table>
+          <TableContainer sx={{ mb: 4, borderRadius: '12px', border: `1px solid ${brandColors.border}`, overflowX: 'auto' }}>
+            <Table sx={{ minWidth: 420 }}>
               <TableHead sx={{ backgroundColor: brandColors.background }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700, color: brandColors.text }}>Service Description</TableCell>
