@@ -16,6 +16,7 @@ import BlogPage from './pages/Blog/BlogPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import PrivacyPage from './pages/Legal/PrivacyPage'
 import TermsPage from './pages/Legal/TermsPage'
 import RefundPage from './pages/Legal/RefundPage'
@@ -67,6 +68,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Route>
         </Route>
 

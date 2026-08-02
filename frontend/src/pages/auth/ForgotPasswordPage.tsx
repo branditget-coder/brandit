@@ -1,21 +1,33 @@
 import { useState } from 'react'
-import { Box, Typography, TextField, Button, Link, alpha, CircularProgress } from '@mui/material'
+import { Box, Typography, TextField, Button, Link, alpha, CircularProgress, Alert } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FiArrowLeft, FiSend } from 'react-icons/fi'
 import { brandColors } from '../../theme'
+import api from '../../services/api'
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [email, setEmail] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+    if (!email || !email.includes('@')) {
+      setError('Please enter a valid email address.')
+      return
+    }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1200))
-    setLoading(false)
-    setSent(true)
+    try {
+      await api.post('/auth/forgot-password', { email: email.trim().toLowerCase() })
+      setSent(true)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Could not process password reset request. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -43,7 +55,8 @@ export default function ForgotPasswordPage() {
           ) : (
             <>
               <Typography variant="h3" sx={{ mb: 0.75 }}>Forgot password?</Typography>
-              <Typography variant="body2" sx={{ color: brandColors.muted, mb: 4 }}>Enter your email and we'll send a reset link.</Typography>
+              <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>Enter your email and we'll send a reset link.</Typography>
+              {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
               <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                 <TextField label="Email Address" type="email" fullWidth required value={email} onChange={e => setEmail(e.target.value)} />
                 <Button type="submit" variant="contained" size="large" fullWidth disabled={loading} endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <FiSend />}>

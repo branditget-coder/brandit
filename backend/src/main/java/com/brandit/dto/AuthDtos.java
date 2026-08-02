@@ -26,6 +26,10 @@ public class AuthDtos {
 
         private String phone;
         private User.Role role;
+
+        public void setEmail(String email) {
+            this.email = email != null ? email.trim().toLowerCase() : null;
+        }
     }
 
     @Data
@@ -36,6 +40,10 @@ public class AuthDtos {
 
         @NotBlank(message = "Password is required")
         private String password;
+
+        public void setEmail(String email) {
+            this.email = email != null ? email.trim().toLowerCase() : null;
+        }
     }
 
     @Data
@@ -58,12 +66,20 @@ public class AuthDtos {
         private String email;
         private String firstName;
         private String lastName;
+
+        public void setEmail(String email) {
+            this.email = email != null ? email.trim().toLowerCase() : null;
+        }
     }
 
     @Data
     public static class ForgotPasswordRequest {
         @NotBlank @Email
         private String email;
+
+        public void setEmail(String email) {
+            this.email = email != null ? email.trim().toLowerCase() : null;
+        }
     }
 
     @Data

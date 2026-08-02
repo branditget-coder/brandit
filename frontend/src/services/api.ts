@@ -63,7 +63,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
+                           originalRequest?.url?.includes('/auth/register') ||
+                           originalRequest?.url?.includes('/auth/refresh') ||
+                           originalRequest?.url?.includes('/auth/forgot-password') ||
+                           originalRequest?.url?.includes('/auth/reset-password')
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true
       const refreshToken = localStorage.getItem('brandit_refresh_token')
       if (refreshToken) {
