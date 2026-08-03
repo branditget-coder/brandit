@@ -210,4 +210,14 @@ public class CommonDtos {
         private boolean active;
         private LocalDateTime subscribedAt;
     }
+
+    @Data
+    public static class ActivityLogResponse {
+        private Long id;
+        private String userEmail;
+        private String userName;
+        private String action;
+        private String metadataJson;
+        private LocalDateTime createdAt;
+    }
 }

@@ -2,7 +2,9 @@ package com.brandit.service;
 
 import com.brandit.dto.CommonDtos.BroadcastInsightsResponse;
 import com.brandit.entity.Newsletter;
+import com.brandit.entity.UserActivityLog;
 import com.brandit.repository.NewsletterRepository;
+import com.brandit.repository.UserActivityLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +19,7 @@ import java.util.List;
 public class WeeklyCareerInsightsService {
 
     private final NewsletterRepository newsletterRepository;
+    private final UserActivityLogRepository userActivityLogRepository;
     private final EmailService emailService;
 
     private static final String DEFAULT_WEEKLY_SUBJECT = "🚀 BrandIt Weekly Insights: 5 LinkedIn Personal Branding Strategies for 2026";
@@ -53,6 +56,12 @@ public class WeeklyCareerInsightsService {
             }
         }
         log.info("✅ Automated Weekly Career Insights broadcast complete.");
+        try {
+            userActivityLogRepository.save(UserActivityLog.builder()
+                    .action("AUTOMATED_WEEKLY_INSIGHTS_BROADCAST")
+                    .metadataJson("{\"subscribersCount\":" + subscribers.size() + ",\"subject\":\"" + DEFAULT_WEEKLY_SUBJECT + "\"}")
+                    .build());
+        } catch (Exception ignored) {}
     }
 
     /**
@@ -76,6 +85,13 @@ public class WeeklyCareerInsightsService {
                 log.error("Failed to dispatch weekly insight to {}: {}", subscriber.getEmail(), e.getMessage());
             }
         }
+
+        try {
+            userActivityLogRepository.save(UserActivityLog.builder()
+                    .action("ADMIN_WEEKLY_INSIGHTS_BROADCAST")
+                    .metadataJson("{\"sentCount\":" + sentCount + ",\"totalSubscribers\":" + totalSubscribers + ",\"subject\":\"" + finalSubject.replace("\"", "\\\"") + "\"}")
+                    .build());
+        } catch (Exception ignored) {}
 
         BroadcastInsightsResponse response = new BroadcastInsightsResponse();
         response.setTotalSubscribers(totalSubscribers);

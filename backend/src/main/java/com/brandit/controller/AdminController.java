@@ -95,6 +95,8 @@ public class AdminController {
 
         User saved = userRepository.save(user);
 
+        logActivity("ADMIN_CREATE_USER", "Created user " + saved.getEmail() + " with role " + saved.getRole().name());
+
         UserAdminResponse r = new UserAdminResponse();
         r.setId(saved.getId());
         r.setFirstName(saved.getFirstName());
@@ -134,6 +136,8 @@ public class AdminController {
 
         User saved = userRepository.save(user);
 
+        logActivity("ADMIN_UPDATE_USER", "Updated user details for " + saved.getEmail());
+
         UserAdminResponse r = new UserAdminResponse();
         r.setId(saved.getId());
         r.setFirstName(saved.getFirstName());
@@ -155,6 +159,9 @@ public class AdminController {
         try {
             user.setRole(User.Role.valueOf(request.getRole().toUpperCase()));
             userRepository.save(user);
+
+            logActivity("ADMIN_UPDATE_ROLE", "Updated role for user " + user.getEmail() + " to " + user.getRole().name());
+
             return ResponseEntity.ok(new MessageResponse("Role updated to " + user.getRole().name()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new MessageResponse("Invalid role. Allowed roles: USER, ADMIN, TEAM"));
@@ -177,6 +184,8 @@ public class AdminController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
 
+        String deletedEmail = user.getEmail();
+
         // Cascade delete dependent records
         bookingRepository.deleteByUserId(id);
         invoiceRepository.deleteByUserId(id);
@@ -184,6 +193,9 @@ public class AdminController {
         aiResumeScanRepository.deleteByUserId(id);
 
         userRepository.delete(user);
+
+        logActivity("ADMIN_DELETE_USER", "Deleted user account " + deletedEmail + " (ID: " + id + ") and purged all associated records from database");
+
         return ResponseEntity.ok(new MessageResponse("User account and all associated records deleted successfully."));
     }
 
@@ -278,12 +290,53 @@ public class AdminController {
                 .orElseThrow(() -> new IllegalArgumentException("Subscriber not found"));
         subscriber.setActive(!subscriber.isActive());
         newsletterRepository.save(subscriber);
+
+        logActivity("ADMIN_TOGGLE_SUBSCRIBER", "Toggled subscriber " + subscriber.getEmail() + " status to " + (subscriber.isActive() ? "Active" : "Inactive"));
+
         return ResponseEntity.ok(new MessageResponse("Subscriber status updated to: " + (subscriber.isActive() ? "Active" : "Inactive")));
     }
 
     @DeleteMapping("/newsletter/subscribers/{id}")
     public ResponseEntity<MessageResponse> deleteSubscriber(@PathVariable Long id) {
+        Newsletter subscriber = newsletterRepository.findById(id).orElse(null);
+        String subEmail = subscriber != null ? subscriber.getEmail() : ("ID " + id);
         newsletterRepository.deleteById(id);
+
+        logActivity("ADMIN_DELETE_SUBSCRIBER", "Deleted subscriber " + subEmail);
+
         return ResponseEntity.ok(new MessageResponse("Subscriber removed successfully."));
+    }
+
+    @GetMapping("/activity-logs")
+    public ResponseEntity<List<ActivityLogResponse>> getActivityLogs() {
+        List<ActivityLogResponse> logs = userActivityLogRepository.findTop50ByOrderByCreatedAtDesc().stream().map(l -> {
+            ActivityLogResponse r = new ActivityLogResponse();
+            r.setId(l.getId());
+            r.setUserEmail(l.getUser() != null ? l.getUser().getEmail() : "SYSTEM/ADMIN");
+            r.setUserName(l.getUser() != null ? l.getUser().getFullName() : "System");
+            r.setAction(l.getAction());
+            r.setMetadataJson(l.getMetadataJson());
+            r.setCreatedAt(l.getCreatedAt() != null ? l.getCreatedAt() : java.time.LocalDateTime.now());
+            return r;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(logs);
+    }
+
+    private void logActivity(String action, String metadataJson) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = null;
+            if (auth != null && auth.getName() != null) {
+                currentUser = userRepository.findByEmail(auth.getName()).orElse(null);
+            }
+            com.brandit.entity.UserActivityLog logEntry = com.brandit.entity.UserActivityLog.builder()
+                    .user(currentUser)
+                    .action(action)
+                    .metadataJson(metadataJson)
+                    .build();
+            userActivityLogRepository.save(logEntry);
+        } catch (Exception e) {
+            // Non-blocking fallback for logging
+        }
     }
 }
