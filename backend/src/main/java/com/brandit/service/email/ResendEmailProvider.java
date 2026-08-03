@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Order(1)
+@Order(2)
 @Slf4j
 public class ResendEmailProvider implements EmailProviderStrategy {
 
