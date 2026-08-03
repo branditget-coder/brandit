@@ -2,11 +2,13 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy backend folder into container workspace
-COPY backend/ ./
+# Copy pom.xml first and pre-fetch dependencies for Docker layer caching
+COPY backend/pom.xml ./
+RUN mvn dependency:go-offline -B
 
-# Package application JAR skipping tests
-RUN mvn clean package -DskipTests
+# Copy full backend source and build application executable JAR
+COPY backend/ ./
+RUN mvn clean package -DskipTests -B
 
 # Stage 2: Runtime image
 FROM eclipse-temurin:21-jre-alpine
