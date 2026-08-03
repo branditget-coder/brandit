@@ -16,6 +16,31 @@ public class DatabaseMigrationConfig implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
+            // Ensure all columns exist on bookings table
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_screenshot TEXT;");
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_method VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_id VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS amount NUMERIC(19, 2);");
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS notes TEXT;");
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS meeting_link VARCHAR(255);");
+            log.info("✅ Verified and added missing columns to PostgreSQL bookings table.");
+        } catch (Exception e) {
+            log.warn("Bookings column schema migration notice: {}", e.getMessage());
+        }
+
+        try {
+            // Ensure all columns exist on app_users table
+            jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS phone VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS current_role VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS bio TEXT;");
+            jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255);");
+            log.info("✅ Verified and added missing columns to PostgreSQL app_users table.");
+        } catch (Exception e) {
+            log.warn("AppUsers column schema migration notice: {}", e.getMessage());
+        }
+
+        try {
             // Drop any existing rigid foreign key constraint on bookings table
             jdbcTemplate.execute(
                 "DO $$ " +
