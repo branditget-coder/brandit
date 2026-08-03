@@ -10,4 +10,5 @@ import java.util.List;
 public interface UserActivityLogRepository extends JpaRepository<UserActivityLog, Long> {
     List<UserActivityLog> findByUserIdOrderByCreatedAtDesc(Long userId);
     List<UserActivityLog> findTop50ByOrderByCreatedAtDesc();
+    void deleteByUserId(Long userId);
 }

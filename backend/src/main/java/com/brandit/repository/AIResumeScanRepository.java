@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface AIResumeScanRepository extends JpaRepository<AIResumeScan, Long> {
     List<AIResumeScan> findByUserIdOrderByCreatedAtDesc(Long userId);
+    void deleteByUserId(Long userId);
 }

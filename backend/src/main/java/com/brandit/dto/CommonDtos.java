@@ -160,4 +160,30 @@ public class CommonDtos {
         private boolean emailVerified;
         private LocalDateTime createdAt;
     }
+
+    @Data
+    public static class AdminCreateUserRequest {
+        @NotBlank private String firstName;
+        @NotBlank private String lastName;
+        @NotBlank @Email private String email;
+        @NotBlank private String password;
+        private String phone;
+        private String role; // USER, ADMIN, TEAM
+        private boolean emailVerified = true;
+    }
+
+    @Data
+    public static class AdminUpdateUserRequest {
+        @NotBlank private String firstName;
+        private String lastName;
+        @NotBlank @Email private String email;
+        private String phone;
+        private String role;
+        private Boolean emailVerified;
+    }
+
+    @Data
+    public static class AdminUpdateRoleRequest {
+        @NotBlank private String role;
+    }
 }
