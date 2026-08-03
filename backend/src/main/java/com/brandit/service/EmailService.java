@@ -168,4 +168,13 @@ public class EmailService {
             sendEmailSync(clientEmail, "Payment Submission Receipt — BrandIt (" + serviceName + ")", htmlBody);
         }
     }
+
+    /**
+     * 7. Send Weekly Career Insights Email to Subscribed Account
+     */
+    @Async
+    public void sendWeeklyCareerInsightDigest(String toEmail, String subject, String contentHtml) {
+        String htmlBody = templateBuilder.buildWeeklyCareerInsightsTemplate(subject, contentHtml, toEmail, frontendUrl);
+        sendEmailSync(toEmail, subject, htmlBody);
+    }
 }

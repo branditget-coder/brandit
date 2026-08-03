@@ -1,15 +1,18 @@
 package com.brandit.controller;
 
 import com.brandit.dto.CommonDtos.*;
+import com.brandit.entity.Newsletter;
 import com.brandit.entity.Testimonial;
 import com.brandit.entity.User;
 import com.brandit.repository.AIResumeScanRepository;
 import com.brandit.repository.BlogPostRepository;
 import com.brandit.repository.BookingRepository;
 import com.brandit.repository.InvoiceRepository;
+import com.brandit.repository.NewsletterRepository;
 import com.brandit.repository.TestimonialRepository;
 import com.brandit.repository.UserActivityLogRepository;
 import com.brandit.repository.UserRepository;
+import com.brandit.service.WeeklyCareerInsightsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,8 @@ public class AdminController {
     private final AIResumeScanRepository aiResumeScanRepository;
     private final TestimonialRepository testimonialRepository;
     private final BlogPostRepository blogPostRepository;
+    private final NewsletterRepository newsletterRepository;
+    private final WeeklyCareerInsightsService weeklyCareerInsightsService;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/analytics")
@@ -242,5 +247,43 @@ public class AdminController {
     public ResponseEntity<MessageResponse> deleteTestimonial(@PathVariable Long id) {
         testimonialRepository.deleteById(id);
         return ResponseEntity.ok(new MessageResponse("Testimonial deleted."));
+    }
+
+    // Weekly Career Insights & Opted-In Newsletter Accounts
+    @GetMapping("/newsletter/subscribers")
+    public ResponseEntity<List<NewsletterSubscriberResponse>> getNewsletterSubscribers() {
+        List<NewsletterSubscriberResponse> subscribers = newsletterRepository.findAllByOrderBySubscribedAtDesc().stream().map(s -> {
+            NewsletterSubscriberResponse r = new NewsletterSubscriberResponse();
+            r.setId(s.getId());
+            r.setEmail(s.getEmail());
+            r.setActive(s.isActive());
+            r.setSubscribedAt(s.getSubscribedAt() != null ? s.getSubscribedAt() : java.time.LocalDateTime.now());
+            return r;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(subscribers);
+    }
+
+    @PostMapping("/newsletter/broadcast")
+    public ResponseEntity<BroadcastInsightsResponse> broadcastWeeklyInsights(@Valid @RequestBody BroadcastInsightsRequest request) {
+        BroadcastInsightsResponse response = weeklyCareerInsightsService.broadcastCustomInsights(
+                request.getSubject(),
+                request.getContentHtml()
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/newsletter/subscribers/{id}/toggle")
+    public ResponseEntity<MessageResponse> toggleSubscriberStatus(@PathVariable Long id) {
+        Newsletter subscriber = newsletterRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Subscriber not found"));
+        subscriber.setActive(!subscriber.isActive());
+        newsletterRepository.save(subscriber);
+        return ResponseEntity.ok(new MessageResponse("Subscriber status updated to: " + (subscriber.isActive() ? "Active" : "Inactive")));
+    }
+
+    @DeleteMapping("/newsletter/subscribers/{id}")
+    public ResponseEntity<MessageResponse> deleteSubscriber(@PathVariable Long id) {
+        newsletterRepository.deleteById(id);
+        return ResponseEntity.ok(new MessageResponse("Subscriber removed successfully."));
     }
 }

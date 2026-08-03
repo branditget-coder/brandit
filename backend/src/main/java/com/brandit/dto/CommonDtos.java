@@ -186,4 +186,28 @@ public class CommonDtos {
     public static class AdminUpdateRoleRequest {
         @NotBlank private String role;
     }
+
+    // Weekly Insights & Newsletter
+    @Data
+    public static class BroadcastInsightsRequest {
+        @NotBlank private String subject;
+        @NotBlank private String contentHtml;
+        private String presetId;
+    }
+
+    @Data
+    public static class BroadcastInsightsResponse {
+        private int totalSubscribers;
+        private int sentCount;
+        private String statusMessage;
+        private LocalDateTime dispatchedAt;
+    }
+
+    @Data
+    public static class NewsletterSubscriberResponse {
+        private Long id;
+        private String email;
+        private boolean active;
+        private LocalDateTime subscribedAt;
+    }
 }

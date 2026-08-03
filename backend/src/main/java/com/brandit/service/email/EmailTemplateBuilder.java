@@ -218,4 +218,18 @@ public class EmailTemplateBuilder {
 
                 imageHtml, frontendUrl);
     }
+
+    public String buildWeeklyCareerInsightsTemplate(String subject, String contentHtml, String recipientEmail, String frontendUrl) {
+        String baseUrl = cleanUrl(frontendUrl);
+        return wrapHtmlTemplate(subject,
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>🚀 BrandIt Weekly Career Insights</h2>" +
+                "<p style='color:#4B5563; font-size:14px;'>Exclusive personal branding, executive resume, and LinkedIn growth digest for <strong>" + recipientEmail + "</strong>.</p>" +
+                "<div class='card' style='background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:22px; margin:20px 0; box-sizing:border-box; word-break:break-word; font-size:15px; line-height:1.7;'>" +
+                contentHtml +
+                "</div>" +
+                "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 20px; text-align:center; margin-top:24px;'>" +
+                "  <p style='margin:0 0 10px 0; font-weight:700; color:#0A66C2;'>Ready to fast-track your executive career?</p>" +
+                "  <a href='" + baseUrl + "/book' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:12px 24px; border-radius:10px; font-weight:700; font-size:14px; text-align:center; font-family:sans-serif;'>Book 1-on-1 Consultation &rarr;</a>" +
+                "</div>", frontendUrl);
+    }
 }

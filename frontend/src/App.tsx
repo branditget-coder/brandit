@@ -38,6 +38,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminBookings from './pages/admin/AdminBookings'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminWeeklyInsights from './pages/admin/AdminWeeklyInsights'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Auth Guards
@@ -99,6 +100,7 @@ export default function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="insights" element={<AdminWeeklyInsights />} />
           </Route>
         </Route>
 

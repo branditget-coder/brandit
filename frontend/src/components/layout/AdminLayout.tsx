@@ -7,7 +7,7 @@ import {
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   FiGrid, FiUsers, FiCalendar, FiFileText,
-  FiBarChart2, FiMenu, FiLogOut, FiAlertTriangle
+  FiBarChart2, FiMenu, FiLogOut, FiAlertTriangle, FiSend
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -20,6 +20,7 @@ const adminNav = [
   { label: 'Analytics', href: '/admin/analytics', icon: FiBarChart2 },
   { label: 'Users', href: '/admin/users', icon: FiUsers },
   { label: 'Bookings', href: '/admin/bookings', icon: FiCalendar },
+  { label: 'Weekly Insights', href: '/admin/insights', icon: FiSend },
 ]
 
 export default function AdminLayout() {
