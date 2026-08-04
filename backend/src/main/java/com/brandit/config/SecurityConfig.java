@@ -72,6 +72,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/newsletter").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/bookings/public-slots").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/bookings/public/**").permitAll()
                 .requestMatchers("/api/payments/**").permitAll()
                 // Diagnostics - publicly accessible for Railway health checks
                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()

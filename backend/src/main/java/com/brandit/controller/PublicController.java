@@ -1,9 +1,11 @@
 package com.brandit.controller;
 
 import com.brandit.dto.CommonDtos.*;
+import com.brandit.entity.Booking;
 import com.brandit.entity.Contact;
 import com.brandit.entity.Newsletter;
 import com.brandit.entity.Testimonial;
+import com.brandit.repository.BookingRepository;
 import com.brandit.repository.ContactRepository;
 import com.brandit.repository.NewsletterRepository;
 import com.brandit.repository.TestimonialRepository;
@@ -13,14 +15,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
+import java.net.URI;
 import java.sql.Connection;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,6 +41,7 @@ public class PublicController {
     private final NewsletterRepository newsletterRepository;
     private final TestimonialRepository testimonialRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final EmailService emailService;
     private final DataSource dataSource;
 
@@ -125,5 +134,69 @@ public class PublicController {
         res.setApproved(t.isApproved());
         res.setCreatedAt(t.getCreatedAt());
         return res;
+    }
+
+    @GetMapping({"/public/bookings/{id}/payment-proof", "/bookings/public/{id}/payment-proof"})
+    public ResponseEntity<byte[]> getPaymentProofImage(@PathVariable Long id) {
+        Optional<Booking> bookingOpt = bookingRepository.findById(id);
+        if (bookingOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        String screenshot = bookingOpt.get().getPaymentScreenshot();
+        if (screenshot == null || screenshot.isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+        return buildImageResponse(screenshot);
+    }
+
+    @GetMapping({"/public/bookings/payment-proof-by-ref", "/bookings/public/payment-proof-by-ref"})
+    public ResponseEntity<byte[]> getPaymentProofImageByRef(@RequestParam String ref) {
+        if (ref == null || ref.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Optional<Booking> bookingOpt = bookingRepository.findFirstByPaymentIdOrderByCreatedAtDesc(ref.trim());
+        if (bookingOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        String screenshot = bookingOpt.get().getPaymentScreenshot();
+        if (screenshot == null || screenshot.isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+        return buildImageResponse(screenshot);
+    }
+
+    private ResponseEntity<byte[]> buildImageResponse(String screenshotData) {
+        try {
+            if (screenshotData.startsWith("http://") || screenshotData.startsWith("https://")) {
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .location(URI.create(screenshotData))
+                        .build();
+            }
+
+            String base64Data = screenshotData;
+            MediaType contentType = MediaType.IMAGE_JPEG;
+
+            if (screenshotData.contains(",")) {
+                String[] parts = screenshotData.split(",", 2);
+                String header = parts[0].toLowerCase();
+                base64Data = parts[1];
+                if (header.contains("image/png")) {
+                    contentType = MediaType.IMAGE_PNG;
+                } else if (header.contains("image/webp")) {
+                    contentType = MediaType.parseMediaType("image/webp");
+                } else if (header.contains("image/gif")) {
+                    contentType = MediaType.IMAGE_GIF;
+                }
+            }
+
+            byte[] imageBytes = Base64.getDecoder().decode(base64Data.trim());
+            return ResponseEntity.ok()
+                    .contentType(contentType)
+                    .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
+                    .body(imageBytes);
+        } catch (Exception e) {
+            log.error("Failed to decode payment screenshot image bytes", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

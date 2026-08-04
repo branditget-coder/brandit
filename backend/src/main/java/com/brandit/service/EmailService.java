@@ -154,9 +154,17 @@ public class EmailService {
     public void sendPaymentVerificationAdminNotification(String clientName, String clientEmail, String clientPhone,
                                                           String serviceName, String bookingDate, String bookingTime,
                                                           String price, String upiRef, String screenshotBase64) {
+        sendPaymentVerificationAdminNotification(clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, null);
+    }
+
+    @Async
+    public void sendPaymentVerificationAdminNotification(String clientName, String clientEmail, String clientPhone,
+                                                          String serviceName, String bookingDate, String bookingTime,
+                                                          String price, String upiRef, String screenshotBase64,
+                                                          Long bookingId) {
         String subject = "💳 Payment Submitted: " + clientName + " (" + price + ") — Ref: " + upiRef;
         String htmlBody = templateBuilder.buildPaymentVerificationAdminTemplate(
-                clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, frontendUrl
+                clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, bookingId, frontendUrl
         );
 
         // 1. Send to Customer Acquisition, HR, and Admin Team

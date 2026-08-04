@@ -101,7 +101,8 @@ public class BookingService {
                 saved.getBookingTime().toString(),
                 priceStr,
                 saved.getPaymentId(),
-                request.getPaymentScreenshot()
+                request.getPaymentScreenshot(),
+                saved.getId()
         );
 
         return mapToResponse(saved);
@@ -139,7 +140,8 @@ public class BookingService {
                 latest.getBookingTime() != null ? latest.getBookingTime().toString() : "TBD",
                 priceStr,
                 latest.getPaymentId(),
-                null
+                latest.getPaymentScreenshot(),
+                latest.getId()
         );
 
         return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + latest.getId() + " (" + latest.getServiceName() + ")";
@@ -177,7 +179,8 @@ public class BookingService {
                 booking.getBookingTime() != null ? booking.getBookingTime().toString() : "TBD",
                 priceStr,
                 booking.getPaymentId(),
-                null
+                booking.getPaymentScreenshot(),
+                booking.getId()
         );
 
         return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + booking.getId() + " (" + booking.getServiceName() + ") to " + recipientEmail;
@@ -250,7 +253,8 @@ public class BookingService {
                 saved.getBookingTime().toString(),
                 priceStr != null ? priceStr : "₹1,499",
                 saved.getPaymentId(),
-                null
+                saved.getPaymentScreenshot(),
+                saved.getId()
         );
 
         return mapToResponse(saved);

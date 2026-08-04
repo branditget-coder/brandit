@@ -183,19 +183,46 @@ public class EmailTemplateBuilder {
     public String buildPaymentVerificationAdminTemplate(String clientName, String clientEmail, String clientPhone,
                                                          String serviceName, String bookingDate, String bookingTime,
                                                          String price, String upiRef, String screenshotBase64, String frontendUrl) {
-        String safeScreenshot = screenshotBase64;
-        if (safeScreenshot != null && safeScreenshot.length() > 250000) {
-            safeScreenshot = null; // Prevent oversized payload from failing email API requests
+        return buildPaymentVerificationAdminTemplate(clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, null, frontendUrl);
+    }
+
+    public String buildPaymentVerificationAdminTemplate(String clientName, String clientEmail, String clientPhone,
+                                                         String serviceName, String bookingDate, String bookingTime,
+                                                         String price, String upiRef, String screenshotBase64,
+                                                         Long bookingId, String frontendUrl) {
+        String baseUrl = cleanUrl(frontendUrl);
+        String imageUrl = null;
+
+        if (screenshotBase64 != null && (screenshotBase64.startsWith("http://") || screenshotBase64.startsWith("https://"))) {
+            imageUrl = screenshotBase64;
+        } else if (bookingId != null) {
+            imageUrl = baseUrl + "/api/public/bookings/" + bookingId + "/payment-proof";
+        } else if (upiRef != null && !upiRef.isBlank()) {
+            try {
+                imageUrl = baseUrl + "/api/public/bookings/payment-proof-by-ref?ref=" + java.net.URLEncoder.encode(upiRef.trim(), java.nio.charset.StandardCharsets.UTF_8.name());
+            } catch (Exception e) {
+                imageUrl = baseUrl + "/api/public/bookings/payment-proof-by-ref?ref=" + upiRef.trim();
+            }
         }
 
-        String imageHtml = (safeScreenshot != null && !safeScreenshot.isBlank())
-                ? "<div style='margin-top:16px; text-align:center;'>" +
-                  "  <p style='font-weight:700; color:#111827; margin-bottom:8px;'>Uploaded Payment Proof Screenshot:</p>" +
-                  "  <img src='" + safeScreenshot + "' alt='Payment Screenshot Proof' style='max-width:100%; max-height:450px; border-radius:12px; border:2px solid #0A66C2; box-shadow:0 6px 16px rgba(0,0,0,0.12);' />" +
-                  "</div>"
-                : (screenshotBase64 != null && !screenshotBase64.isBlank())
-                ? "<div style='margin-top:16px; p:12px; background:#F1F5F9; border-radius:8px; text-align:center;'><p style='color:#0A66C2; font-weight:700; margin:0;'>✓ Payment Screenshot Uploaded by Client (Ref: " + upiRef + ")</p></div>"
-                : "<p style='color:#DC2626; font-weight:600;'>No screenshot image provided.</p>";
+        boolean hasScreenshot = (imageUrl != null) || (screenshotBase64 != null && !screenshotBase64.isBlank());
+
+        String imageHtml;
+        if (imageUrl != null) {
+            imageHtml = "<div style='margin-top:20px; text-align:center; background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px; box-sizing:border-box;'>" +
+                        "  <p style='font-weight:700; color:#111827; margin:0 0 12px 0; font-size:15px;'>📷 Uploaded Payment Proof Screenshot:</p>" +
+                        "  <a href='" + imageUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; max-width:100%; text-decoration:none;'>" +
+                        "    <img src='" + imageUrl + "' alt='Payment Screenshot Proof' style='max-width:100%; height:auto; max-height:450px; border-radius:10px; border:2px solid #0A66C2; box-shadow:0 4px 14px rgba(0,0,0,0.12); display:block; margin:0 auto;' />" +
+                        "  </a>" +
+                        "  <div style='margin-top:12px; text-align:center;'>" +
+                        "    <a href='" + imageUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:8px 16px; border-radius:6px; font-weight:600; font-size:13px; font-family:sans-serif;'>🔍 Click to View / Download Full Screenshot</a>" +
+                        "  </div>" +
+                        "</div>";
+        } else if (hasScreenshot) {
+            imageHtml = "<div style='margin-top:16px; padding:12px; background:#F1F5F9; border-radius:8px; text-align:center;'><p style='color:#0A66C2; font-weight:700; margin:0;'>✓ Payment Screenshot Uploaded by Client (Ref: " + upiRef + ")</p></div>";
+        } else {
+            imageHtml = "<p style='color:#DC2626; font-weight:600; text-align:center;'>No screenshot image provided.</p>";
+        }
 
         return wrapHtmlTemplate("New Payment Submitted for Verification",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>💳 New Payment Submitted — Verification Required</h2>" +
