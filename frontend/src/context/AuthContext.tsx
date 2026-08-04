@@ -22,7 +22,8 @@ interface AuthContextType {
   isLoading: boolean
   isSessionExpired: boolean
   login: (email: string, password: string) => Promise<User>
-  register: (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM') => Promise<User>
+  sendOtp: (email: string, firstName?: string) => Promise<void>
+  register: (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM', otp?: string) => Promise<User>
   loginWithSocial: (provider: 'google', tokenOrCode: string) => Promise<void>
   logout: () => void
   updateProfile: (data: Partial<User>) => Promise<void>
@@ -163,9 +164,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res.data.user
   }
 
-  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM'): Promise<User> => {
+  const sendOtp = async (email: string, firstName?: string): Promise<void> => {
     const cleanEmail = email ? email.trim().toLowerCase() : ''
-    const res = await api.post('/auth/register', { firstName, lastName, email: cleanEmail, password, phone, role })
+    await api.post('/auth/send-otp', { email: cleanEmail, firstName })
+  }
+
+  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM', otp?: string): Promise<User> => {
+    const cleanEmail = email ? email.trim().toLowerCase() : ''
+    const res = await api.post('/auth/register', { firstName, lastName, email: cleanEmail, password, phone, role, otp })
     saveAuthSession(res.data.accessToken, res.data.refreshToken, res.data.user)
     return res.data.user
   }
@@ -193,6 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         isSessionExpired,
         login,
+        sendOtp,
         register,
         loginWithSocial,
         logout,

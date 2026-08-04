@@ -9,6 +9,19 @@ import lombok.Data;
 public class AuthDtos {
 
     @Data
+    public static class SendOtpRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        private String email;
+
+        private String firstName;
+
+        public void setEmail(String email) {
+            this.email = email != null ? email.trim().toLowerCase() : null;
+        }
+    }
+
+    @Data
     public static class RegisterRequest {
         @NotBlank(message = "First name is required")
         private String firstName;
@@ -26,6 +39,7 @@ public class AuthDtos {
 
         private String phone;
         private User.Role role;
+        private String otp;
 
         public void setEmail(String email) {
             this.email = email != null ? email.trim().toLowerCase() : null;

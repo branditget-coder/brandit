@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box, Typography, TextField, Button, Link, InputAdornment,
   IconButton, alpha, CircularProgress, Grid, Alert, Chip
 } from '@mui/material'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiEye, FiEyeOff, FiArrowRight, FiBriefcase, FiUsers, FiCheckCircle } from 'react-icons/fi'
+import {
+  FiEye, FiEyeOff, FiArrowRight, FiBriefcase, FiUsers,
+  FiCheckCircle, FiShield, FiMail, FiRefreshCw, FiArrowLeft
+} from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
 import BrandLogo from '../../components/common/BrandLogo'
@@ -13,8 +16,8 @@ import BrandLogo from '../../components/common/BrandLogo'
 type UserType = 'client' | 'team'
 
 export default function RegisterPage() {
-  // Step 1: role selection, Step 2: form
-  const [step, setStep] = useState<1 | 2>(1)
+  // Step 1: role selection, Step 2: form details, Step 3: 4-digit OTP verification
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [userType, setUserType] = useState<UserType | null>(null)
 
   const [firstName, setFirstName] = useState('')
@@ -23,12 +26,28 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
+
+  // Step 3 OTP state
+  const [otpDigits, setOtpDigits] = useState(['', '', '', ''])
+  const [resendTimer, setResendTimer] = useState(0)
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [infoMsg, setInfoMsg] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
   const navigate = useNavigate()
-  const { register } = useAuth()
+  const { register, sendOtp } = useAuth()
+
+  useEffect(() => {
+    let timer: any
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [resendTimer])
 
   const handleSelectRole = (type: UserType) => {
     setUserType(type)
@@ -44,14 +63,61 @@ export default function RegisterPage() {
     return true
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleProceedToOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setInfoMsg(null)
     if (!validateForm()) return
 
     setLoading(true)
     try {
-      const newUser = await register(firstName, lastName, email, password, phone, userType === 'team' ? 'TEAM' : 'USER')
+      await sendOtp(email.trim(), firstName.trim())
+      setStep(3)
+      setInfoMsg(`A 4-digit verification code has been sent to ${email.trim()}`)
+      setResendTimer(30)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to send verification email. Please check your details and try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return
+    setError(null)
+    setInfoMsg(null)
+    setLoading(true)
+    try {
+      await sendOtp(email.trim(), firstName.trim())
+      setInfoMsg(`A fresh 4-digit verification code has been sent to ${email.trim()}`)
+      setResendTimer(30)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to resend verification code. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyOtpAndRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    const code = otpDigits.join('')
+    if (code.length < 4) {
+      setError('Please enter the complete 4-digit verification code.')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const newUser = await register(
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        userType === 'team' ? 'TEAM' : 'USER',
+        code
+      )
       localStorage.setItem('brandit_is_new_user', 'true')
       setSuccess(true)
       setTimeout(() => {
@@ -59,9 +125,38 @@ export default function RegisterPage() {
         navigate(defaultRoute)
       }, 1500)
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.')
+      setError(err.response?.data?.message || 'Verification failed. Please check the 4-digit code.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleOtpDigitChange = (index: number, val: string) => {
+    const clean = val.replace(/\D/g, '')
+    if (clean.length > 1) {
+      const digits = clean.slice(0, 4).split('')
+      const newOtp = ['', '', '', '']
+      digits.forEach((d, i) => { if (i < 4) newOtp[i] = d })
+      setOtpDigits(newOtp)
+      const nextInput = document.getElementById('otp-input-3')
+      nextInput?.focus()
+      return
+    }
+
+    const newOtp = [...otpDigits]
+    newOtp[index] = clean
+    setOtpDigits(newOtp)
+
+    if (clean && index < 3) {
+      const nextInput = document.getElementById(`otp-input-${index + 1}`)
+      nextInput?.focus()
+    }
+  }
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-input-${index - 1}`)
+      prevInput?.focus()
     }
   }
 
@@ -189,7 +284,7 @@ export default function RegisterPage() {
                   />
                 </Box>
                 <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>
-                  Fill in your details to get started.{' '}
+                  Fill in your details below. We will send a 4-digit verification code to your email.{' '}
                   <Box
                     component="span"
                     onClick={() => { setStep(1); setError(null) }}
@@ -201,7 +296,7 @@ export default function RegisterPage() {
 
                 {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
 
-                <Box component="form" onSubmit={handleSubmit}>
+                <Box component="form" onSubmit={handleProceedToOtp}>
                   <Grid container spacing={2} sx={{ mb: 2 }}>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
@@ -232,7 +327,7 @@ export default function RegisterPage() {
                   </Grid>
 
                   <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
-                    Email Address *
+                    Email Address * (OTP verification code will be sent here)
                   </Typography>
                   <TextField
                     fullWidth id="register-email"
@@ -289,7 +384,7 @@ export default function RegisterPage() {
                       '&:hover': { backgroundColor: alpha(brandColors.primary, 0.9) },
                     }}
                   >
-                    {loading ? 'Creating Account...' : 'Create Account'}
+                    {loading ? 'Sending 4-Digit Code...' : 'Send Verification OTP →'}
                   </Button>
                 </Box>
 
@@ -299,6 +394,106 @@ export default function RegisterPage() {
                     Sign in
                   </Link>
                 </Typography>
+              </motion.div>
+            )}
+
+            {/* ── STEP 3: 4-Digit OTP Verification ── */}
+            {step === 3 && !success && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                  <Box sx={{
+                    width: 64, height: 64, borderRadius: '50%',
+                    backgroundColor: alpha(brandColors.primary, 0.1),
+                    color: brandColors.primary,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    mx: 'auto', mb: 2,
+                  }}>
+                    <FiShield size={32} />
+                  </Box>
+                  <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Verify Email Address</Typography>
+                  <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 360, mx: 'auto' }}>
+                    Enter the 4-digit security code sent to <strong>{email}</strong>
+                  </Typography>
+                </Box>
+
+                {infoMsg && <Alert severity="success" icon={<FiMail size={18} />} sx={{ mb: 3, borderRadius: '12px' }}>{infoMsg}</Alert>}
+                {error && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{error}</Alert>}
+
+                <Box component="form" onSubmit={handleVerifyOtpAndRegister}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4 }}>
+                    {otpDigits.map((digit, idx) => (
+                      <TextField
+                        key={idx}
+                        id={`otp-input-${idx}`}
+                        value={digit}
+                        onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleOtpKeyDown(idx, e)}
+                        inputProps={{
+                          maxLength: 1,
+                          style: {
+                            textAlign: 'center',
+                            fontSize: '1.75rem',
+                            fontWeight: 800,
+                            padding: '12px 0',
+                            fontFamily: 'monospace',
+                            color: brandColors.primary,
+                          },
+                        }}
+                        sx={{
+                          width: 56,
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '14px',
+                            backgroundColor: alpha(brandColors.primary, 0.03),
+                            borderColor: digit ? brandColors.primary : brandColors.border,
+                            '&.Mui-focused': {
+                              boxShadow: `0 0 0 3px ${alpha(brandColors.primary, 0.2)}`,
+                            },
+                          },
+                        }}
+                      />
+                    ))}
+                  </Box>
+
+                  <Button
+                    id="otp-submit"
+                    type="submit" fullWidth variant="contained" disabled={loading}
+                    endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <FiCheckCircle size={18} />}
+                    sx={{
+                      py: 1.5, borderRadius: '12px',
+                      backgroundColor: brandColors.primary,
+                      fontWeight: 700, fontSize: '1rem', textTransform: 'none',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                      '&:hover': { backgroundColor: alpha(brandColors.primary, 0.9) },
+                    }}
+                  >
+                    {loading ? 'Verifying Code...' : 'Verify & Create Account'}
+                  </Button>
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 3 }}>
+                    <Button
+                      startIcon={<FiArrowLeft size={16} />}
+                      onClick={() => { setStep(2); setError(null); setInfoMsg(null) }}
+                      sx={{ textTransform: 'none', color: brandColors.muted, fontWeight: 600 }}
+                    >
+                      Edit details
+                    </Button>
+
+                    <Button
+                      startIcon={<FiRefreshCw size={14} className={loading ? 'spin' : ''} />}
+                      onClick={handleResendOtp}
+                      disabled={resendTimer > 0 || loading}
+                      sx={{ textTransform: 'none', color: brandColors.primary, fontWeight: 700 }}
+                    >
+                      {resendTimer > 0 ? `Resend Code (${resendTimer}s)` : 'Resend Code'}
+                    </Button>
+                  </Box>
+                </Box>
               </motion.div>
             )}
 
@@ -320,9 +515,9 @@ export default function RegisterPage() {
                   }}>
                     <FiCheckCircle size={36} />
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>Welcome to BrandIt!</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>Account Created & Verified!</Typography>
                   <Typography variant="body2" sx={{ color: brandColors.muted }}>
-                    Setting up your account & redirecting to your dashboard...
+                    Your email address has been successfully verified. Redirecting to your dashboard...
                   </Typography>
                 </Box>
               </motion.div>

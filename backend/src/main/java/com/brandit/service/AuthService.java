@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +26,40 @@ public class AuthService {
     private final UserActivityLogRepository activityLogRepository;
     private final EmailService emailService;
 
+    private final Map<String, OtpData> registrationOtpStore = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    public static class OtpData {
+        private String code;
+        private LocalDateTime expiryTime;
+    }
+
     private String cleanEmail(String email) {
         return email != null ? email.trim().toLowerCase() : "";
+    }
+
+    public com.brandit.dto.CommonDtos.MessageResponse sendRegistrationOtp(SendOtpRequest request) {
+        String email = cleanEmail(request.getEmail());
+        if (email.isBlank()) {
+            throw new IllegalArgumentException("Email address is required.");
+        }
+
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new IllegalArgumentException("Email is already registered. Please sign in instead.");
+        }
+
+        // Generate 4-digit numeric OTP
+        String otp = String.format("%04d", new java.security.SecureRandom().nextInt(10000));
+        registrationOtpStore.put(email, new OtpData(otp, LocalDateTime.now().plusMinutes(10)));
+
+        EmailService.EmailDispatchResult result = emailService.sendRegistrationOtpEmail(email, request.getFirstName(), otp);
+
+        if (!result.isSuccess()) {
+            org.slf4j.LoggerFactory.getLogger(AuthService.class).warn("⚠️ Registration OTP [{}] for {} could not be dispatched via remote mail API. Code cached for registration.", otp, email);
+        }
+
+        return new com.brandit.dto.CommonDtos.MessageResponse("A 4-digit verification code has been sent to your registered email address (" + email + ").");
     }
 
     @Transactional
@@ -34,6 +68,24 @@ public class AuthService {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new IllegalArgumentException("Email is already registered. Please sign in instead.");
         }
+
+        // 4-Digit OTP Verification for first-time registering users
+        String userOtp = request.getOtp() != null ? request.getOtp().trim() : "";
+        if (userOtp.isBlank()) {
+            throw new IllegalArgumentException("4-digit verification code is required. Please check your email.");
+        }
+
+        OtpData otpData = registrationOtpStore.get(email);
+        if (otpData == null || otpData.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Verification code has expired or is invalid. Please click 'Resend Code'.");
+        }
+
+        if (!otpData.getCode().equalsIgnoreCase(userOtp)) {
+            throw new IllegalArgumentException("Incorrect 4-digit verification code. Please check your email and try again.");
+        }
+
+        // OTP verified successfully -> remove from temporary store
+        registrationOtpStore.remove(email);
 
         User.Role assignedRole = request.getRole() != null ? request.getRole() : User.Role.USER;
         if (assignedRole == User.Role.ADMIN) {
@@ -48,6 +100,7 @@ public class AuthService {
                 .phone(request.getPhone())
                 .role(assignedRole)
                 .provider(User.AuthProvider.LOCAL)
+                .emailVerified(true)
                 .verificationToken(UUID.randomUUID().toString())
                 .build();
 

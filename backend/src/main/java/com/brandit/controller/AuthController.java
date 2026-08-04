@@ -18,6 +18,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/send-otp")
+    public ResponseEntity<MessageResponse> sendRegistrationOtp(@Valid @RequestBody SendOtpRequest request) {
+        return ResponseEntity.ok(authService.sendRegistrationOtp(request));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));

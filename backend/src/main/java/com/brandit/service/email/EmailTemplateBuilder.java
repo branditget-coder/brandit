@@ -78,6 +78,23 @@ public class EmailTemplateBuilder {
                 "</div>", frontendUrl);
     }
 
+    public String buildRegistrationOtpTemplate(String firstName, String recipientEmail, String otp, String frontendUrl) {
+        String name = (firstName != null && !firstName.isBlank()) ? firstName.trim() : "Valued Member";
+        return wrapHtmlTemplate("Verify Your BrandIt Account",
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome to BrandIt, " + name + "! 👋</h2>" +
+                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Thank you for starting your account registration. Please use the 4-digit verification code below to verify your email address and complete your registration:</p>" +
+
+                "<div style='text-align:center; margin:28px 0; padding:24px; background-color:#F0F9FF; border:2px dashed #0A66C2; border-radius:16px; box-sizing:border-box;'>" +
+                "  <p style='margin:0 0 8px 0; color:#0369A1; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;'>Your 4-Digit Verification Code</p>" +
+                "  <div style='font-size:42px; font-weight:900; letter-spacing:16px; color:#0A66C2; font-family:monospace; padding-left:16px; margin:10px 0;'>" + otp + "</div>" +
+                "  <p style='margin:8px 0 0 0; color:#64748B; font-size:12px;'>⏱️ This code will expire in <strong>10 minutes</strong>. Do not share it with anyone.</p>" +
+                "</div>" +
+
+                "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
+                "  <p style='margin:0; font-size:13px; color:#64748B;'>If you did not request account creation on BrandIt, you can safely ignore this email.</p>" +
+                "</div>", frontendUrl);
+    }
+
     public String buildBookingTemplate(String clientName, String serviceName, String bookingDate, String bookingTime, String price, String paymentId, String frontendUrl) {
         String dashboardLink = cleanUrl(frontendUrl) + "/dashboard";
         String txnRef = (paymentId != null && !paymentId.isBlank()) ? paymentId : "CONFIRMED";

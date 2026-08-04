@@ -75,6 +75,16 @@ public class EmailService {
     }
 
     /**
+     * Send 4-Digit Registration Verification OTP Email ONLY to the registering user
+     */
+    public EmailDispatchResult sendRegistrationOtpEmail(String toEmail, String firstName, String otp) {
+        String subject = "🔑 " + otp + " is your BrandIt Verification Code";
+        String htmlBody = templateBuilder.buildRegistrationOtpTemplate(firstName, toEmail, otp, frontendUrl);
+        log.info("Dispatching 4-digit registration verification OTP ({}) to registering user ONLY: {}", otp, toEmail);
+        return sendEmailSync(toEmail, subject, htmlBody);
+    }
+
+    /**
      * 1. Send Welcome Email on Account Registration
      */
     @Async
