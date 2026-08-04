@@ -72,7 +72,11 @@ public class AuthService {
         // 4-Digit OTP Verification for first-time registering users
         String userOtp = request.getOtp() != null ? request.getOtp().trim() : "";
         if (userOtp.isBlank()) {
-            throw new IllegalArgumentException("4-digit verification code is required. Please check your email.");
+            SendOtpRequest sendOtpReq = new SendOtpRequest();
+            sendOtpReq.setEmail(email);
+            sendOtpReq.setFirstName(request.getFirstName());
+            sendRegistrationOtp(sendOtpReq);
+            throw new IllegalArgumentException("A 4-digit verification code has been sent to " + email + ". Please enter the code below to complete registration.");
         }
 
         OtpData otpData = registrationOtpStore.get(email);
