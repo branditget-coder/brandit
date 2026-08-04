@@ -14,7 +14,7 @@ const services = [
 ]
 
 const socials = [
-  { icon: FiLinkedin, href: 'https://www.linkedin.com/in/brandit-team/', label: 'LinkedIn' },
+  { icon: FiLinkedin, href: 'https://www.linkedin.com/company/brandit-get/', label: 'LinkedIn' },
   { icon: FiInstagram, href: 'https://www.instagram.com/brandit.team', label: 'Instagram' },
 ]
 
