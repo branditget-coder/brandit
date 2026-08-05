@@ -146,7 +146,7 @@ export default function TeamConsultations() {
     const endMins = String((mins + 45) % 60).padStart(2, '0')
     const endIso = `${dateFormatted}T${endHrs}${endMins}00`
 
-    const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startIso}/${endIso}&details=${details}&add=${encodeURIComponent(selectedBooking.clientEmail || '')},${encodeURIComponent(consultantEmail)}`
+    const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startIso}/${endIso}&details=${details}&add=${encodeURIComponent(selectedBooking.clientEmail || '')},${encodeURIComponent(consultantEmail)},raghavdhir1510@gmail.com`
     window.open(calUrl, '_blank')
   }
 

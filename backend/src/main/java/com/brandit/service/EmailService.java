@@ -221,9 +221,15 @@ public class EmailService {
             sendEmailSync(consultantToUse, "[CONSULTANT INVITE] " + subject, htmlBody);
         }
 
-        // 3. Dispatch alert to HR & Team (Stuti, Kritika, Admin)
+        // 3. Dispatch copy to Lead Admin (raghavdhir1510@gmail.com) if not already sent
+        String leadAdminEmail = "raghavdhir1510@gmail.com";
+        if (!leadAdminEmail.equalsIgnoreCase(clientEmail) && !leadAdminEmail.equalsIgnoreCase(consultantToUse)) {
+            sendEmailSync(leadAdminEmail, "[ADMIN COPY] " + subject, htmlBody);
+        }
+
+        // 4. Dispatch alert to HR & Team (Stuti, Kritika, Yash)
         for (String teamEmail : TEAM_NOTIFICATION_EMAILS) {
-            if (!teamEmail.equalsIgnoreCase(clientEmail) && !teamEmail.equalsIgnoreCase(consultantToUse)) {
+            if (!teamEmail.equalsIgnoreCase(clientEmail) && !teamEmail.equalsIgnoreCase(consultantToUse) && !teamEmail.equalsIgnoreCase(leadAdminEmail)) {
                 sendEmailSync(teamEmail, "[HR NOTIFICATION] " + subject, htmlBody);
             }
         }
