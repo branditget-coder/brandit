@@ -118,9 +118,9 @@ export default function TeamConsultations() {
     setMeetDate(booking.bookingDate || todayStr)
     setMeetTime(booking.bookingTime ? booking.bookingTime.substring(0, 5) : '11:00')
     
-    // Auto-generate proper Google Meet link if existing one is invalid or missing
+    // Default to existing valid link or blank for real Meet creation
     const hasValidMeet = booking.meetingLink && booking.meetingLink.includes('meet.google.com/')
-    setMeetLink(hasValidMeet ? booking.meetingLink! : generateGoogleMeetUrl())
+    setMeetLink(hasValidMeet ? booking.meetingLink! : '')
     setCustomNotes(booking.notes || 'Please have your updated resume and target job goals ready for discussion.')
     
     setScheduleSuccessMsg(null)
@@ -128,14 +128,32 @@ export default function TeamConsultations() {
     setScheduleModalOpen(true)
   }
 
-  const handleGenerateMeetLink = () => {
-    setMeetLink(generateGoogleMeetUrl())
+  const handleOpenInstantMeet = () => {
+    window.open('https://meet.google.com/new', '_blank')
+  }
+
+  const handleOpenGoogleCalendar = () => {
+    if (!selectedBooking || !meetDate || !meetTime) return
+    const title = encodeURIComponent(`BrandIt Consultation: ${selectedBooking.clientName || 'Client'} & ${consultantName}`)
+    const details = encodeURIComponent(`Package: ${selectedBooking.serviceName}\nClient Email: ${selectedBooking.clientEmail}\nClient Phone: ${selectedBooking.clientPhone || 'N/A'}\n\nNotes:\n${customNotes}`)
+    
+    const dateFormatted = meetDate.replace(/-/g, '')
+    const timeFormatted = meetTime.replace(':', '') + '00'
+    const startIso = `${dateFormatted}T${timeFormatted}`
+    
+    const [hrs, mins] = meetTime.split(':').map(Number)
+    const endHrs = String((hrs + Math.floor((mins + 45) / 60)) % 24).padStart(2, '0')
+    const endMins = String((mins + 45) % 60).padStart(2, '0')
+    const endIso = `${dateFormatted}T${endHrs}${endMins}00`
+
+    const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startIso}/${endIso}&details=${details}&add=${encodeURIComponent(selectedBooking.clientEmail || '')},${encodeURIComponent(consultantEmail)}`
+    window.open(calUrl, '_blank')
   }
 
   const handleScheduleSubmit = async () => {
     if (!selectedBooking) return
     if (!meetDate || !meetTime || !meetLink) {
-      setScheduleErrMsg('Please select Date, Time, and provide a valid Google Meet link.')
+      setScheduleErrMsg('Please select Date, Time, and paste a valid real Google Meet link (or click "Launch Real Meet Room").')
       return
     }
 
@@ -614,29 +632,38 @@ export default function TeamConsultations() {
                 />
               </Grid>
 
-              {/* Google Meet Link Generator with official URL format */}
+              {/* Real Google Meet Creator Helpers */}
               <Grid item xs={12}>
+                <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<FiVideo size={13} />}
+                    onClick={handleOpenInstantMeet}
+                    sx={{ borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'none', color: '#1A73E8', borderColor: '#1A73E8' }}
+                  >
+                    🚀 Launch Real Meet Room
+                  </Button>
+
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<FiCalendar size={13} />}
+                    onClick={handleOpenGoogleCalendar}
+                    sx={{ borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'none', color: '#0F9D58', borderColor: '#0F9D58' }}
+                  >
+                    📅 Create via Google Calendar
+                  </Button>
+                </Box>
+
                 <TextField
-                  label="Google Meet Link (https://meet.google.com/abc-defg-hij)"
+                  label="Google Meet Link (Paste real active Meet URL)"
                   fullWidth
                   size="small"
                   placeholder="https://meet.google.com/abc-defg-hij"
                   value={meetLink}
                   onChange={(e) => setMeetLink(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Button
-                          size="small"
-                          onClick={handleGenerateMeetLink}
-                          startIcon={<FiRefreshCw size={12} />}
-                          sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 700 }}
-                        >
-                          Generate
-                        </Button>
-                      </InputAdornment>
-                    ),
-                  }}
+                  helperText="Click 'Launch Real Meet Room' above to create a live Google Meet room, then paste the link here."
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                 />
               </Grid>
