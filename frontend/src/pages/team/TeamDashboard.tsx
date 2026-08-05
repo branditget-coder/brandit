@@ -44,11 +44,15 @@ export default function TeamDashboard() {
   const fetchBookings = async () => {
     try {
       setLoading(true)
-      const res = await api.get('/bookings')
+      const res = await api.get('/bookings/all')
       setBookings(Array.isArray(res.data) ? res.data : [])
     } catch {
-      // Empty state handling when no real data exists yet
-      setBookings([])
+      try {
+        const fallbackRes = await api.get('/bookings')
+        setBookings(Array.isArray(fallbackRes.data) ? fallbackRes.data : [])
+      } catch {
+        setBookings([])
+      }
     } finally {
       setLoading(false)
     }

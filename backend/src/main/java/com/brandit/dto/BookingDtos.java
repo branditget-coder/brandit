@@ -48,6 +48,24 @@ public class BookingDtos {
         private LocalDateTime createdAt;
         private String clientName;
         private String clientEmail;
+        private String clientPhone;
+        private String consultantName;
+    }
+
+    @Data
+    public static class ScheduleMeetRequest {
+        @NotNull(message = "Booking date is required")
+        private LocalDate bookingDate;
+
+        @NotNull(message = "Booking time is required")
+        private LocalTime bookingTime;
+
+        @NotBlank(message = "Google Meet link is required")
+        private String meetingLink;
+
+        private String consultantName = "Hritika Seth";
+        private String consultantEmail = "sethhritika@gmail.com";
+        private String customNotes;
     }
 
     @Data

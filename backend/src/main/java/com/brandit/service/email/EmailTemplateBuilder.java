@@ -276,4 +276,40 @@ public class EmailTemplateBuilder {
                 "  <a href='" + baseUrl + "/book' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:12px 24px; border-radius:10px; font-weight:700; font-size:14px; text-align:center; font-family:sans-serif;'>Book 1-on-1 Consultation &rarr;</a>" +
                 "</div>", frontendUrl);
     }
+
+    public String buildGoogleMeetInviteTemplate(String clientName, String serviceName, String bookingDate, String bookingTime,
+                                                String meetingLink, String consultantName, String customNotes, String frontendUrl) {
+        String meetUrl = (meetingLink != null && !meetingLink.isBlank()) ? meetingLink : "https://meet.google.com";
+        String notesBlock = (customNotes != null && !customNotes.isBlank())
+                ? "<div class='card' style='background-color:#FFFBEB; border:1px solid #FCD34D; border-radius:12px; padding:16px 18px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
+                  "  <p style='margin:0 0 6px 0; color:#B45309; font-weight:700; font-size:13px; text-transform:uppercase;'>📝 Preparation & Notes from HR Team:</p>" +
+                  "  <p style='margin:0; color:#78350F; font-size:14px; white-space:pre-wrap;'>" + customNotes + "</p>" +
+                  "</div>"
+                : "";
+
+        return wrapHtmlTemplate("Google Meet Consultation Invitation",
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>📹 Your Google Meet Consultation is Scheduled!</h2>" +
+                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Hello <strong>" + clientName + "</strong>,</p>" +
+                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Your personal branding consultation has been scheduled with our Main Consultant, <strong>" + consultantName + "</strong>. Please find your meeting invitation details below:</p>" +
+
+                "<div class='card' style='background-color:#F0F9FF; border:1px solid #BAE6FD; border-radius:14px; padding:20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
+                "  <h3 style='margin:0 0 14px 0; color:#0369A1; font-size:16px; border-bottom:1px solid #7DD3FC; padding-bottom:8px;'>📅 Meeting Details</h3>" +
+                "  <p style='margin:6px 0;'><strong>Service Package:</strong> " + serviceName + "</p>" +
+                "  <p style='margin:6px 0;'><strong>Consultant:</strong> " + consultantName + " (BrandIt Lead Consultant)</p>" +
+                "  <p style='margin:6px 0;'><strong>Date & Time:</strong> <span style='color:#0A66C2; font-weight:800;'>" + bookingDate + " at " + bookingTime + " IST</span></p>" +
+                "  <p style='margin:6px 0; word-break:break-all;'><strong>Google Meet Link:</strong> <a href='" + meetUrl + "' target='_blank' style='color:#0A66C2; font-weight:700;'>" + meetUrl + "</a></p>" +
+                "</div>" +
+
+                notesBlock +
+
+                "<div style='text-align:center; margin:30px 0;'>" +
+                "  <a href='" + meetUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background:linear-gradient(135deg, #1A73E8 0%, #0D52BF 100%); color:#FFFFFF !important; text-decoration:none !important; padding:16px 32px; border-radius:12px; font-weight:800; font-size:16px; text-align:center; font-family:sans-serif; box-shadow:0 4px 14px rgba(26,115,232,0.35);'>🎥 Join Google Meet Session &rarr;</a>" +
+                "</div>" +
+
+                "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px; margin-top:20px; font-size:13px; color:#64748B;'>" +
+                "  <p style='margin:0 0 4px 0; font-weight:700; color:#334155;'>💡 Preparation Tips for your session:</p>" +
+                "  <p style='margin:2px 0;'>• Please join 2–3 minutes early using a desktop/laptop for best presentation experience.</p>" +
+                "  <p style='margin:2px 0;'>• Have your updated CV, LinkedIn URL, and any specific targets ready to share.</p>" +
+                "</div>", frontendUrl);
+    }
 }

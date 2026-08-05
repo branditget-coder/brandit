@@ -42,15 +42,22 @@ public class BookingController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
         return ResponseEntity.ok(bookingService.getAllBookings());
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
     public ResponseEntity<BookingResponse> updateBookingStatus(@PathVariable Long id,
                                                                 @Valid @RequestBody UpdateBookingStatusRequest request) {
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, request));
+    }
+
+    @PostMapping("/{id}/schedule-meet")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
+    public ResponseEntity<BookingResponse> scheduleGoogleMeet(@PathVariable Long id,
+                                                               @Valid @RequestBody ScheduleMeetRequest request) {
+        return ResponseEntity.ok(bookingService.scheduleGoogleMeet(id, request));
     }
 }

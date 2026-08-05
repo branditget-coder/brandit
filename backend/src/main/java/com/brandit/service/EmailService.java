@@ -196,4 +196,35 @@ public class EmailService {
         String htmlBody = templateBuilder.buildWeeklyCareerInsightsTemplate(subject, contentHtml, toEmail, frontendUrl);
         sendEmailSync(toEmail, subject, htmlBody);
     }
+
+    /**
+     * 8. Dispatch Google Meet Invitation Email to Client, Consultant (Hritika Seth), and HR Team
+     */
+    @Async
+    public void sendGoogleMeetInvite(String clientEmail, String clientName, String serviceName,
+                                     String bookingDate, String bookingTime, String meetingLink,
+                                     String consultantName, String consultantEmail, String customNotes) {
+        String subject = "📹 Google Meet Invitation: " + serviceName + " with " + consultantName + " (" + bookingDate + " @ " + bookingTime + ")";
+        String htmlBody = templateBuilder.buildGoogleMeetInviteTemplate(
+                clientName, serviceName, bookingDate, bookingTime, meetingLink, consultantName, customNotes, frontendUrl
+        );
+
+        // 1. Send invite to Client
+        if (clientEmail != null && !clientEmail.isBlank()) {
+            sendEmailSync(clientEmail, subject, htmlBody);
+        }
+
+        // 2. Send invite to Consultant (Hritika Seth: sethhritika@gmail.com / consultantEmail)
+        String consultantToUse = (consultantEmail != null && !consultantEmail.isBlank()) ? consultantEmail : "sethhritika@gmail.com";
+        if (!consultantToUse.equalsIgnoreCase(clientEmail)) {
+            sendEmailSync(consultantToUse, "[CONSULTANT INVITE] " + subject, htmlBody);
+        }
+
+        // 3. Dispatch alert to HR & Team (Stuti, Kritika, Admin)
+        for (String teamEmail : TEAM_NOTIFICATION_EMAILS) {
+            if (!teamEmail.equalsIgnoreCase(clientEmail) && !teamEmail.equalsIgnoreCase(consultantToUse)) {
+                sendEmailSync(teamEmail, "[HR NOTIFICATION] " + subject, htmlBody);
+            }
+        }
+    }
 }

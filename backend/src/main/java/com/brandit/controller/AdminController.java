@@ -157,7 +157,15 @@ public class AdminController {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
 
         try {
-            user.setRole(User.Role.valueOf(request.getRole().toUpperCase()));
+            User.Role targetRole = User.Role.valueOf(request.getRole().toUpperCase());
+            if (targetRole == User.Role.TEAM || targetRole == User.Role.ADMIN) {
+                boolean isAuthorized = com.brandit.service.AuthService.ALLOWED_TEAM_EMAILS.stream()
+                        .anyMatch(e -> e.equalsIgnoreCase(user.getEmail()));
+                if (!isAuthorized) {
+                    return ResponseEntity.badRequest().body(new MessageResponse("Team/Admin account access is restricted to the 5 authorized BrandIt team members (Raghav, Kritika, Hritika, Stuti, Yash)."));
+                }
+            }
+            user.setRole(targetRole);
             userRepository.save(user);
 
             logActivity("ADMIN_UPDATE_ROLE", "Updated role for user " + user.getEmail() + " to " + user.getRole().name());

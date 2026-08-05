@@ -26,6 +26,15 @@ public class AuthService {
     private final UserActivityLogRepository activityLogRepository;
     private final EmailService emailService;
 
+    public static final java.util.List<String> ALLOWED_TEAM_EMAILS = java.util.List.of(
+            "raghavdhir1510@gmail.com",    // Raghav Dhir (Lead Admin)
+            "dhawankritika866@gmail.com",   // Kritika Dhawan (Operations & HR)
+            "sethhritika@gmail.com",       // Hritika Seth (Lead Consultant)
+            "bhardwajstuti101@gmail.com",   // Stuti Sharma (HR)
+            "yashjainnn13@gmail.com",      // Yash Jain (Finance & Accounting)
+            "yashjain13@gmail.com"         // Yash Jain Alias
+    );
+
     private final Map<String, OtpData> registrationOtpStore = new java.util.concurrent.ConcurrentHashMap<>();
 
     @lombok.Data
@@ -91,9 +100,20 @@ public class AuthService {
         // OTP verified successfully -> remove from temporary store
         registrationOtpStore.remove(email);
 
+        boolean isAuthorizedTeamEmail = ALLOWED_TEAM_EMAILS.stream().anyMatch(e -> e.equalsIgnoreCase(email));
+
         User.Role assignedRole = request.getRole() != null ? request.getRole() : User.Role.USER;
-        if (assignedRole == User.Role.ADMIN) {
-            assignedRole = User.Role.USER;
+        
+        // Strict Security Rule: ONLY the 5 pre-authorized team members can register or get TEAM/ADMIN roles!
+        if (assignedRole == User.Role.TEAM || assignedRole == User.Role.ADMIN) {
+            if (!isAuthorizedTeamEmail) {
+                assignedRole = User.Role.USER; // Automatically force all unauthorized registrants to Client (USER) role!
+            } else if (email.equalsIgnoreCase("raghavdhir1510@gmail.com")) {
+                assignedRole = User.Role.ADMIN;
+            }
+        } else if (isAuthorizedTeamEmail) {
+            // Auto-grant TEAM/ADMIN role if an authorized team member registers
+            assignedRole = email.equalsIgnoreCase("raghavdhir1510@gmail.com") ? User.Role.ADMIN : User.Role.TEAM;
         }
 
         User user = User.builder()

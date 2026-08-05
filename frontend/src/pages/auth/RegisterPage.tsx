@@ -271,7 +271,7 @@ export default function RegisterPage() {
                     }}
                   />
                 </Box>
-                <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>
+                <Typography variant="body2" sx={{ color: brandColors.muted, mb: 2 }}>
                   Fill in your details below to get started.{' '}
                   <Box
                     component="span"
@@ -281,6 +281,12 @@ export default function RegisterPage() {
                     Change role
                   </Box>
                 </Typography>
+
+                {userType === 'team' && (
+                  <Alert severity="warning" sx={{ mb: 2.5, borderRadius: '12px', fontSize: '0.85rem' }}>
+                    <strong>🔒 Team Member Access Notice:</strong> Team accounts are restricted to the 5 authorized BrandIt core team members (Raghav, Kritika, Hritika, Stuti, Yash). Any other email address will automatically register as a Client account.
+                  </Alert>
+                )}
 
                 {infoMsg && (
                   <Alert severity="info" icon={<FiMail size={18} />} sx={{ mb: 3, borderRadius: '12px' }}>

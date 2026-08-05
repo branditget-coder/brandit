@@ -308,6 +308,58 @@ public class BookingService {
         return mapToResponse(saved);
     }
 
+    @Transactional
+    public BookingResponse scheduleGoogleMeet(Long bookingId, ScheduleMeetRequest request) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking with ID #" + bookingId + " not found"));
+
+        booking.setBookingDate(request.getBookingDate());
+        booking.setBookingTime(request.getBookingTime());
+        booking.setMeetingLink(request.getMeetingLink());
+        booking.setStatus(Booking.Status.CONFIRMED);
+        if (request.getCustomNotes() != null && !request.getCustomNotes().isBlank()) {
+            booking.setNotes(request.getCustomNotes());
+        }
+
+        Booking saved = bookingRepository.save(booking);
+
+        User clientUser = saved.getUser();
+        String clientName = (clientUser != null && clientUser.getFullName() != null) ? clientUser.getFullName() : "Valued Client";
+        String clientEmail = (clientUser != null && clientUser.getEmail() != null) ? clientUser.getEmail() : null;
+
+        String consultantName = (request.getConsultantName() != null && !request.getConsultantName().isBlank())
+                ? request.getConsultantName().trim()
+                : "Hritika Seth";
+        String consultantEmail = (request.getConsultantEmail() != null && !request.getConsultantEmail().isBlank())
+                ? request.getConsultantEmail().trim()
+                : "sethhritika@gmail.com";
+
+        // Dispatch Google Meet invitation email to client, consultant (Hritika Seth), and HR team
+        emailService.sendGoogleMeetInvite(
+                clientEmail,
+                clientName,
+                saved.getServiceName(),
+                saved.getBookingDate().toString(),
+                saved.getBookingTime().toString(),
+                saved.getMeetingLink(),
+                consultantName,
+                consultantEmail,
+                request.getCustomNotes()
+        );
+
+        if (clientUser != null) {
+            activityLogRepository.save(UserActivityLog.builder()
+                    .user(clientUser)
+                    .action("GOOGLE_MEET_SCHEDULED")
+                    .metadataJson("Scheduled Google Meet with " + consultantName + " on " + saved.getBookingDate() + " at " + saved.getBookingTime() + " | Meet: " + saved.getMeetingLink())
+                    .build());
+        }
+
+        BookingResponse res = mapToResponse(saved);
+        res.setConsultantName(consultantName);
+        return res;
+    }
+
     private BookingResponse mapToResponse(Booking booking) {
         BookingResponse res = new BookingResponse();
         res.setId(booking.getId());
@@ -325,7 +377,9 @@ public class BookingService {
         if (booking.getUser() != null) {
             res.setClientName(booking.getUser().getFullName());
             res.setClientEmail(booking.getUser().getEmail());
+            res.setClientPhone(booking.getUser().getPhone());
         }
+        res.setConsultantName("Hritika Seth");
         return res;
     }
 }
