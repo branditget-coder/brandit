@@ -38,7 +38,7 @@ public class AdminInitializer implements CommandLineRunner {
 
     private static final List<TeamMemberSeed> OFFICIAL_TEAM_MEMBERS = List.of(
             new TeamMemberSeed("Raghav", "Dhir", "raghavdhir1510@gmail.com", "+918264452182", User.Role.ADMIN, "Lead Tech Strategist & Admin"),
-            new TeamMemberSeed("Raghav", "Dhir", "raghavdhir.work@gmail.com", "+918264452182", User.Role.ADMIN, "Lead Tech Strategist & Admin (Work)"),
+            new TeamMemberSeed("Raghav", "Dhir", "raghavdhir.work@gmail.com", "+918264452182", User.Role.TEAM, "Technical Specialist & Team Member"),
             new TeamMemberSeed("Hritika", "Seth", "sethhritika@gmail.com", "+918708231539", User.Role.TEAM, "LinkedIn Manager & Lead Consultant"),
             new TeamMemberSeed("Kritika", "Dhawan", "dhawankritika866@gmail.com", "+916284318951", User.Role.TEAM, "Customer Outreach & Operations"),
             new TeamMemberSeed("Stuti", "Sharma", "bhardwajstuti101@gmail.com", "+919015470950", User.Role.TEAM, "Human Resource Manager"),

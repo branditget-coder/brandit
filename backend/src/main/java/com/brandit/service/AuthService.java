@@ -105,7 +105,7 @@ public class AuthService {
 
         User.Role assignedRole = request.getRole() != null ? request.getRole() : User.Role.USER;
         
-        boolean isRaghavAdmin = email.equalsIgnoreCase("raghavdhir1510@gmail.com") || email.equalsIgnoreCase("raghavdhir.work@gmail.com");
+        boolean isRaghavAdmin = email.equalsIgnoreCase("raghavdhir1510@gmail.com");
 
         // Strict Security Rule: ONLY pre-authorized team members can register or get TEAM/ADMIN roles!
         if (assignedRole == User.Role.TEAM || assignedRole == User.Role.ADMIN) {
@@ -113,6 +113,8 @@ public class AuthService {
                 assignedRole = User.Role.USER; // Automatically force all unauthorized registrants to Client (USER) role!
             } else if (isRaghavAdmin) {
                 assignedRole = User.Role.ADMIN;
+            } else {
+                assignedRole = User.Role.TEAM; // Authorized team emails get TEAM role
             }
         } else if (isAuthorizedTeamEmail) {
             // Auto-grant TEAM/ADMIN role if an authorized team member registers
