@@ -8,6 +8,7 @@ import { FiMenu, FiX, FiUser, FiArrowRight } from 'react-icons/fi'
 import { motion } from 'framer-motion'
 import { brandColors } from '../../theme'
 import BrandLogo from './BrandLogo'
+import LiveVisitorBadge from './LiveVisitorBadge'
 
 const navLinks = [
   { label: 'Services', href: '/services' },
@@ -99,8 +100,9 @@ export default function Navbar() {
                 })}
               </Box>
 
-              {/* CTA Buttons */}
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.25 }}>
+              {/* CTA Buttons + Live Visitor Badge */}
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.5 }}>
+                <LiveVisitorBadge variant="compact" />
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     component={RouterLink}
@@ -197,7 +199,10 @@ export default function Navbar() {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <BrandLogo variant="dark" size="small" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <BrandLogo variant="dark" size="small" />
+            <LiveVisitorBadge variant="compact" />
+          </Box>
           <IconButton
             onClick={() => setMobileOpen(false)}
             size="small"

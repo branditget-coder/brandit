@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { FiArrowRight, FiCheckCircle, FiTrendingUp, FiTarget, FiUsers } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
+import LiveVisitorBadge from '../common/LiveVisitorBadge'
+
 const featurePillars = [
   { icon: <FiTrendingUp size={22} color={brandColors.primary} />, title: 'Profile Setup & Advice', desc: 'Complete structural overhaul & growth blueprint — ₹99' },
   { icon: <FiTarget size={22} color={brandColors.primary} />, title: 'Personal Branding', desc: '8 strategy-backed posts/month publishing — ₹320/mo' },
@@ -51,34 +53,36 @@ export default function HeroSection() {
       <Container maxWidth="lg" sx={{ px: { xs: 2.5, sm: 3, md: 4 } }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           <Grid item xs={12} md={6}>
-            {/* Pill Badge - Optimized for Mobile Margins & Auto Height */}
+            {/* Pill Badge & Live Visitor Counter */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  mb: 3,
-                  px: { xs: 2, sm: 2.5 },
-                  py: { xs: 1, sm: 1.25 },
-                  fontSize: { xs: '0.775rem', sm: '0.85rem' },
-                  fontWeight: 700,
-                  backgroundColor: alpha(brandColors.primary, 0.08),
-                  color: brandColors.primary,
-                  border: `1px solid ${alpha(brandColors.primary, 0.2)}`,
-                  borderRadius: '100px',
-                  maxWidth: '100%',
-                  lineHeight: 1.45,
-                  boxShadow: `0 2px 12px ${alpha(brandColors.primary, 0.06)}`,
-                  wordBreak: 'break-word',
-                  textAlign: 'left',
-                }}
-              >
-                ⚡ Your Profile, Your Brand, Your Opportunity — Plans From ₹99
-              </Box>
+              <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" sx={{ mb: 3, gap: 1 }}>
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    px: { xs: 2, sm: 2.5 },
+                    py: { xs: 1, sm: 1.25 },
+                    fontSize: { xs: '0.775rem', sm: '0.85rem' },
+                    fontWeight: 700,
+                    backgroundColor: alpha(brandColors.primary, 0.08),
+                    color: brandColors.primary,
+                    border: `1px solid ${alpha(brandColors.primary, 0.2)}`,
+                    borderRadius: '100px',
+                    maxWidth: '100%',
+                    lineHeight: 1.45,
+                    boxShadow: `0 2px 12px ${alpha(brandColors.primary, 0.06)}`,
+                    wordBreak: 'break-word',
+                    textAlign: 'left',
+                  }}
+                >
+                  ⚡ Your Profile, Your Brand, Your Opportunity — Plans From ₹99
+                </Box>
+                <LiveVisitorBadge variant="full" />
+              </Stack>
             </motion.div>
 
             {/* Headline */}
