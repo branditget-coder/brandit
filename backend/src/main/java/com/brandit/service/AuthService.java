@@ -28,6 +28,7 @@ public class AuthService {
 
     public static final java.util.List<String> ALLOWED_TEAM_EMAILS = java.util.List.of(
             "raghavdhir1510@gmail.com",    // Raghav Dhir (Lead Admin)
+            "raghavdhir.work@gmail.com",   // Raghav Dhir Work Email (Admin)
             "dhawankritika866@gmail.com",   // Kritika Dhawan (Operations & HR)
             "sethhritika@gmail.com",       // Hritika Seth (Lead Consultant)
             "bhardwajstuti101@gmail.com",   // Stuti Sharma (HR)
@@ -104,16 +105,18 @@ public class AuthService {
 
         User.Role assignedRole = request.getRole() != null ? request.getRole() : User.Role.USER;
         
-        // Strict Security Rule: ONLY the 5 pre-authorized team members can register or get TEAM/ADMIN roles!
+        boolean isRaghavAdmin = email.equalsIgnoreCase("raghavdhir1510@gmail.com") || email.equalsIgnoreCase("raghavdhir.work@gmail.com");
+
+        // Strict Security Rule: ONLY pre-authorized team members can register or get TEAM/ADMIN roles!
         if (assignedRole == User.Role.TEAM || assignedRole == User.Role.ADMIN) {
             if (!isAuthorizedTeamEmail) {
                 assignedRole = User.Role.USER; // Automatically force all unauthorized registrants to Client (USER) role!
-            } else if (email.equalsIgnoreCase("raghavdhir1510@gmail.com")) {
+            } else if (isRaghavAdmin) {
                 assignedRole = User.Role.ADMIN;
             }
         } else if (isAuthorizedTeamEmail) {
             // Auto-grant TEAM/ADMIN role if an authorized team member registers
-            assignedRole = email.equalsIgnoreCase("raghavdhir1510@gmail.com") ? User.Role.ADMIN : User.Role.TEAM;
+            assignedRole = isRaghavAdmin ? User.Role.ADMIN : User.Role.TEAM;
         }
 
         User user = User.builder()
