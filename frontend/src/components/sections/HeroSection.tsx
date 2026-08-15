@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { FiArrowRight, FiCheckCircle, FiTrendingUp, FiTarget, FiUsers } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
-import LiveVisitorBadge from '../common/LiveVisitorBadge'
 
 const featurePillars = [
   { icon: <FiTrendingUp size={22} color={brandColors.primary} />, title: 'Profile Setup & Advice', desc: 'Complete structural overhaul & growth blueprint — ₹99' },
@@ -81,7 +80,6 @@ export default function HeroSection() {
                 >
                   ⚡ Your Profile, Your Brand, Your Opportunity — Plans From ₹99
                 </Box>
-                <LiveVisitorBadge variant="full" />
               </Stack>
             </motion.div>
 
