@@ -8,7 +8,7 @@ import {
 import { motion } from 'framer-motion'
 import {
   FiSend, FiUsers, FiCheckCircle, FiClock, FiSearch, FiTrash2,
-  FiEye, FiZap, FiFileText, FiRefreshCw, FiX, FiCheck
+  FiEye, FiZap, FiFileText, FiRefreshCw, FiX, FiCheck, FiUserPlus
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
@@ -89,6 +89,9 @@ export default function AdminWeeklyInsights() {
     severity: 'success',
   })
 
+  // Backfill state
+  const [backfilling, setBackfilling] = useState(false)
+
   const fetchSubscribers = async () => {
     try {
       const res = await api.get<SubscriberItem[]>('/admin/newsletter/subscribers')
@@ -163,6 +166,24 @@ export default function AdminWeeklyInsights() {
     }
   }
 
+  const handleBackfillExistingUsers = async () => {
+    setBackfilling(true)
+    try {
+      const res = await api.post<{ enrolled: number; totalUsers: number; message: string }>('/admin/newsletter/backfill')
+      const { enrolled, message } = res.data
+      setSnackbar({
+        open: true,
+        message: `✅ ${message}`,
+        severity: enrolled > 0 ? 'success' : 'success'
+      })
+      await fetchSubscribers()
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.response?.data?.message || 'Backfill failed. Please try again.', severity: 'error' })
+    } finally {
+      setBackfilling(false)
+    }
+  }
+
   const activeCount = subscribers.filter(s => s.active).length
   const filteredSubscribers = subscribers.filter(s => s.email.toLowerCase().includes(search.toLowerCase()))
 
@@ -223,9 +244,21 @@ export default function AdminWeeklyInsights() {
               <FiZap size={22} color={brandColors.primary} />
               <Typography variant="h5" sx={{ fontWeight: 800 }}>Compose & Broadcast Career Insights</Typography>
             </Box>
-            <Button variant="outlined" startIcon={<FiRefreshCw size={14} />} onClick={fetchSubscribers} size="small" sx={{ borderRadius: '8px' }}>
-              Refresh Subscribers ({activeCount})
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={backfilling ? <CircularProgress size={14} /> : <FiUserPlus size={14} />}
+                onClick={handleBackfillExistingUsers}
+                disabled={backfilling}
+                size="small"
+                sx={{ borderRadius: '8px', borderColor: '#7C3AED', color: '#7C3AED', '&:hover': { borderColor: '#7C3AED', backgroundColor: alpha('#7C3AED', 0.05) } }}
+              >
+                {backfilling ? 'Enrolling...' : 'Enroll Existing Users'}
+              </Button>
+              <Button variant="outlined" startIcon={<FiRefreshCw size={14} />} onClick={fetchSubscribers} size="small" sx={{ borderRadius: '8px' }}>
+                Refresh Subscribers ({activeCount})
+              </Button>
+            </Box>
           </Box>
 
           <form onSubmit={handleBroadcastSubmit}>

@@ -315,6 +315,37 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("Subscriber removed successfully."));
     }
 
+    @PostMapping("/newsletter/backfill")
+    public ResponseEntity<Map<String, Object>> backfillAllExistingUsers() {
+        List<com.brandit.entity.User> allUsers = userRepository.findAll();
+        int enrolled = 0;
+        List<String> newlyEnrolled = new java.util.ArrayList<>();
+
+        for (com.brandit.entity.User user : allUsers) {
+            String email = user.getEmail();
+            if (email != null && !email.isBlank() && !newsletterRepository.existsByEmail(email.toLowerCase())) {
+                Newsletter subscription = Newsletter.builder()
+                        .email(email.toLowerCase())
+                        .active(true)
+                        .build();
+                newsletterRepository.save(subscription);
+                enrolled++;
+                newlyEnrolled.add(email);
+            }
+        }
+
+        logActivity("ADMIN_NEWSLETTER_BACKFILL", "Backfilled " + enrolled + " existing user accounts into weekly insights.");
+
+        Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("enrolled", enrolled);
+        result.put("totalUsers", allUsers.size());
+        result.put("message", enrolled == 0
+                ? "All existing accounts were already enrolled. No changes made."
+                : enrolled + " existing account(s) have been enrolled in Weekly Career Insights.");
+        result.put("newlyEnrolledEmails", newlyEnrolled);
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/activity-logs")
     public ResponseEntity<List<ActivityLogResponse>> getActivityLogs() {
         List<ActivityLogResponse> logs = userActivityLogRepository.findTop50ByOrderByCreatedAtDesc().stream().map(l -> {
