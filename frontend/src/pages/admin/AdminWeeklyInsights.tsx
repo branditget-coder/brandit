@@ -29,45 +29,103 @@ interface BroadcastResult {
 
 const PRESET_INSIGHTS = [
   {
-    id: 'linkedin_hacks',
-    title: '5 LinkedIn Personal Branding Hacks for 2026',
-    subject: '🚀 BrandIt Weekly Insights: 5 LinkedIn Personal Branding Strategies for 2026',
-    contentHtml: `<h3 style="color:#0A66C2; margin-top:0;">This Week's Executive Career Blueprint</h3>
-<p>Building an authoritative personal brand is the highest-ROI asset for senior professionals, managers, and founders in 2026.</p>
-<ul>
-  <li><strong>1. Optimize your Headline for Search:</strong> Use Target Role + Core Expertise + Tangible Metric (e.g. <em>VP of Product | Scaling SaaS Platforms to $50M ARR</em>).</li>
-  <li><strong>2. Leverage the Featured Section:</strong> Pin your top-performing posts, press mentions, and case studies to convert profile visits into inbound opportunities.</li>
-  <li><strong>3. Write High-Hook Posts:</strong> Start your LinkedIn posts with strong problem statements. Avoid generic fluff.</li>
-  <li><strong>4. Engage with Industry Leaders:</strong> Leave thoughtful, value-add comments on top voice posts in your niche.</li>
-  <li><strong>5. Quantify Your Experience:</strong> Use the Google X-Y-Z formula: <em>Accomplished [X], as measured by [Y], by doing [Z]</em>.</li>
-</ul>
-<p style="margin-top:16px;">Want a 1-on-1 audit of your LinkedIn profile and executive resume? Book a strategy session with BrandIt lead consultants!</p>`
+    id: 'linkedin_profile_tip',
+    title: '3 Quick Ways to Improve Your LinkedIn Today',
+    subject: '✨ This Week from BrandIt: 3 Easy LinkedIn Wins',
+    contentHtml: `<p style="font-size:16px; color:#1E293B; margin-top:0;">Hi there! 👋</p>
+
+<p style="color:#374151;">Here are <strong>3 simple things</strong> you can do right now to make your LinkedIn profile stand out:</p>
+
+<p style="color:#374151;">🔵 <strong>1. Update your headline</strong><br>
+Don't just write your job title. Add what you help people with.<br>
+<em>Example: "Marketing Manager | Helping small businesses grow online"</em></p>
+
+<p style="color:#374151;">🟢 <strong>2. Add a profile photo</strong><br>
+Profiles with a clear, friendly photo get <strong>14x more views</strong>. Use a simple background and smile!</p>
+
+<p style="color:#374151;">🟡 <strong>3. Write one post this week</strong><br>
+Share something you learned recently — even 3-4 lines is enough. Consistency beats perfection.</p>
+
+<hr style="border:none; border-top:1px solid #E5E7EB; margin:20px 0;" />
+
+<p style="color:#6B7280; font-size:14px;">Need help with your LinkedIn or personal brand? 
+<a href="https://brandit.get" style="color:#2563EB;">Book a free strategy call</a> with our team. 🚀</p>`,
   },
   {
-    id: 'resume_ats',
-    title: 'Executive Resume Power Keywords & ATS Checklist',
-    subject: '📄 Weekly Insights: Executive Resume Optimization & ATS Pass Rates',
-    contentHtml: `<h3 style="color:#0A66C2; margin-top:0;">Executive Resume Power Keywords & ATS Checklist</h3>
-<p>Over 85% of executive resumes fail automated Applicant Tracking Systems (ATS) due to formatting errors and weak action verbs.</p>
-<ul>
-  <li><strong>1. Strip Out Tables & Headers:</strong> ATS parsers frequently skip text embedded inside complex multi-column tables or header/footer boxes.</li>
-  <li><strong>2. Use High-Impact Power Verbs:</strong> Replace <em>"responsible for"</em> with <em>Spearheaded, Architected, Accelerated, Negotiated, Cultivated</em>.</li>
-  <li><strong>3. Align Core Competencies:</strong> Include specific tech stacks, leadership frameworks, and industry terminology matching your target JD.</li>
-  <li><strong>4. Keep Length to 2 Pages Max:</strong> Even for 15+ years experience, prioritize your last 10 years of measurable achievements.</li>
-</ul>`
+    id: 'resume_basics',
+    title: 'Make Your Resume Get Noticed (Simple Tips)',
+    subject: '📄 This Week from BrandIt: Fix Your Resume in 10 Minutes',
+    contentHtml: `<p style="font-size:16px; color:#1E293B; margin-top:0;">Hi there! 👋</p>
+
+<p style="color:#374151;">Most resumes get skipped in under <strong>10 seconds</strong>. Here's how to fix that quickly:</p>
+
+<p style="color:#374151;">✅ <strong>Start bullet points with action words</strong><br>
+Instead of "Responsible for sales" → write "Grew sales by 30% in 6 months"</p>
+
+<p style="color:#374151;">✅ <strong>Keep it to 1–2 pages</strong><br>
+Recruiters don't read long resumes. Pick your best 5–6 achievements and highlight those.</p>
+
+<p style="color:#374151;">✅ <strong>Use simple formatting</strong><br>
+Avoid tables, columns, and fancy graphics. Clean text is easier to read — and works better with job portals.</p>
+
+<p style="color:#374151;">✅ <strong>Add numbers wherever you can</strong><br>
+"Managed a team" is weak. "Managed a team of 8 people and reduced delivery time by 20%" is strong.</p>
+
+<hr style="border:none; border-top:1px solid #E5E7EB; margin:20px 0;" />
+
+<p style="color:#6B7280; font-size:14px;">Want us to review your resume personally? 
+<a href="https://brandit.get" style="color:#2563EB;">Book a session with BrandIt</a> — we'll guide you step by step.</p>`,
   },
   {
-    id: 'salary_negotiation',
-    title: 'Salary & Promotion Negotiation Blueprint',
-    subject: '💡 Weekly Insights: How to Negotiate a 30%+ Executive Pay Raise',
-    contentHtml: `<h3 style="color:#0A66C2; margin-top:0;">Salary & Executive Compensation Negotiation Blueprint</h3>
-<p>Never accept an initial job offer or annual review without presenting a structured Value Impact Portfolio.</p>
-<ul>
-  <li><strong>1. Anchoring on Market Benchmark Data:</strong> Research verified compensation brackets via Levels.fyi and executive recruiters.</li>
-  <li><strong>2. Quantify Revenue & Cost Impact:</strong> Frame your request around the pipeline revenue, cost savings, or key projects you delivered.</li>
-  <li><strong>3. Negotiate Non-Salary Equity & Bonuses:</strong> If base salary budget is capped, negotiate signing bonuses, stock options, remote flexibility, or learning stipends.</li>
-</ul>`
-  }
+    id: 'career_confidence',
+    title: 'How to Talk About Yourself (Without Feeling Awkward)',
+    subject: '💬 This Week from BrandIt: Speak About Your Work with Confidence',
+    contentHtml: `<p style="font-size:16px; color:#1E293B; margin-top:0;">Hi there! 👋</p>
+
+<p style="color:#374151;">A lot of people find it hard to talk about their own work — especially in interviews or on LinkedIn. You're not alone!</p>
+
+<p style="color:#374151;">Here's a simple way to introduce yourself that actually works:</p>
+
+<p style="background:#F0F9FF; border-left:4px solid #2563EB; padding:12px 16px; border-radius:4px; color:#1E293B;">
+<strong>"I help [type of person] do [what you help them with], so they can [benefit they get]."</strong>
+</p>
+
+<p style="color:#374151;"><em>Example: "I help small business owners build their online presence, so they can attract more customers without spending on ads."</em></p>
+
+<p style="color:#374151;">Try writing your version of this sentence today. Use it on your LinkedIn headline, in your bio, or the next time someone asks "so what do you do?"</p>
+
+<p style="color:#374151;">The more you say it, the more natural it feels. 💪</p>
+
+<hr style="border:none; border-top:1px solid #E5E7EB; margin:20px 0;" />
+
+<p style="color:#6B7280; font-size:14px;">Need help crafting your personal brand story? 
+<a href="https://brandit.get" style="color:#2563EB;">Chat with the BrandIt team</a> — we make it simple.</p>`,
+  },
+  {
+    id: 'job_search_tips',
+    title: 'Job Search Feels Slow? Try This',
+    subject: '🔍 This Week from BrandIt: Get More Responses from Job Applications',
+    contentHtml: `<p style="font-size:16px; color:#1E293B; margin-top:0;">Hi there! 👋</p>
+
+<p style="color:#374151;">If you've been applying to jobs and not hearing back, it can feel really discouraging. Here's what actually helps:</p>
+
+<p style="color:#374151;">📌 <strong>Apply to fewer jobs, but better ones</strong><br>
+Instead of applying to 50 jobs and copying the same resume, pick 10 that truly fit and tailor each application.</p>
+
+<p style="color:#374151;">📌 <strong>Message the recruiter directly</strong><br>
+After applying, send a short, polite message on LinkedIn saying you applied and you're genuinely interested. Most people don't do this — which means you'll stand out.</p>
+
+<p style="color:#374151;">📌 <strong>Ask for referrals</strong><br>
+If you know someone at the company — even casually — ask if they can pass your name along. A referral increases your chances by 5x.</p>
+
+<p style="color:#374151;">📌 <strong>Follow up once (politely)</strong><br>
+If you didn't hear back after 7 days, it's okay to follow up once. Keep it short and friendly.</p>
+
+<hr style="border:none; border-top:1px solid #E5E7EB; margin:20px 0;" />
+
+<p style="color:#6B7280; font-size:14px;">Want a personalized job search strategy? 
+<a href="https://brandit.get" style="color:#2563EB;">Book a 1-on-1 session with BrandIt</a> and let's figure it out together.</p>`,
+  },
 ]
 
 export default function AdminWeeklyInsights() {
@@ -76,7 +134,7 @@ export default function AdminWeeklyInsights() {
   const [search, setSearch] = useState<string>('')
 
   // Broadcast Form State
-  const [selectedPreset, setSelectedPreset] = useState<string>('linkedin_hacks')
+  const [selectedPreset, setSelectedPreset] = useState<string>('linkedin_profile_tip')
   const [subject, setSubject] = useState<string>(PRESET_INSIGHTS[0].subject)
   const [contentHtml, setContentHtml] = useState<string>(PRESET_INSIGHTS[0].contentHtml)
   const [sending, setSending] = useState<boolean>(false)
