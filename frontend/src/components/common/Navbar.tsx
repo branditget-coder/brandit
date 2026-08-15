@@ -5,7 +5,7 @@ import {
 } from '@mui/material'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { FiMenu, FiX, FiUser, FiArrowRight } from 'react-icons/fi'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { brandColors } from '../../theme'
 import BrandLogo from './BrandLogo'
 
@@ -31,7 +31,7 @@ export default function Navbar() {
         elevation={0}
         sx={{
           backgroundColor: 'transparent',
-          top: { xs: 0, sm: 12 },
+          top: { xs: 0, sm: 14 },
           px: { xs: 0, sm: 2, md: 3 },
           transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
@@ -41,83 +41,102 @@ export default function Navbar() {
             sx={{
               mx: { xs: 0, sm: 'auto' },
               px: { xs: 2.5, sm: 3, md: 3.5 },
-              py: { xs: 1, sm: 1.2 },
-              borderRadius: { xs: '0 0 20px 20px', sm: '24px' },
-              // Apple iOS Glassmorphic Translucency & Blur
+              py: { xs: 1, sm: 1.1 },
+              borderRadius: { xs: '0 0 20px 20px', sm: '100px' },
+              // Ultra-Modern Glassmorphic Floating Capsule
               backgroundColor: trigger
-                ? 'rgba(255, 255, 255, 0.82)'
-                : 'rgba(255, 255, 255, 0.68)',
-              backdropFilter: 'blur(24px) saturate(190%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+                ? 'rgba(255, 255, 255, 0.92)'
+                : 'rgba(255, 255, 255, 0.82)',
+              backdropFilter: 'blur(28px) saturate(200%)',
+              WebkitBackdropFilter: 'blur(28px) saturate(200%)',
               border: trigger
-                ? '1px solid rgba(226, 232, 240, 0.8)'
-                : '1px solid rgba(255, 255, 255, 0.75)',
+                ? `1px solid ${alpha(brandColors.primary, 0.2)}`
+                : '1px solid rgba(255, 255, 255, 0.9)',
               boxShadow: trigger
-                ? '0 12px 36px -6px rgba(15, 23, 42, 0.08), 0 0 1px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
-                : '0 8px 30px -4px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                ? '0 16px 40px -10px rgba(10, 102, 194, 0.14), 0 0 1px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.95)'
+                : '0 10px 30px -5px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
               transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            <Toolbar disableGutters sx={{ minHeight: { xs: 52, md: 56 }, justifyContent: 'space-between' }}>
+            <Toolbar disableGutters sx={{ minHeight: { xs: 54, md: 58 }, justifyContent: 'space-between' }}>
               {/* Logo */}
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
                 <BrandLogo variant="dark" size="medium" />
               </motion.div>
 
-              {/* Desktop Nav Links */}
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.75 }}>
+              {/* Desktop Nav Links with Prominent Readable Text */}
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.75, position: 'relative' }}>
                 {navLinks.map((link) => {
                   const active = location.pathname === link.href
                   return (
-                    <motion.div key={link.label} whileHover={{ y: -1 }} whileTap={{ scale: 0.96 }}>
+                    <Box key={link.label} sx={{ position: 'relative' }}>
                       <Button
                         component={RouterLink}
                         to={link.href}
                         sx={{
-                          color: active ? brandColors.primary : '#334155',
-                          fontWeight: active ? 700 : 500,
-                          fontSize: '0.875rem',
-                          px: 2,
-                          py: 0.85,
-                          borderRadius: '14px',
+                          color: active ? brandColors.primary : '#0F172A',
+                          fontWeight: active ? 750 : 600,
+                          fontSize: '0.975rem',
+                          letterSpacing: '-0.01em',
+                          fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
+                          px: 2.2,
+                          py: 0.9,
+                          borderRadius: '100px',
                           backgroundColor: active ? alpha(brandColors.primary, 0.09) : 'transparent',
                           border: active ? `1px solid ${alpha(brandColors.primary, 0.2)}` : '1px solid transparent',
                           transition: 'all 0.25s ease',
+                          position: 'relative',
+                          zIndex: 1,
                           '&:hover': {
-                            backgroundColor: alpha(brandColors.primary, 0.06),
+                            backgroundColor: alpha(brandColors.primary, 0.07),
                             color: brandColors.primary,
-                            borderColor: alpha(brandColors.primary, 0.12),
                           },
                         }}
                       >
+                        {active && (
+                          <Box
+                            component="span"
+                            sx={{
+                              width: 7,
+                              height: 7,
+                              borderRadius: '50%',
+                              backgroundColor: brandColors.primary,
+                              mr: 1,
+                              display: 'inline-block',
+                              boxShadow: `0 0 8px ${brandColors.primary}`,
+                            }}
+                          />
+                        )}
                         {link.label}
                       </Button>
-                    </motion.div>
+                    </Box>
                   )
                 })}
               </Box>
 
               {/* CTA Buttons */}
               <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.5 }}>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
                   <Button
                     component={RouterLink}
                     to="/login"
-                    startIcon={<FiUser size={15} />}
+                    startIcon={<FiUser size={16} />}
                     sx={{
-                      color: '#475569',
-                      fontWeight: 600,
-                      fontSize: '0.85rem',
-                      px: 2,
-                      py: 0.85,
-                      borderRadius: '14px',
-                      backgroundColor: 'rgba(241, 245, 249, 0.6)',
-                      border: '1px solid rgba(203, 213, 225, 0.5)',
+                      color: '#0F172A',
+                      fontWeight: 700,
+                      fontSize: '0.925rem',
+                      fontFamily: '"Plus Jakarta Sans", sans-serif',
+                      px: 2.5,
+                      py: 0.9,
+                      borderRadius: '100px',
+                      backgroundColor: 'rgba(241, 245, 249, 0.8)',
+                      border: '1px solid rgba(203, 213, 225, 0.8)',
                       backdropFilter: 'blur(8px)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: 'rgba(241, 245, 249, 0.9)',
-                        color: brandColors.text,
-                        borderColor: 'rgba(148, 163, 184, 0.5)',
+                        backgroundColor: 'rgba(241, 245, 249, 1)',
+                        color: brandColors.primary,
+                        borderColor: alpha(brandColors.primary, 0.4),
                       },
                     }}
                   >
@@ -125,25 +144,28 @@ export default function Navbar() {
                   </Button>
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
                   <Button
                     component={RouterLink}
                     to="/book"
                     variant="contained"
-                    endIcon={<FiArrowRight size={15} />}
+                    endIcon={<FiArrowRight size={16} />}
                     sx={{
-                      px: 2.75,
-                      py: 0.9,
-                      borderRadius: '14px',
-                      fontWeight: 700,
-                      fontSize: '0.875rem',
+                      px: 3,
+                      py: 0.95,
+                      borderRadius: '100px',
+                      fontWeight: 750,
+                      fontSize: '0.95rem',
+                      fontFamily: '"Plus Jakarta Sans", sans-serif',
                       textTransform: 'none',
                       backgroundColor: brandColors.primary,
-                      backgroundImage: `linear-gradient(135deg, ${brandColors.primary} 0%, #084e96 100%)`,
-                      boxShadow: '0 6px 20px rgba(10, 102, 194, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
+                      backgroundImage: `linear-gradient(135deg, ${brandColors.primary} 0%, #2563EB 100%)`,
+                      boxShadow: '0 6px 20px rgba(10, 102, 194, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                      transition: 'all 0.25s ease',
                       '&:hover': {
-                        backgroundImage: `linear-gradient(135deg, #0958a8 0%, #063c75 100%)`,
-                        boxShadow: '0 8px 24px rgba(10, 102, 194, 0.42)',
+                        backgroundImage: `linear-gradient(135deg, #0850A0 0%, #1D4ED8 100%)`,
+                        boxShadow: '0 8px 25px rgba(10, 102, 194, 0.48)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
@@ -158,15 +180,15 @@ export default function Navbar() {
                 sx={{
                   display: { md: 'none' },
                   color: brandColors.text,
-                  backgroundColor: 'rgba(241, 245, 249, 0.7)',
+                  backgroundColor: 'rgba(241, 245, 249, 0.8)',
                   backdropFilter: 'blur(8px)',
-                  borderRadius: '12px',
+                  borderRadius: '100px',
                   p: 1,
-                  border: '1px solid rgba(203, 213, 225, 0.6)',
+                  border: '1px solid rgba(203, 213, 225, 0.7)',
                 }}
                 aria-label="Open menu"
               >
-                <FiMenu size={22} />
+                <FiMenu size={20} />
               </IconButton>
             </Toolbar>
           </Box>
@@ -174,7 +196,7 @@ export default function Navbar() {
       </AppBar>
 
       {/* Offset for fixed floating glass navbar */}
-      <Toolbar sx={{ height: { xs: 76, sm: 88 } }} />
+      <Toolbar sx={{ height: { xs: 72, sm: 84 } }} />
 
       {/* Mobile Glassmorphic Drawer */}
       <Drawer
@@ -184,11 +206,11 @@ export default function Navbar() {
         PaperProps={{
           sx: {
             width: { xs: '85vw', sm: 340 },
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
             backdropFilter: 'blur(30px) saturate(200%)',
             WebkitBackdropFilter: 'blur(30px) saturate(200%)',
             p: { xs: 3, sm: 3.5 },
-            borderLeft: '1px solid rgba(255, 255, 255, 0.7)',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
             boxShadow: '-12px 0 40px rgba(15, 23, 42, 0.12)',
             borderRadius: '24px 0 0 24px',
           },
@@ -225,10 +247,11 @@ export default function Navbar() {
                     justifyContent: 'flex-start',
                     px: 2.2,
                     py: 1.4,
-                    borderRadius: '14px',
+                    borderRadius: '100px',
                     color: active ? brandColors.primary : brandColors.text,
                     fontWeight: active ? 700 : 500,
-                    fontSize: '1rem',
+                    fontSize: '0.95rem',
+                    fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
                     backgroundColor: active ? alpha(brandColors.primary, 0.08) : 'rgba(255, 255, 255, 0.5)',
                     border: active ? `1px solid ${alpha(brandColors.primary, 0.2)}` : '1px solid rgba(226, 232, 240, 0.6)',
                     '&:hover': {
@@ -237,6 +260,19 @@ export default function Navbar() {
                     },
                   }}
                 >
+                  {active && (
+                    <Box
+                      component="span"
+                      sx={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        backgroundColor: brandColors.primary,
+                        mr: 1.2,
+                        display: 'inline-block',
+                      }}
+                    />
+                  )}
                   {link.label}
                 </Button>
               </ListItem>
@@ -254,7 +290,7 @@ export default function Navbar() {
             startIcon={<FiUser size={18} />}
             sx={{
               py: 1.3,
-              borderRadius: '14px',
+              borderRadius: '100px',
               fontWeight: 600,
               borderColor: 'rgba(203, 213, 225, 0.8)',
               backgroundColor: 'rgba(255, 255, 255, 0.6)',
@@ -271,10 +307,10 @@ export default function Navbar() {
             endIcon={<FiArrowRight size={18} />}
             sx={{
               py: 1.4,
-              borderRadius: '14px',
+              borderRadius: '100px',
               fontWeight: 700,
               backgroundColor: brandColors.primary,
-              backgroundImage: `linear-gradient(135deg, ${brandColors.primary} 0%, #084e96 100%)`,
+              backgroundImage: `linear-gradient(135deg, ${brandColors.primary} 0%, #2563EB 100%)`,
               boxShadow: '0 6px 20px rgba(10, 102, 194, 0.35)',
             }}
           >

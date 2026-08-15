@@ -162,3 +162,12 @@ org.h2.jdbc.JdbcSQLSyntaxErrorException: Domain "TEXT" not found; SQL statement:
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
 	at com.brandit.BranditApplication.main(BranditApplication.java:13)
+2026-08-15 11:40:36.192060+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "BOOKINGS" not found; SQL statement:
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_screenshot TEXT [42102-224]
+2026-08-15 11:40:36.197070+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "APP_USERS" not found; SQL statement:
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS phone VARCHAR(255) [42102-224]
+2026-08-15 11:40:36.197574+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]DO $$ DECLARE r RECORD; BEGIN   FOR r IN (     SELECT constraint_name     FROM information_schema.table_constraints     WHERE table_name = 'bookings' AND constraint_type = 'FOREIGN KEY'   ) LOOP     EXECUTE 'ALTER TABLE bookings DROP CONSTRAINT IF EXISTS ' || quote_ident(r.constraint_name);   END LOOP; END $$;"; expected "DELETE, DROP"; SQL statement:
+DO $$ DECLARE r RECORD; BEGIN   FOR r IN (     SELECT constraint_name     FROM information_schema.table_constraints     WHERE table_name = 'bookings' AND constraint_type = 'FOREIGN KEY'   ) LOOP     EXECUTE 'ALTER TABLE bookings DROP CONSTRAINT IF EXISTS ' || quote_ident(r.constraint_name);   END LOOP; END $$; [42001-224]
