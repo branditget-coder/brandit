@@ -155,7 +155,7 @@ export default function AdminLayout() {
         <DrawerContent />
       </Drawer>
 
-      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+      <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden' }}>
         <AppBar position="sticky" elevation={0} sx={{ backgroundColor: alpha('#fff', 0.85), backdropFilter: 'blur(20px)', borderBottom: `1px solid ${brandColors.border}`, color: brandColors.text }}>
           <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 } }}>
             <IconButton sx={{ display: { md: 'none' } }} onClick={() => setMobileOpen(true)} aria-label="Open menu">

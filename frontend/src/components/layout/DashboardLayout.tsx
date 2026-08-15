@@ -148,7 +148,7 @@ export default function DashboardLayout() {
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+      <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden' }}>
         {/* Top Bar */}
         <AppBar
           position="sticky"

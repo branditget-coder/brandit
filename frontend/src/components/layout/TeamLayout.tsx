@@ -54,11 +54,9 @@ export default function TeamLayout() {
             }}
           />
         </Box>
-        {isMobile && (
-          <IconButton onClick={() => setMobileOpen(false)} size="small">
-            <FiX size={20} />
-          </IconButton>
-        )}
+        <IconButton onClick={() => setMobileOpen(false)} size="small" sx={{ display: { md: 'none' } }}>
+          <FiX size={20} />
+        </IconButton>
       </Box>
 
       <Divider sx={{ mb: 3, borderColor: brandColors.border }} />
@@ -73,7 +71,7 @@ export default function TeamLayout() {
               <ListItemButton
                 component={RouterLink}
                 to={item.href}
-                onClick={() => isMobile && setMobileOpen(false)}
+                onClick={() => setMobileOpen(false)}
                 sx={{
                   borderRadius: '14px',
                   py: 1.25,
@@ -159,43 +157,42 @@ export default function TeamLayout() {
   )
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: brandColors.background }}>
-      {/* Mobile App Bar */}
-      {isMobile && (
-        <Paper
-          square
-          elevation={0}
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 1100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            px: 2.5,
-            py: 1.5,
-            borderBottom: `1px solid ${brandColors.border}`,
-            backgroundColor: '#fff',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <BrandLogo size="small" />
-            <Chip label="TEAM" size="small" sx={{ backgroundColor: alpha('#8B5CF6', 0.12), color: '#7C3AED', fontWeight: 800, height: 20, fontSize: '0.65rem' }} />
-          </Box>
-          <IconButton onClick={() => setMobileOpen(true)} size="medium">
-            <FiMenu size={22} />
-          </IconButton>
-        </Paper>
-      )}
-
-      {/* Desktop Drawer */}
-      <Drawer
-        variant={isMobile ? 'temporary' : 'permanent'}
-        open={isMobile ? mobileOpen : true}
-        onClose={() => setMobileOpen(false)}
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: brandColors.background, overflowX: 'hidden' }}>
+      {/* Fixed Mobile Top App Bar */}
+      <Paper
+        square
+        elevation={0}
         sx={{
+          display: { xs: 'flex', md: 'none' },
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 64,
+          zIndex: 1100,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 2.5,
+          borderBottom: `1px solid ${brandColors.border}`,
+          backgroundColor: 'rgba(255, 255, 255, 0.92)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+          <BrandLogo size="small" />
+          <Chip label="TEAM" size="small" sx={{ backgroundColor: alpha('#8B5CF6', 0.12), color: '#7C3AED', fontWeight: 800, height: 22, fontSize: '0.65rem' }} />
+        </Box>
+        <IconButton onClick={() => setMobileOpen(true)} size="medium" sx={{ p: 1, backgroundColor: alpha(brandColors.primary, 0.06), borderRadius: '12px' }}>
+          <FiMenu size={22} color={brandColors.text} />
+        </IconButton>
+      </Paper>
+
+      {/* Desktop Permanent Sidebar Drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
           width: DRAWER_WIDTH,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
@@ -209,15 +206,36 @@ export default function TeamLayout() {
         {sidebarContent}
       </Drawer>
 
-      {/* Main Workspace Area */}
+      {/* Mobile Temporary Slide-Over Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            backgroundColor: '#fff',
+            boxShadow: '-8px 0 32px rgba(0,0,0,0.12)',
+          },
+        }}
+      >
+        {sidebarContent}
+      </Drawer>
+
+      {/* Main Workspace Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 2.5, sm: 4, md: 5 },
-          mt: { xs: 7, md: 0 },
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
+          minWidth: 0,
+          p: { xs: 2, sm: 3.5, md: 5 },
+          pt: { xs: '80px', md: 5 }, // Proper top margin clearance for fixed mobile app bar
+          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
           maxWidth: '1280px',
+          overflowX: 'hidden',
         }}
       >
         <Outlet />

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import {
   Box, Typography, Grid, Paper, Chip, Button, Stack, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, Avatar, alpha, CircularProgress, Tooltip, IconButton
+  TableCell, TableContainer, TableHead, TableRow, alpha, CircularProgress, Tooltip,
+  Card, CardContent, Divider, useTheme, useMediaQuery
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import {
@@ -25,15 +26,18 @@ interface BookingItem {
 }
 
 const teamRoster = [
-  { name: 'Raghav Dhir', role: 'Lead Tech Strategist', phone: '+91 8264452182', image: '/assets/team/raghav.jpg' },
-  { name: 'Hritika Seth', role: 'LinkedIn Manager & Consultant', phone: '+91 8708231539', image: '/assets/team/hritika.jpg' },
-  { name: 'Kritika Dhawan', role: 'Customer Outreach & Ops', phone: '+91 6284318951', image: '/assets/team/kritika.jpg' },
-  { name: 'Stuti Sharma', role: 'Human Resource', phone: '+91 9015470950', image: '/assets/team/stuti.jpg' },
-  { name: 'Yash', role: 'Accounting & Finance', phone: '+91 9024469496', image: '/assets/team/yash.jpg' },
+  { name: 'Raghav Dhir', role: 'Lead Tech Strategist', phone: '+91 8264452182' },
+  { name: 'Hritika Seth', role: 'LinkedIn Manager & Consultant', phone: '+91 8708231539' },
+  { name: 'Kritika Dhawan', role: 'Customer Outreach & Ops', phone: '+91 6284318951' },
+  { name: 'Stuti Sharma', role: 'Human Resource', phone: '+91 9015470950' },
+  { name: 'Yash', role: 'Accounting & Finance', phone: '+91 9024469496' },
 ]
 
 export default function TeamDashboard() {
   const { user } = useAuth()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
   const [bookings, setBookings] = useState<BookingItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -69,9 +73,9 @@ export default function TeamDashboard() {
 
   const stats = [
     { label: 'Assigned Consultations', value: bookings.length.toString(), icon: FiCalendar, color: brandColors.primary, bg: alpha(brandColors.primary, 0.1) },
-    { label: 'Pending Client Calls', value: bookings.filter(b => b.status === 'PENDING').length.toString(), icon: FiClock, color: '#F59E0B', bg: alpha('#F59E0B', 0.1) },
+    { label: 'Pending Calls', value: bookings.filter(b => b.status === 'PENDING').length.toString(), icon: FiClock, color: '#F59E0B', bg: alpha('#F59E0B', 0.1) },
     { label: 'Confirmed Sessions', value: bookings.filter(b => b.status === 'CONFIRMED').length.toString(), icon: FiCheckCircle, color: '#10B981', bg: alpha('#10B981', 0.1) },
-    { label: 'Team Members Online', value: teamRoster.length.toString(), icon: FiUsers, color: '#8B5CF6', bg: alpha('#8B5CF6', 0.1) },
+    { label: 'Team Online', value: teamRoster.length.toString(), icon: FiUsers, color: '#8B5CF6', bg: alpha('#8B5CF6', 0.1) },
   ]
 
   const getStatusChip = (status: string) => {
@@ -88,18 +92,18 @@ export default function TeamDashboard() {
   }
 
   return (
-    <Box>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <Box sx={{ width: '100%', overflowX: 'hidden' }}>
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         
-        {/* Modernized Welcome Header Banner with High-Contrast Text */}
+        {/* Modernized Responsive Welcome Banner */}
         <Paper
           sx={{
-            p: { xs: 3.5, sm: 4.5 },
-            borderRadius: '24px',
+            p: { xs: 2.5, sm: 3.5, md: 4.5 },
+            borderRadius: { xs: '20px', md: '24px' },
             background: 'linear-gradient(135deg, #0F172A 0%, #1E3E8A 55%, #2563EB 100%)',
             color: '#FFFFFF',
-            mb: 4,
-            boxShadow: '0 12px 36px rgba(15, 23, 42, 0.35)',
+            mb: 3.5,
+            boxShadow: '0 12px 36px rgba(15, 23, 42, 0.25)',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -108,10 +112,10 @@ export default function TeamDashboard() {
           <Box
             sx={{
               position: 'absolute',
-              top: -60,
-              right: -60,
-              width: 220,
-              height: 220,
+              top: -50,
+              right: -50,
+              width: 200,
+              height: 200,
               borderRadius: '50%',
               background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(0,0,0,0) 70%)',
               filter: 'blur(30px)',
@@ -119,9 +123,9 @@ export default function TeamDashboard() {
             }}
           />
 
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2.5, position: 'relative', zIndex: 1 }}>
-            <Box sx={{ maxWidth: '720px' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: { xs: 'column', sm: 'row' }, gap: 2.5, position: 'relative', zIndex: 1 }}>
+            <Box sx={{ maxWidth: '720px', width: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.5, flexWrap: 'wrap' }}>
                 <Chip
                   label="BRANDIT TEAM WORKSPACE"
                   size="small"
@@ -130,7 +134,7 @@ export default function TeamDashboard() {
                     backdropFilter: 'blur(8px)',
                     color: '#FFFFFF',
                     fontWeight: 800,
-                    fontSize: '0.72rem',
+                    fontSize: '0.68rem',
                     letterSpacing: '0.04em',
                     border: '1px solid rgba(255,255,255,0.3)',
                   }}
@@ -146,18 +150,18 @@ export default function TeamDashboard() {
                   fontWeight: 800,
                   mb: 1,
                   color: '#FFFFFF !important',
-                  fontSize: { xs: '1.75rem', sm: '2.2rem' },
+                  fontSize: { xs: '1.5rem', sm: '2rem', md: '2.3rem' },
                   letterSpacing: '-0.02em',
                 }}
               >
-                Hello, {user?.firstName}!
+                Hello, {user?.firstName || 'Team Member'}!
               </Typography>
 
               <Typography
                 variant="body1"
                 sx={{
                   color: 'rgba(255, 255, 255, 0.92) !important',
-                  fontSize: '1rem',
+                  fontSize: { xs: '0.88rem', sm: '0.98rem' },
                   lineHeight: 1.6,
                   fontWeight: 400,
                 }}
@@ -170,17 +174,19 @@ export default function TeamDashboard() {
               component={RouterLink}
               to="/team/resources"
               variant="contained"
-              startIcon={<FiBookOpen size={18} />}
+              startIcon={<FiBookOpen size={17} />}
               sx={{
+                width: { xs: '100%', sm: 'auto' },
                 backgroundColor: '#FFFFFF',
                 color: '#1E3A8A',
                 fontWeight: 700,
                 borderRadius: '14px',
-                px: 3.5,
-                py: 1.4,
-                fontSize: '0.95rem',
+                px: 3,
+                py: 1.2,
+                fontSize: '0.9rem',
                 textTransform: 'none',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                whiteSpace: 'nowrap',
                 '&:hover': {
                   backgroundColor: '#F8FAFC',
                   color: '#0F172A',
@@ -193,21 +199,21 @@ export default function TeamDashboard() {
           </Box>
         </Paper>
 
-        {/* Stats Grid */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* Responsive 2x2 Stats Grid on Mobile */}
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: 3.5 }}>
           {stats.map((stat, i) => (
-            <Grid item xs={12} sm={6} md={3} key={stat.label}>
+            <Grid item xs={6} sm={6} md={3} key={stat.label}>
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: i * 0.08 }}>
-                <Paper sx={{ p: 3, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 16px rgba(0,0,0,0.02)' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                    <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: stat.bg, color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <stat.icon size={24} />
+                <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 16px rgba(0,0,0,0.02)' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                    <Box sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, borderRadius: '12px', backgroundColor: stat.bg, color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <stat.icon size={isMobile ? 20 : 24} />
                     </Box>
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.text, mb: 0.5 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.text, mb: 0.3, fontSize: { xs: '1.4rem', sm: '1.8rem', md: '2rem' } }}>
                     {stat.value}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: brandColors.muted, fontWeight: 600 }}>
+                  <Typography variant="body2" sx={{ color: brandColors.muted, fontWeight: 600, fontSize: { xs: '0.78rem', sm: '0.875rem' } }}>
                     {stat.label}
                   </Typography>
                 </Paper>
@@ -216,15 +222,15 @@ export default function TeamDashboard() {
           ))}
         </Grid>
 
-        {/* Client Consultations Section */}
+        {/* Client Consultations & Playbooks Grid */}
         <Grid container spacing={3}>
           <Grid item xs={12} lg={8}>
-            <Paper sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <FiCalendar size={22} color={brandColors.primary} />
-                  <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
-                    Assigned Client Consultations
+            <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                  <FiCalendar size={20} color={brandColors.primary} />
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+                    Assigned Consultations
                   </Typography>
                 </Box>
                 <Button component={RouterLink} to="/team/consultations" size="small" endIcon={<FiExternalLink />}>
@@ -237,22 +243,73 @@ export default function TeamDashboard() {
                   <CircularProgress size={32} />
                 </Box>
               ) : bookings.length === 0 ? (
-                /* Polished Empty State (No Mock Data) */
-                <Box sx={{ py: 6, px: 3, textAlign: 'center', backgroundColor: alpha(brandColors.primary, 0.02), borderRadius: '16px', border: `1px dashed ${brandColors.border}` }}>
-                  <Box sx={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
-                    <FiInbox size={28} />
+                <Box sx={{ py: 5, px: 2, textAlign: 'center', backgroundColor: alpha(brandColors.primary, 0.02), borderRadius: '16px', border: `1px dashed ${brandColors.border}` }}>
+                  <Box sx={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 1.5 }}>
+                    <FiInbox size={24} />
                   </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.5 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.5 }}>
                     No Client Consultations Yet
                   </Typography>
-                  <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 460, mx: 'auto', mb: 2.5, lineHeight: 1.6 }}>
-                    No consultation bookings have been submitted by clients yet. As soon as clients schedule personal branding sessions, their details will appear here in real-time.
+                  <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 440, mx: 'auto', mb: 2, lineHeight: 1.6, fontSize: '0.85rem' }}>
+                    As soon as clients schedule personal branding sessions, their details will appear here in real-time.
                   </Typography>
                   <Button component={RouterLink} to="/book" variant="outlined" size="small" sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700 }}>
                     Test Client Booking Link
                   </Button>
                 </Box>
+              ) : isMobile ? (
+                /* Mobile Cards View for Client Consultations */
+                <Stack spacing={1.5}>
+                  {bookings.map((booking) => (
+                    <Card key={booking.id} sx={{ borderRadius: '14px', border: `1px solid ${brandColors.border}`, boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Box>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: brandColors.text }}>
+                              {booking.clientName}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700, display: 'block' }}>
+                              {booking.servicePackage}
+                            </Typography>
+                          </Box>
+                          {getStatusChip(booking.status)}
+                        </Box>
+
+                        <Stack spacing={0.3} sx={{ my: 1 }}>
+                          <Typography variant="caption" component="a" href={`tel:${booking.clientPhone}`} sx={{ color: brandColors.text, display: 'flex', alignItems: 'center', gap: 0.6, textDecoration: 'none', fontWeight: 600 }}>
+                            <FiPhone size={12} color={brandColors.primary} /> {booking.clientPhone}
+                          </Typography>
+                          <Typography variant="caption" component="a" href={`mailto:${booking.clientEmail}`} sx={{ color: brandColors.muted, display: 'flex', alignItems: 'center', gap: 0.6, textDecoration: 'none' }}>
+                            <FiMail size={12} /> {booking.clientEmail}
+                          </Typography>
+                        </Stack>
+
+                        <Divider sx={{ my: 1 }} />
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>
+                            📅 {booking.preferredDate}
+                          </Typography>
+
+                          <Stack direction="row" spacing={1}>
+                            {booking.status === 'PENDING' && (
+                              <Button size="small" variant="contained" color="success" onClick={() => handleStatusUpdate(booking.id, 'CONFIRMED')} sx={{ borderRadius: '8px', fontSize: '0.72rem', py: 0.3, px: 1 }}>
+                                Confirm
+                              </Button>
+                            )}
+                            {booking.status === 'CONFIRMED' && (
+                              <Button size="small" variant="outlined" color="primary" onClick={() => handleStatusUpdate(booking.id, 'COMPLETED')} sx={{ borderRadius: '8px', fontSize: '0.72rem', py: 0.3, px: 1 }}>
+                                Done
+                              </Button>
+                            )}
+                          </Stack>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Stack>
               ) : (
+                /* Desktop Table View */
                 <TableContainer>
                   <Table sx={{ minWidth: 600 }}>
                     <TableHead>
@@ -317,18 +374,18 @@ export default function TeamDashboard() {
             </Paper>
           </Grid>
 
-          {/* Team Directory & Quick Tools */}
+          {/* Quick Tools & Team Directory */}
           <Grid item xs={12} lg={4}>
             <Stack spacing={3}>
               {/* Quick Company SOPs Card */}
-              <Paper sx={{ p: 3, borderRadius: '24px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
-                  <FiFileText size={20} color={brandColors.primary} />
-                  <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+              <Paper sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 2 }}>
+                  <FiFileText size={18} color={brandColors.primary} />
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                     Quick Company Playbooks
                   </Typography>
                 </Box>
-                <Stack spacing={1.5}>
+                <Stack spacing={1.2}>
                   {[
                     { label: 'LinkedIn Optimization Standard (SOP-01)', href: '/team/resources' },
                     { label: 'Client Onboarding Consultation Protocol', href: '/team/resources' },
@@ -340,16 +397,17 @@ export default function TeamDashboard() {
                       to={sop.href}
                       variant="outlined"
                       fullWidth
-                      startIcon={<FiBookOpen size={16} />}
+                      startIcon={<FiBookOpen size={15} />}
                       sx={{
                         justifyContent: 'flex-start',
                         borderRadius: '12px',
-                        py: 1,
-                        px: 2,
+                        py: 0.9,
+                        px: 1.8,
                         textTransform: 'none',
-                        fontSize: '0.85rem',
+                        fontSize: '0.82rem',
                         borderColor: brandColors.border,
                         color: brandColors.text,
+                        textAlign: 'left',
                         '&:hover': { borderColor: brandColors.primary, color: brandColors.primary },
                       }}
                     >
@@ -360,33 +418,34 @@ export default function TeamDashboard() {
               </Paper>
 
               {/* Team Roster Card */}
-              <Paper sx={{ p: 3, borderRadius: '24px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
-                  <FiShield size={20} color="#7C3AED" />
-                  <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+              <Paper sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: '24px', border: `1px solid ${brandColors.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 2 }}>
+                  <FiShield size={18} color="#7C3AED" />
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                     BrandIt Team Directory
                   </Typography>
                 </Box>
-                <Stack spacing={2}>
+                <Stack spacing={1.5}>
                   {teamRoster.map((member) => (
-                    <Box key={member.name} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Avatar
-                        src={member.image}
-                        sx={{ width: 44, height: 44, border: `2px solid ${alpha(brandColors.primary, 0.2)}`, '& img': { objectFit: 'cover' } }}
-                      />
-                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text }}>
+                    <Box key={member.name} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Box sx={{ minWidth: 0, pr: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.85rem' }}>
                           {member.name}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block' }}>
+                        <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', fontSize: '0.72rem' }}>
                           {member.role}
                         </Typography>
                       </Box>
-                      <Tooltip title="Call Member">
-                        <IconButton component="a" href={`tel:${member.phone.replace(/\s+/g, '')}`} size="small" sx={{ color: brandColors.primary }}>
-                          <FiPhone size={14} />
-                        </IconButton>
-                      </Tooltip>
+                      <Button
+                        component="a"
+                        href={`tel:${member.phone.replace(/\s+/g, '')}`}
+                        size="small"
+                        variant="outlined"
+                        startIcon={<FiPhone size={12} />}
+                        sx={{ borderRadius: '8px', fontSize: '0.72rem', textTransform: 'none', px: 1.2, py: 0.3 }}
+                      >
+                        Call
+                      </Button>
                     </Box>
                   ))}
                 </Stack>

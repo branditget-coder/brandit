@@ -171,3 +171,13 @@ ALTER TABLE app_users ADD COLUMN IF NOT EXISTS phone VARCHAR(255) [42102-224]
 2026-08-15 11:40:36.197574+05:30 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]DO $$ DECLARE r RECORD; BEGIN   FOR r IN (     SELECT constraint_name     FROM information_schema.table_constraints     WHERE table_name = 'bookings' AND constraint_type = 'FOREIGN KEY'   ) LOOP     EXECUTE 'ALTER TABLE bookings DROP CONSTRAINT IF EXISTS ' || quote_ident(r.constraint_name);   END LOOP; END $$;"; expected "DELETE, DROP"; SQL statement:
 DO $$ DECLARE r RECORD; BEGIN   FOR r IN (     SELECT constraint_name     FROM information_schema.table_constraints     WHERE table_name = 'bookings' AND constraint_type = 'FOREIGN KEY'   ) LOOP     EXECUTE 'ALTER TABLE bookings DROP CONSTRAINT IF EXISTS ' || quote_ident(r.constraint_name);   END LOOP; END $$; [42001-224]
+2026-08-15 13:20:14.869925+05:30 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE verification_codes (\000d\000a    id BIGINT [*]AUTO_INCREMENT PRIMARY KEY,\000d\000a    code VARCHAR(255),\000d\000a    created_at TIMESTAMP,\000d\000a    email VARCHAR(255),\000d\000a    expires_at TIMESTAMP,\000d\000a    first_name VARCHAR(255)\000d\000a)"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+CREATE TABLE verification_codes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(255),
+    created_at TIMESTAMP,
+    email VARCHAR(255),
+    expires_at TIMESTAMP,
+    first_name VARCHAR(255)
+) [42001-224]
