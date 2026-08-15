@@ -3,37 +3,22 @@ import axios from 'axios'
 const getApiBaseUrl = () => {
   let rawUrl = import.meta.env.VITE_API_URL
 
-  // If in deployed/production browser environment (e.g. brandit.vercel.app)
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    // Only use VITE_API_URL if it is a valid remote URL (not localhost / 127.0.0.1)
-    if (rawUrl && rawUrl.trim() !== '' && rawUrl !== '/api' && !rawUrl.includes('localhost') && !rawUrl.includes('127.0.0.1')) {
-      let clean = rawUrl.trim()
-      if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
-        clean = `https://${clean}`
-      }
+  // If VITE_API_URL is explicitly set to a custom remote API domain (e.g. https://api.go-brandit.com)
+  if (rawUrl && rawUrl.trim() !== '' && rawUrl !== '/api') {
+    let clean = rawUrl.trim()
+    // Do not force direct browser connections to up.railway.app subdomains because mobile carriers (Jio/Airtel/Vi) block them
+    if ((clean.startsWith('http://') || clean.startsWith('https://')) && !clean.includes('up.railway.app')) {
       clean = clean.replace(/\/+$/, '')
       if (!clean.endsWith('/api')) {
         clean = `${clean}/api`
       }
       return clean
     }
-    // Default to Railway production backend URL for deployed site
-    return 'https://brandit-production-61bf.up.railway.app/api'
   }
 
-  // If running locally (localhost / 127.0.0.1)
-  if (rawUrl && rawUrl.trim() !== '' && rawUrl !== '/api') {
-    let clean = rawUrl.trim()
-    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
-      clean = `http://${clean}`
-    }
-    clean = clean.replace(/\/+$/, '')
-    if (!clean.endsWith('/api')) {
-      clean = `${clean}/api`
-    }
-    return clean
-  }
-
+  // Default to relative '/api' route.
+  // In Vercel production: Vercel proxies '/api/*' -> Railway backend server-to-server (bypassing mobile ISP blocks).
+  // In Vite local dev: Vite proxies '/api/*' -> localhost:8080.
   return '/api'
 }
 

@@ -62,16 +62,23 @@ public class EmailService {
 
             if (configured) {
                 auditLogs.add("Attempting send via strategy: " + name);
-                boolean sent = provider.send(to, subject, htmlBody, fromEmail);
-                if (sent) {
-                    auditLogs.add("SUCCESS: Email sent via " + name);
-                    return new EmailDispatchResult(true, name, auditLogs);
+                try {
+                    boolean sent = provider.send(to, subject, htmlBody, fromEmail);
+                    if (sent) {
+                        auditLogs.add("SUCCESS: Email sent via " + name);
+                        log.info("✅ EMAIL DISPATCH SUCCESS to: {} via provider: [{}]", to, name);
+                        return new EmailDispatchResult(true, name, auditLogs);
+                    }
+                    auditLogs.add("FAILED: Strategy " + name + " failed to send email. Trying next fallback...");
+                } catch (Exception e) {
+                    auditLogs.add("EXCEPTION in strategy " + name + ": " + e.getMessage());
+                    log.warn("⚠️ Exception during email dispatch via {}: {}", name, e.getMessage());
                 }
-                auditLogs.add("FAILED: Strategy " + name + " failed to send email. Trying next fallback...");
             }
         }
 
         auditLogs.add("CRITICAL: All available email strategies failed or were not configured.");
+        log.error("❌ CRITICAL EMAIL DISPATCH FAILURE to recipient: {}. Audit logs:\n{}", to, String.join("\n", auditLogs));
         return new EmailDispatchResult(false, "NONE", auditLogs);
     }
 

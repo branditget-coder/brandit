@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(1)
+@Order(4)
 @Slf4j
 public class SmtpEmailProvider implements EmailProviderStrategy {
 
@@ -44,9 +44,8 @@ public class SmtpEmailProvider implements EmailProviderStrategy {
             return false;
         }
         try {
-            String sender = (fromEmail != null && fromEmail.contains("@") && !fromEmail.contains("resend.dev"))
-                    ? fromEmail
-                    : mailUsername;
+            String senderAddr = (mailUsername != null && !mailUsername.isBlank()) ? mailUsername : "brandit.get@gmail.com";
+            String sender = "BrandIt Consulting <" + senderAddr + ">";
 
             log.info("Attempting email dispatch via JavaMailSender SMTP to: {} (Sender: {})", to, sender);
 

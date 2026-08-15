@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Order(2)
+@Order(1)
 @Slf4j
 public class BrevoEmailProvider implements EmailProviderStrategy {
 
