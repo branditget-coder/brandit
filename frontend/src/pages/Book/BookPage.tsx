@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Box, Container, Typography, Stepper, Step, StepLabel, Button, Alert, Paper } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -214,9 +214,19 @@ export default function BookPage() {
     }
   }
 
+  const topRef = useRef<HTMLDivElement>(null)
+
+  const scrollToTop = () => {
+    // Scroll the window to the absolute top
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // Also scroll the ref element into view as a fallback
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const handleNext = async () => {
     if (!isAuthenticated) {
       setShowAuthRequired(true)
+      scrollToTop()
       return
     }
 
@@ -227,10 +237,14 @@ export default function BookPage() {
 
     if (activeStep < steps.length - 1) {
       setActiveStep(s => s + 1)
+      scrollToTop()
     }
   }
 
-  const handleBack = () => setActiveStep(s => s - 1)
+  const handleBack = () => {
+    setActiveStep(s => s - 1)
+    scrollToTop()
+  }
 
   const canNext = () => {
     if (activeStep === 0) return !!selected.service
@@ -242,7 +256,7 @@ export default function BookPage() {
 
   if (!isAuthenticated && (showAuthRequired || activeStep > 0)) {
     return (
-      <Box sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background }}>
+      <Box ref={topRef} sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background, minHeight: '70vh', display: 'flex', alignItems: 'center' }}>
         <Container maxWidth="sm">
           <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: `1px solid ${brandColors.border}`, textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}>
             <Box sx={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, color: brandColors.primary }}>
@@ -294,7 +308,7 @@ export default function BookPage() {
   }
 
   return (
-    <Box sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background }}>
+    <Box ref={topRef} sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background }}>
       <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 } }}>
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6 } }}>
