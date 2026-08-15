@@ -24,8 +24,8 @@ export default function AboutPage() {
                 Personal Brand
               </Box>
             </Typography>
-            <Typography variant="body1" sx={{ color: brandColors.muted, maxWidth: 620, mx: 'auto', lineHeight: 1.8, fontSize: { xs: '0.95rem', sm: '1.05rem' } }}>
-              BrandIt was created with a clear mission: help professionals, job seekers, and entrepreneurs build authority through specialized LinkedIn profile setup, content strategy, and network outreach.
+            <Typography variant="body1" sx={{ color: brandColors.muted, maxWidth: 640, mx: 'auto', lineHeight: 1.8, fontSize: { xs: '0.95rem', sm: '1.05rem' } }}>
+              BrandIt (operated by legal entity <strong>RAGHAV DHIR</strong>) is a specialized <strong>Career & Personal Branding Consulting Services</strong> firm. Operating out of DeraBassi, Punjab, 140507, India, we help career professionals, job seekers, and executives build industry authority through structured profile setup, content publishing, and targeted network outreach.
             </Typography>
           </motion.div>
         </Container>

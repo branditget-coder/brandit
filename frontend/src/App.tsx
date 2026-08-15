@@ -20,6 +20,7 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import PrivacyPage from './pages/Legal/PrivacyPage'
 import TermsPage from './pages/Legal/TermsPage'
 import RefundPage from './pages/Legal/RefundPage'
+import ShippingPage from './pages/Legal/ShippingPage'
 
 // Dashboard
 import UserDashboard from './pages/dashboard/UserDashboard'
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/refund" element={<RefundPage />} />
+          <Route path="/shipping" element={<ShippingPage />} />
         </Route>
 
         {/* Auth Routes (Public Only - Redirects if already logged in) */}

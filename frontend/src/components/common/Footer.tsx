@@ -19,9 +19,10 @@ const footerLinks = {
     { label: 'Contact Us', href: '/contact' },
   ],
   Legal: [
+    { label: 'Terms & Conditions', href: '/terms' },
     { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Non-Refundable Policy', href: '/refund' },
+    { label: 'Return & Refund Policy', href: '/refund' },
+    { label: 'Shipping & Delivery Policy', href: '/shipping' },
   ],
 }
 
@@ -49,7 +50,7 @@ export default function Footer() {
             <Box sx={{ mb: 3 }}>
               <BrandLogo variant="light" size="large" showSlogan={true} />
               <Typography variant="body2" sx={{ color: '#9CA3AF', lineHeight: 1.7, maxWidth: 340, mt: 1.5 }}>
-                Professional personal branding, LinkedIn growth, and career consulting for job seekers and industry leaders.
+                Professional personal branding, LinkedIn growth, and career consulting. BrandIt is owned & operated by <strong>RAGHAV DHIR</strong>.
               </Typography>
             </Box>
 
@@ -95,32 +96,33 @@ export default function Footer() {
                   size="small"
                   sx={{
                     color: '#9CA3AF',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '10px',
                     width: 38,
                     height: 38,
                     '&:hover': {
                       color: '#fff',
+                      backgroundColor: brandColors.primary,
                       borderColor: brandColors.primary,
-                      backgroundColor: `${brandColors.primary}20`,
                     },
                     transition: 'all 0.2s ease',
                   }}
                 >
-                  <s.icon size={16} />
+                  <s.icon size={18} />
                 </IconButton>
               ))}
             </Box>
           </Grid>
 
           {/* Links Columns */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <Grid item xs={6} sm={4} md={2.5} key={title}>
+          {Object.entries(footerLinks).map(([category, links]) => (
+            <Grid item xs={6} sm={4} md={2.6} key={category}>
               <Typography
-                variant="caption"
-                sx={{ color: '#6B7280', display: 'block', mb: 2.5, letterSpacing: '0.08em', fontWeight: 700 }}
+                variant="subtitle2"
+                sx={{ color: '#fff', display: 'block', mb: 2.5, letterSpacing: '0.05em', fontWeight: 700 }}
               >
-                {title.toUpperCase()}
+                {category}
               </Typography>
               <Stack spacing={1.5}>
                 {links.map((link) => (
@@ -154,10 +156,10 @@ export default function Footer() {
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
           <Typography variant="body2" sx={{ color: '#6B7280' }}>
-            © {new Date().getFullYear()} BrandIt. All rights reserved. All transactions are non-refundable.
+            © {new Date().getFullYear()} BrandIt. Operated by <strong>RAGHAV DHIR</strong>. Operating Address: DeraBassi, Punjab, 140507, India.
           </Typography>
           <Typography variant="body2" sx={{ color: '#6B7280' }}>
-            Elevate your digital footprint with BrandIt.
+            Line of Business: Career & Personal Branding Consulting Services
           </Typography>
         </Box>
       </Container>

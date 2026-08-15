@@ -155,6 +155,16 @@ export default function ContactPage() {
             <Grid item xs={12} md={5}>
               <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
                 <Stack spacing={3}>
+                  {/* Registered Operating Address & Entity (PayU Requirement) */}
+                  <Box sx={{ p: 3, borderRadius: '20px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', boxShadow: '0 4px 16px rgba(0,0,0,0.02)' }}>
+                    <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 0.5, letterSpacing: '0.05em', fontWeight: 700 }}>LEGAL ENTITY & OPERATING ADDRESS</Typography>
+                    <Typography variant="subtitle2" sx={{ color: brandColors.text, fontWeight: 700, mb: 0.5 }}>RAGHAV DHIR (Trade Name: BrandIt)</Typography>
+                    <Typography variant="body2" sx={{ color: brandColors.muted, lineHeight: 1.6, fontSize: '0.875rem', mb: 1 }}>
+                      <strong>Line of Business:</strong> Career & Personal Branding Consulting Services<br />
+                      <strong>Operating Address:</strong> DeraBassi, Punjab, 140507, India
+                    </Typography>
+                  </Box>
+
                   {/* Email Card */}
                   <Box sx={{ p: 3, borderRadius: '20px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', boxShadow: '0 4px 16px rgba(0,0,0,0.02)' }}>
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

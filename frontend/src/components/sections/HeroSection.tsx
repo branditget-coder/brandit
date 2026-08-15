@@ -93,16 +93,23 @@ export default function HeroSection() {
                 variant="h1"
                 sx={{
                   mb: 3,
-                  fontSize: { xs: '2.1rem', sm: '2.8rem', md: '3.5rem' },
-                  lineHeight: { xs: 1.15, md: 1.1 },
-                  letterSpacing: '-0.03em',
+                  fontSize: { xs: '2.2rem', sm: '3rem', md: '3.75rem' },
+                  lineHeight: { xs: 1.2, md: 1.15 },
+                  letterSpacing: '-0.035em',
+                  fontWeight: 800,
                 }}
               >
                 Build Your Personal Brand &{' '}
                 <Box
                   component="span"
                   sx={{
-                    color: brandColors.primary,
+                    background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 50%, #3B82F6 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    display: 'inline-block',
+                    pb: '0.15em',
+                    mb: '-0.15em',
+                    pr: '0.05em',
                   }}
                 >
                   Network Engine.

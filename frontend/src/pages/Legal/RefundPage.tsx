@@ -1,44 +1,44 @@
 import { Box, Container, Typography, Alert } from '@mui/material'
 import { brandColors } from '../../theme'
-import { FiShieldOff } from 'react-icons/fi'
+import { FiRefreshCw } from 'react-icons/fi'
 
 export default function RefundPage() {
   return (
     <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: brandColors.background }}>
       <Container maxWidth="md">
-        <Typography variant="h1" sx={{ mb: 1.5, fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Non-Refundable Policy</Typography>
-        <Typography variant="body2" sx={{ color: brandColors.muted, mb: 4 }}>Last updated: July 2026</Typography>
+        <Typography variant="h1" sx={{ mb: 1.5, fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Return, Refund & Cancellation Policy</Typography>
+        <Typography variant="body2" sx={{ color: brandColors.muted, mb: 4 }}>Last updated: August 2026</Typography>
 
-        <Alert icon={<FiShieldOff size={22} />} severity="warning" sx={{ mb: 5, borderRadius: '16px', fontWeight: 600, fontSize: '0.95rem' }}>
-          Strict Policy Notice: All transactions, service packages, upfront fees, and monthly subscriptions at BrandIt are 100% NON-REFUNDABLE.
+        <Alert icon={<FiRefreshCw size={22} />} severity="info" sx={{ mb: 5, borderRadius: '16px', fontWeight: 600, fontSize: '0.95rem' }}>
+          BrandIt is operated by <strong>RAGHAV DHIR</strong>. We strive for 100% satisfaction in our Personal Branding & Career Consulting Services. Below are our official Refund & Cancellation guidelines.
         </Alert>
 
         <Box sx={{ p: { xs: 3, md: 5 }, borderRadius: '20px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff' }}>
           {[
             {
-              title: '1. Strict Non-Refundable Policy',
-              body: 'All payments made to BrandIt for Profile Setup (₹99), Personal Branding (₹320/mo), Network Growth Engine (₹400/mo), and LinkedIn Consulting (₹250/mo) are final and non-refundable. Once a payment is processed, work begins immediately and bandwidth is reserved.'
+              title: '1. Cancellation Policy & Duration',
+              body: 'Clients may request cancellation of any service package (Profile Setup ₹99, Personal Branding ₹320/mo, Growth Engine ₹400/mo, or Consulting ₹250/mo) within 24 hours of placing the order or at least 24 hours prior to a scheduled 1-on-1 consultation session. For monthly subscription programs, clients may cancel upcoming renewal cycles at any time before the billing date.'
             },
             {
-              title: '2. No Chargebacks or Reversals',
-              body: 'Clients agree not to initiate chargebacks, dispute transactions, or request payment reversals with banks or payment gateways (Stripe/Razorpay). Any unauthorized chargeback will be contested with full documentation of service agreement.'
+              title: '2. Refund Request Duration & Eligibility',
+              body: 'Refund requests must be submitted within 24 hours of transaction completion via email to brandit.get@gmail.com. If service execution (profile structural audit, content writing, or custom strategy roadmap) has not yet commenced, a full refund will be granted. Once custom strategy work or profile optimization has been delivered, partial refunds or service revisions will be evaluated on a case-by-case basis.'
             },
             {
-              title: '3. Monthly Subscription Cancellation',
-              body: 'For recurring monthly programs (₹320/mo, ₹400/mo, ₹250/mo), clients may cancel upcoming renewal cycles at any time before the next billing date. However, payments for the current billing cycle already charged will not be refunded.'
+              title: '3. Refund Mode & Processing Timeline',
+              body: 'All approved refunds will be credited back to the customer’s original mode of payment (Credit Card, Debit Card, Net Banking, UPI, or Wallet) via PayU Payment Gateway. Refunds are processed within 5 to 7 working days from the date of refund approval.'
             },
             {
-              title: '4. Service Deliverables & Revisions',
-              body: 'If you are not satisfied with specific post copy or profile suggestions, our team will work with you to revise and align content within the scope of your purchased service package.'
+              title: '4. Service Revisions & Support Guarantee',
+              body: 'If you are dissatisfied with specific post drafts, profile headline copy, or strategy blueprints, our team provides up to 2 rounds of complimentary revisions to ensure complete alignment with your career goals.'
             },
             {
-              title: '5. Contact Support',
-              body: 'For any questions or clarification regarding your account, please reach out to our Customer Handling team (Kritika Dhawan: +91 6284318951) or email brandit.get@gmail.com.'
+              title: '5. Operating Address & Customer Contact',
+              body: 'For any cancellation or refund inquiries, please contact our operating team:\n• Operating Legal Entity: RAGHAV DHIR (Trade Name: BrandIt)\n• Operating Address: DeraBassi, Punjab, 140507, India\n• Support Email: brandit.get@gmail.com\n• Phone / WhatsApp: +91 8708231539 / +91 6284318951'
             },
           ].map(s => (
             <Box key={s.title} sx={{ mb: 4, '&:last-child': { mb: 0 } }}>
               <Typography variant="h5" sx={{ mb: 1.5, color: brandColors.text, fontWeight: 700 }}>{s.title}</Typography>
-              <Typography variant="body1" sx={{ lineHeight: 1.8, color: brandColors.muted, fontSize: '0.95rem' }}>{s.body}</Typography>
+              <Typography variant="body1" sx={{ lineHeight: 1.8, color: brandColors.muted, fontSize: '0.95rem', whiteSpace: 'pre-line' }}>{s.body}</Typography>
             </Box>
           ))}
         </Box>

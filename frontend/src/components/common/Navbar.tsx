@@ -61,9 +61,7 @@ export default function Navbar() {
             <Toolbar disableGutters sx={{ minHeight: { xs: 52, md: 56 }, justifyContent: 'space-between' }}>
               {/* Logo */}
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <RouterLink to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                  <BrandLogo variant="dark" size="medium" />
-                </RouterLink>
+                <BrandLogo variant="dark" size="medium" />
               </motion.div>
 
               {/* Desktop Nav Links */}
