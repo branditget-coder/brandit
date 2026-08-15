@@ -329,7 +329,7 @@ export default function AdminWeeklyInsights() {
                 <Box sx={{ p: 5, textAlign: 'center' }}>
                   <FiUsers size={32} color={brandColors.muted} style={{ marginBottom: 12 }} />
                   <Typography variant="h6" sx={{ color: brandColors.text, mb: 0.5 }}>No opted-in accounts match your search</Typography>
-                  <Typography variant="body2" sx={{ color: brandColors.muted }}>Users can subscribe via the website newsletter form or registration preferences.</Typography>
+                  <Typography variant="body2" sx={{ color: brandColors.muted }}>All registered accounts are automatically enrolled in weekly career insights on signup.</Typography>
                 </Box>
               ) : (
                 filteredSubscribers.map((sub, i) => {

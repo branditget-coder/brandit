@@ -5,7 +5,7 @@ import WhyBrandItSection from '../../components/sections/WhyBrandItSection'
 import TeamSection from '../../components/sections/TeamSection'
 import PricingSection from '../../components/sections/PricingSection'
 import FAQSection from '../../components/sections/FAQSection'
-import NewsletterSection from '../../components/sections/NewsletterSection'
+
 import CTABannerSection from '../../components/sections/CTABannerSection'
 
 export default function LandingPage() {
@@ -18,7 +18,7 @@ export default function LandingPage() {
       <TeamSection />
       <PricingSection />
       <FAQSection />
-      <NewsletterSection />
+
       <CTABannerSection />
     </>
   )

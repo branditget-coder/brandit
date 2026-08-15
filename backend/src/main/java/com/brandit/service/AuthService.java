@@ -1,8 +1,10 @@
 package com.brandit.service;
 
 import com.brandit.dto.AuthDtos.*;
+import com.brandit.entity.Newsletter;
 import com.brandit.entity.User;
 import com.brandit.entity.UserActivityLog;
+import com.brandit.repository.NewsletterRepository;
 import com.brandit.repository.UserActivityLogRepository;
 import com.brandit.repository.UserRepository;
 import com.brandit.security.JwtTokenProvider;
@@ -25,6 +27,7 @@ public class AuthService {
     private final JwtTokenProvider tokenProvider;
     private final UserActivityLogRepository activityLogRepository;
     private final EmailService emailService;
+    private final NewsletterRepository newsletterRepository;
 
     public static final java.util.List<String> ALLOWED_TEAM_EMAILS = java.util.List.of(
             "raghavdhir1510@gmail.com",    // Raghav Dhir (Lead Admin)
@@ -135,13 +138,22 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        // Auto-enroll every new registrant in Weekly Career Insights (mandatory)
+        if (!newsletterRepository.existsByEmail(email)) {
+            Newsletter subscription = Newsletter.builder()
+                    .email(email)
+                    .active(true)
+                    .build();
+            newsletterRepository.save(subscription);
+        }
+
         activityLogRepository.save(UserActivityLog.builder()
                 .user(savedUser)
                 .action("USER_REGISTER")
                 .metadataJson("Registered via local email: " + savedUser.getEmail())
                 .build());
 
-        // Dispatch HTML Welcome Email
+        // Dispatch HTML Welcome Email (includes weekly insights enrolment notice)
         emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getFullName(), savedUser.getRole().name());
 
         String accessToken = tokenProvider.generateAccessToken(savedUser.getEmail());
@@ -186,7 +198,9 @@ public class AuthService {
     @Transactional
     public AuthResponse loginWithSocial(String rawEmail, String firstName, String lastName, User.AuthProvider provider, String providerId) {
         String email = cleanEmail(rawEmail);
+        boolean[] isNewUser = {false};
         User user = userRepository.findByEmailIgnoreCase(email).orElseGet(() -> {
+            isNewUser[0] = true;
             User newUser = User.builder()
                     .firstName(firstName != null ? firstName : "User")
                     .lastName(lastName != null ? lastName : "")
@@ -198,6 +212,16 @@ public class AuthService {
                     .build();
             return userRepository.save(newUser);
         });
+
+        // Auto-enroll new social login users in Weekly Career Insights (mandatory)
+        if (isNewUser[0] && !newsletterRepository.existsByEmail(email)) {
+            Newsletter subscription = Newsletter.builder()
+                    .email(email)
+                    .active(true)
+                    .build();
+            newsletterRepository.save(subscription);
+            emailService.sendWelcomeEmail(email, user.getFullName(), user.getRole().name());
+        }
 
         activityLogRepository.save(UserActivityLog.builder()
                 .user(user)
