@@ -36,7 +36,7 @@ const featurePillars = [
     title: 'Personal Branding',
     desc: '8 strategy-backed posts & custom content monthly',
     tag: 'Best Value',
-    badge: '📈 5x Reach Engine',
+    badge: '📈 Steady Reach Growth',
     price: '₹320',
     unit: '/mo',
     color: '#0D9488',
@@ -72,12 +72,12 @@ export default function HeroSection() {
   return (
     <Box
       sx={{
-        pt: { xs: 10, sm: 12, md: 14 },
-        pb: { xs: 8, sm: 10, md: 14 },
+        pt: { xs: 8, sm: 11, md: 14 },
+        pb: { xs: 7, sm: 10, md: 14 },
         position: 'relative',
         overflow: 'hidden',
         backgroundColor: brandColors.background,
-        // Engineering dot-grid ambient backdrop
+        // Ambient engineering dot-grid
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -96,42 +96,42 @@ export default function HeroSection() {
           position: 'absolute',
           top: '-15%',
           right: '-10%',
-          width: { xs: 320, md: 540 },
-          height: { xs: 320, md: 540 },
+          width: { xs: 260, sm: 380, md: 540 },
+          height: { xs: 260, sm: 380, md: 540 },
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(brandColors.primary, 0.1)} 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${alpha(brandColors.primary, 0.08)} 0%, transparent 70%)`,
           filter: 'blur(50px)',
           pointerEvents: 'none',
         },
       }}
     >
-      <Container maxWidth="lg" sx={{ px: { xs: 2.5, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={{ xs: 5, md: 6 }} alignItems="center">
+      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={{ xs: 4, sm: 5, md: 6 }} alignItems="center">
           {/* Left Column: Copy & Actions */}
           <Grid item xs={12} md={6}>
             {/* Pill Badge */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" sx={{ mb: 3, gap: 1 }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" sx={{ mb: { xs: 2.5, sm: 3 }, gap: 1 }}>
                 <Box
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 1,
-                    px: { xs: 2, sm: 2.5 },
-                    py: { xs: 1, sm: 1.25 },
-                    fontSize: { xs: '0.775rem', sm: '0.85rem' },
+                    px: { xs: 1.75, sm: 2.5 },
+                    py: { xs: 0.85, sm: 1.15 },
+                    fontSize: { xs: '0.74rem', sm: '0.84rem' },
                     fontWeight: 700,
                     backgroundColor: alpha(brandColors.primary, 0.08),
                     color: brandColors.primary,
                     border: `1px solid ${alpha(brandColors.primary, 0.22)}`,
                     borderRadius: '100px',
                     maxWidth: '100%',
-                    lineHeight: 1.45,
-                    boxShadow: `0 4px 16px ${alpha(brandColors.primary, 0.08)}`,
+                    lineHeight: 1.4,
+                    boxShadow: `0 4px 16px ${alpha(brandColors.primary, 0.06)}`,
                     wordBreak: 'break-word',
                     textAlign: 'left',
                   }}
@@ -139,12 +139,13 @@ export default function HeroSection() {
                   <Box
                     component="span"
                     sx={{
-                      width: 8,
-                      height: 8,
+                      width: 7,
+                      height: 7,
                       borderRadius: '50%',
                       backgroundColor: brandColors.success,
                       display: 'inline-block',
-                      boxShadow: `0 0 8px ${brandColors.success}`,
+                      boxShadow: `0 0 6px ${brandColors.success}`,
+                      flexShrink: 0,
                     }}
                   />
                   Your Profile, Your Brand, Your Opportunity — Plans From ₹99
@@ -154,15 +155,15 @@ export default function HeroSection() {
 
             {/* Headline */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               <Typography
                 variant="h1"
                 sx={{
-                  mb: 3,
-                  fontSize: { xs: '2.2rem', sm: '3rem', md: '3.75rem' },
+                  mb: { xs: 2, sm: 3 },
+                  fontSize: { xs: '2rem', sm: '2.85rem', md: '3.6rem' },
                   lineHeight: { xs: 1.2, md: 1.15 },
                   letterSpacing: '-0.035em',
                   fontWeight: 800,
@@ -188,7 +189,7 @@ export default function HeroSection() {
 
             {/* Subheading */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
@@ -196,10 +197,10 @@ export default function HeroSection() {
                 variant="subtitle1"
                 sx={{
                   color: brandColors.muted,
-                  mb: 4,
+                  mb: { xs: 3, sm: 4 },
                   maxWidth: 520,
-                  lineHeight: 1.7,
-                  fontSize: { xs: '0.95rem', sm: '1.05rem' },
+                  lineHeight: 1.65,
+                  fontSize: { xs: '0.9rem', sm: '1.02rem' },
                 }}
               >
                 From profile overhaul to 8 monthly strategy posts and active cold outreach campaigns. Clear, accessible packages built to turn your LinkedIn profile into continuous inbound opportunities.
@@ -208,11 +209,11 @@ export default function HeroSection() {
 
             {/* Highlights */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <Stack direction="row" flexWrap="wrap" gap={1.5} sx={{ mb: 4 }}>
+              <Stack direction="row" flexWrap="wrap" gap={{ xs: 1, sm: 1.5 }} sx={{ mb: { xs: 3, sm: 4 } }}>
                 {highlights.map((h) => (
                   <Box
                     key={h}
@@ -220,15 +221,15 @@ export default function HeroSection() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 0.75,
-                      px: 1.25,
-                      py: 0.5,
+                      px: { xs: 1, sm: 1.25 },
+                      py: 0.45,
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                      border: '1px solid rgba(226, 232, 240, 0.8)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                      border: '1px solid rgba(226, 232, 240, 0.85)',
                     }}
                   >
-                    <FiCheckCircle size={15} color={brandColors.success} />
-                    <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 600, fontSize: { xs: '0.82rem', sm: '0.88rem' } }}>
+                    <FiCheckCircle size={14} color={brandColors.success} style={{ flexShrink: 0 }} />
+                    <Typography variant="body2" sx={{ color: brandColors.text, fontWeight: 600, fontSize: { xs: '0.78rem', sm: '0.86rem' } }}>
                       {h}
                     </Typography>
                   </Box>
@@ -238,11 +239,11 @@ export default function HeroSection() {
 
             {/* Luminous CTAs */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: '100%' }}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.75} sx={{ width: '100%' }}>
                 <Button
                   component={RouterLink}
                   to="/book"
@@ -250,18 +251,18 @@ export default function HeroSection() {
                   size="large"
                   endIcon={<FiArrowRight />}
                   sx={{
-                    px: 4,
-                    py: 1.6,
+                    px: { xs: 3, sm: 4 },
+                    py: 1.5,
                     width: { xs: '100%', sm: 'auto' },
-                    minHeight: 50,
-                    fontSize: '0.98rem',
+                    minHeight: 48,
+                    fontSize: { xs: '0.92rem', sm: '0.98rem' },
                     fontWeight: 700,
                     background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
-                    boxShadow: '0 8px 24px -2px rgba(10, 102, 194, 0.38), 0 2px 6px rgba(10, 102, 194, 0.18)',
+                    boxShadow: '0 8px 24px -2px rgba(10, 102, 194, 0.35)',
                     transition: 'all 0.25s ease',
                     '&:hover': {
                       background: 'linear-gradient(135deg, #0850A0 0%, #1D4ED8 100%)',
-                      boxShadow: '0 14px 32px -2px rgba(10, 102, 194, 0.52), 0 4px 12px rgba(10, 102, 194, 0.24)',
+                      boxShadow: '0 14px 30px -2px rgba(10, 102, 194, 0.48)',
                       transform: 'translateY(-2px)',
                     },
                   }}
@@ -274,11 +275,11 @@ export default function HeroSection() {
                   variant="outlined"
                   size="large"
                   sx={{
-                    px: 4,
-                    py: 1.6,
+                    px: { xs: 3, sm: 4 },
+                    py: 1.5,
                     width: { xs: '100%', sm: 'auto' },
-                    minHeight: 50,
-                    fontSize: '0.98rem',
+                    minHeight: 48,
+                    fontSize: { xs: '0.92rem', sm: '0.98rem' },
                     fontWeight: 600,
                     backgroundColor: 'rgba(255, 255, 255, 0.85)',
                     backdropFilter: 'blur(8px)',
@@ -289,7 +290,7 @@ export default function HeroSection() {
                       borderColor: brandColors.primary,
                       backgroundColor: '#FFFFFF',
                       color: brandColors.primary,
-                      boxShadow: '0 8px 22px -2px rgba(15, 23, 42, 0.08)',
+                      boxShadow: '0 8px 20px -2px rgba(15, 23, 42, 0.08)',
                       transform: 'translateY(-2px)',
                     },
                   }}
@@ -299,17 +300,17 @@ export default function HeroSection() {
               </Stack>
             </motion.div>
 
-            {/* Core Feature Pillars (Upgraded with Featured Ribbon & Micro-Badges) */}
+            {/* Core Feature Pillars */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <Grid container spacing={{ xs: 1.75, sm: 2 }} sx={{ mt: { xs: 3.5, sm: 4.5 } }}>
+              <Grid container spacing={{ xs: 1.5, sm: 2 }} sx={{ mt: { xs: 3, sm: 4 } }}>
                 {featurePillars.map((p) => (
                   <Grid item xs={12} sm={4} key={p.title}>
                     <motion.div
-                      whileHover={{ y: -5 }}
+                      whileHover={{ y: -4 }}
                       transition={{ duration: 0.2, ease: 'easeOut' }}
                       style={{ height: '100%' }}
                     >
@@ -318,7 +319,7 @@ export default function HeroSection() {
                         to={p.to}
                         sx={{
                           textDecoration: 'none',
-                          p: { xs: 2, sm: 2 },
+                          p: { xs: 1.75, sm: 2 },
                           borderRadius: '16px',
                           border: p.featured
                             ? `1.5px solid ${p.color}`
@@ -327,7 +328,7 @@ export default function HeroSection() {
                             ? 'linear-gradient(180deg, #FFFFFF 0%, #F0FDFA 100%)'
                             : 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
                           boxShadow: p.featured
-                            ? `0 6px 20px -2px ${alpha(p.color, 0.18)}, 0 2px 6px rgba(15, 23, 42, 0.04)`
+                            ? `0 6px 20px -2px ${alpha(p.color, 0.16)}, 0 2px 6px rgba(15, 23, 42, 0.04)`
                             : '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
                           height: '100%',
                           display: 'flex',
@@ -339,7 +340,7 @@ export default function HeroSection() {
                           cursor: 'pointer',
                           '&:hover': {
                             borderColor: p.color,
-                            boxShadow: `0 14px 28px -4px ${alpha(p.color, 0.22)}, 0 2px 8px -1px rgba(15, 23, 42, 0.04)`,
+                            boxShadow: `0 12px 24px -4px ${alpha(p.color, 0.2)}, 0 2px 8px -1px rgba(15, 23, 42, 0.04)`,
                             background: '#FFFFFF',
                             '& .arrow-icon': {
                               transform: 'translate(2px, -2px)',
@@ -349,13 +350,13 @@ export default function HeroSection() {
                         }}
                       >
                         {/* Top Row: Icon Badge + Category Tag */}
-                        <Box sx={{ mb: 1.5 }}>
-                          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+                        <Box sx={{ mb: 1.25 }}>
+                          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
                             <Box
                               sx={{
-                                width: 36,
-                                height: 36,
-                                borderRadius: '10px',
+                                width: 34,
+                                height: 34,
+                                borderRadius: '9px',
                                 backgroundColor: p.bgColor,
                                 color: p.color,
                                 display: 'flex',
@@ -363,23 +364,21 @@ export default function HeroSection() {
                                 justifyContent: 'center',
                                 border: `1px solid ${p.borderColor}`,
                                 flexShrink: 0,
-                                boxShadow: `0 2px 6px ${alpha(p.color, 0.12)}`,
                               }}
                             >
                               {p.icon}
                             </Box>
                             <Box
                               sx={{
-                                px: 1,
-                                py: 0.35,
+                                px: 0.9,
+                                py: 0.3,
                                 borderRadius: '6px',
                                 backgroundColor: p.featured ? p.color : alpha(p.color, 0.08),
                                 color: p.featured ? '#FFFFFF' : p.color,
-                                fontSize: '0.66rem',
+                                fontSize: '0.64rem',
                                 fontWeight: 750,
                                 letterSpacing: '0.03em',
                                 textTransform: 'uppercase',
-                                boxShadow: p.featured ? `0 2px 8px ${alpha(p.color, 0.3)}` : 'none',
                               }}
                             >
                               {p.tag}
@@ -391,9 +390,9 @@ export default function HeroSection() {
                             variant="subtitle2"
                             sx={{
                               fontWeight: 750,
-                              fontSize: { xs: '0.88rem', sm: '0.9rem' },
+                              fontSize: { xs: '0.86rem', sm: '0.88rem' },
                               color: brandColors.text,
-                              mb: 0.5,
+                              mb: 0.4,
                               lineHeight: 1.3,
                             }}
                           >
@@ -405,10 +404,10 @@ export default function HeroSection() {
                             variant="caption"
                             sx={{
                               color: brandColors.muted,
-                              lineHeight: 1.45,
+                              lineHeight: 1.4,
                               display: 'block',
-                              fontSize: { xs: '0.76rem', sm: '0.78rem' },
-                              mb: 1,
+                              fontSize: { xs: '0.74rem', sm: '0.76rem' },
+                              mb: 0.9,
                             }}
                           >
                             {p.desc}
@@ -419,12 +418,12 @@ export default function HeroSection() {
                             sx={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              px: 0.85,
-                              py: 0.25,
+                              px: 0.8,
+                              py: 0.2,
                               borderRadius: '4px',
                               backgroundColor: alpha(p.color, 0.06),
                               color: p.color,
-                              fontSize: '0.68rem',
+                              fontSize: '0.66rem',
                               fontWeight: 600,
                             }}
                           >
@@ -435,8 +434,8 @@ export default function HeroSection() {
                         {/* Bottom Row: Price & Action */}
                         <Box
                           sx={{
-                            pt: 1.25,
-                            mt: 1,
+                            pt: 1,
+                            mt: 0.75,
                             borderTop: '1px dashed rgba(226, 232, 240, 0.9)',
                             display: 'flex',
                             alignItems: 'center',
@@ -447,7 +446,7 @@ export default function HeroSection() {
                             <Typography
                               sx={{
                                 fontWeight: 800,
-                                fontSize: '0.98rem',
+                                fontSize: '0.95rem',
                                 color: brandColors.text,
                                 letterSpacing: '-0.02em',
                               }}
@@ -456,7 +455,7 @@ export default function HeroSection() {
                             </Typography>
                             <Typography
                               sx={{
-                                fontSize: '0.7rem',
+                                fontSize: '0.68rem',
                                 color: brandColors.muted,
                                 fontWeight: 500,
                               }}
@@ -474,7 +473,7 @@ export default function HeroSection() {
                               transition: 'all 0.2s ease',
                             }}
                           >
-                            <FiArrowUpRight size={16} />
+                            <FiArrowUpRight size={15} />
                           </Box>
                         </Box>
                       </Box>
@@ -485,34 +484,41 @@ export default function HeroSection() {
             </motion.div>
           </Grid>
 
-          {/* Right Column: Premium Creator Growth & Analytics Showcase */}
+          {/* Right Column: Mobile-Responsive Creator Growth Card Showcase */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ position: 'relative', py: { xs: 2, md: 4 } }}>
+            <Box
+              sx={{
+                position: 'relative',
+                py: { xs: 2, sm: 3, md: 4 },
+                px: { xs: 0.5, sm: 1 },
+                maxWidth: '100%',
+              }}
+            >
               {/* Main Dashboard Card */}
               <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                initial={{ opacity: 0, y: 24, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.7, delay: 0.25, ease: 'easeOut' }}
+                transition={{ duration: 0.65, delay: 0.25, ease: 'easeOut' }}
               >
                 <Box
                   sx={{
-                    background: 'linear-gradient(165deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.92) 100%)',
+                    background: 'linear-gradient(165deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.94) 100%)',
                     backdropFilter: 'blur(16px)',
-                    borderRadius: '24px',
-                    p: { xs: 2.5, sm: 3.5 },
+                    borderRadius: { xs: '18px', sm: '24px' },
+                    p: { xs: 2, sm: 2.75, md: 3.25 },
                     border: '1.5px solid rgba(255, 255, 255, 0.9)',
-                    boxShadow: `0 24px 60px -12px ${alpha(brandColors.primary, 0.18)}, 0 8px 24px -4px rgba(15, 23, 42, 0.06)`,
+                    boxShadow: `0 20px 50px -12px ${alpha(brandColors.primary, 0.16)}, 0 4px 16px -2px rgba(15, 23, 42, 0.05)`,
                     position: 'relative',
                   }}
                 >
                   {/* Card Header: Creator Profile */}
-                  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-                    <Stack direction="row" spacing={1.75} alignItems="center">
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: { xs: 2, sm: 2.75 } }}>
+                    <Stack direction="row" spacing={{ xs: 1.25, sm: 1.75 }} alignItems="center">
                       <Box
                         sx={{
                           position: 'relative',
-                          width: 48,
-                          height: 48,
+                          width: { xs: 40, sm: 46 },
+                          height: { xs: 40, sm: 46 },
                           borderRadius: '50%',
                           background: 'linear-gradient(135deg, #0A66C2 0%, #3B82F6 100%)',
                           display: 'flex',
@@ -520,78 +526,81 @@ export default function HeroSection() {
                           justifyContent: 'center',
                           color: '#FFFFFF',
                           fontWeight: 800,
-                          fontSize: '1.1rem',
-                          boxShadow: '0 4px 14px rgba(10, 102, 194, 0.3)',
+                          fontSize: { xs: '0.95rem', sm: '1.05rem' },
+                          boxShadow: '0 4px 12px rgba(10, 102, 194, 0.25)',
+                          flexShrink: 0,
                         }}
                       >
                         AS
-                        {/* Live active indicator */}
                         <Box
                           sx={{
                             position: 'absolute',
-                            bottom: 1,
-                            right: 1,
-                            width: 12,
-                            height: 12,
+                            bottom: 0,
+                            right: 0,
+                            width: 10,
+                            height: 10,
                             borderRadius: '50%',
                             backgroundColor: '#22C55E',
                             border: '2px solid #FFFFFF',
                           }}
                         />
                       </Box>
-                      <Box>
+                      <Box sx={{ minWidth: 0 }}>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
-                          <Typography sx={{ fontWeight: 800, fontSize: '0.98rem', color: brandColors.text }}>
+                          <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.88rem', sm: '0.96rem' }, color: brandColors.text, noWrap: true }}>
                             Arjun Sharma
                           </Typography>
-                          <FiAward size={15} color="#0A66C2" title="LinkedIn Top Voice" />
+                          <FiAward size={14} color="#0A66C2" />
                         </Stack>
-                        <Typography sx={{ fontSize: '0.75rem', color: brandColors.muted, fontWeight: 500 }}>
-                          Tech Founder • LinkedIn Top Voice
+                        <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.muted, fontWeight: 500, noWrap: true }}>
+                          Founder • LinkedIn Top Voice
                         </Typography>
                       </Box>
                     </Stack>
 
                     <Box
                       sx={{
-                        px: 1.25,
-                        py: 0.5,
+                        px: { xs: 1, sm: 1.25 },
+                        py: 0.4,
                         borderRadius: '100px',
                         backgroundColor: '#EFF6FF',
                         border: '1px solid #BFDBFE',
                         color: brandColors.primary,
-                        fontSize: '0.72rem',
+                        fontSize: { xs: '0.66rem', sm: '0.72rem' },
                         fontWeight: 700,
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
+                        flexShrink: 0,
                       }}
                     >
-                      <FiZap size={13} />
-                      Engine Active
+                      <FiZap size={12} />
+                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Engine Active</Box>
+                      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Active</Box>
                     </Box>
                   </Stack>
 
-                  {/* 3-Column Key Growth Metrics */}
-                  <Grid container spacing={1.5} sx={{ mb: 3 }}>
+                  {/* 3-Column Grounded Growth Metrics (Realistic Percentages) */}
+                  <Grid container spacing={{ xs: 1, sm: 1.5 }} sx={{ mb: { xs: 2, sm: 2.5 } }}>
                     <Grid item xs={4}>
                       <Box
                         sx={{
-                          p: 1.5,
-                          borderRadius: '14px',
+                          p: { xs: 1, sm: 1.35 },
+                          borderRadius: '12px',
                           backgroundColor: '#FFFFFF',
                           border: '1px solid rgba(226, 232, 240, 0.8)',
                           boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
+                          textAlign: 'center',
                         }}
                       >
-                        <Typography sx={{ fontSize: '0.7rem', color: brandColors.muted, fontWeight: 600, mb: 0.25 }}>
-                          Impressions
+                        <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.7rem' }, color: brandColors.muted, fontWeight: 600, mb: 0.2 }}>
+                          Reach
                         </Typography>
-                        <Typography sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
-                          148.5K
+                        <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.15rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
+                          +45%
                         </Typography>
-                        <Typography sx={{ fontSize: '0.68rem', color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.25, mt: 0.25 }}>
-                          <FiTrendingUp size={11} /> +340%
+                        <Typography sx={{ fontSize: { xs: '0.62rem', sm: '0.68rem' }, color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25, mt: 0.2 }}>
+                          <FiTrendingUp size={10} /> MoM
                         </Typography>
                       </Box>
                     </Grid>
@@ -599,21 +608,22 @@ export default function HeroSection() {
                     <Grid item xs={4}>
                       <Box
                         sx={{
-                          p: 1.5,
-                          borderRadius: '14px',
+                          p: { xs: 1, sm: 1.35 },
+                          borderRadius: '12px',
                           backgroundColor: '#FFFFFF',
                           border: '1px solid rgba(226, 232, 240, 0.8)',
                           boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
+                          textAlign: 'center',
                         }}
                       >
-                        <Typography sx={{ fontSize: '0.7rem', color: brandColors.muted, fontWeight: 600, mb: 0.25 }}>
-                          Profile Visits
+                        <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.7rem' }, color: brandColors.muted, fontWeight: 600, mb: 0.2 }}>
+                          Profile Views
                         </Typography>
-                        <Typography sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
-                          14.2K
+                        <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.15rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
+                          +58%
                         </Typography>
-                        <Typography sx={{ fontSize: '0.68rem', color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.25, mt: 0.25 }}>
-                          <FiTrendingUp size={11} /> +185%
+                        <Typography sx={{ fontSize: { xs: '0.62rem', sm: '0.68rem' }, color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25, mt: 0.2 }}>
+                          <FiTrendingUp size={10} /> MoM
                         </Typography>
                       </Box>
                     </Grid>
@@ -621,21 +631,22 @@ export default function HeroSection() {
                     <Grid item xs={4}>
                       <Box
                         sx={{
-                          p: 1.5,
-                          borderRadius: '14px',
+                          p: { xs: 1, sm: 1.35 },
+                          borderRadius: '12px',
                           backgroundColor: '#FFFFFF',
                           border: '1px solid rgba(226, 232, 240, 0.8)',
                           boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
+                          textAlign: 'center',
                         }}
                       >
-                        <Typography sx={{ fontSize: '0.7rem', color: brandColors.muted, fontWeight: 600, mb: 0.25 }}>
-                          Inbound Leads
+                        <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.7rem' }, color: brandColors.muted, fontWeight: 600, mb: 0.2 }}>
+                          Inbounds
                         </Typography>
-                        <Typography sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
-                          38 Leads
+                        <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.15rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
+                          +35%
                         </Typography>
-                        <Typography sx={{ fontSize: '0.68rem', color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.25, mt: 0.25 }}>
-                          <FiTrendingUp size={11} /> +92%
+                        <Typography sx={{ fontSize: { xs: '0.62rem', sm: '0.68rem' }, color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25, mt: 0.2 }}>
+                          <FiTrendingUp size={10} /> MoM
                         </Typography>
                       </Box>
                     </Grid>
@@ -644,49 +655,46 @@ export default function HeroSection() {
                   {/* Growth Curve Chart Graphic */}
                   <Box
                     sx={{
-                      p: 2,
-                      borderRadius: '16px',
+                      p: { xs: 1.5, sm: 1.75 },
+                      borderRadius: '14px',
                       backgroundColor: '#FFFFFF',
                       border: '1px solid rgba(226, 232, 240, 0.8)',
-                      mb: 2.5,
+                      mb: { xs: 1.75, sm: 2.25 },
                       position: 'relative',
                       overflow: 'hidden',
                     }}
                   >
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: brandColors.text }}>
-                        30-Day Reach Growth
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                      <Typography sx={{ fontSize: { xs: '0.72rem', sm: '0.76rem' }, fontWeight: 700, color: brandColors.text }}>
+                        Monthly Engagement Trend
                       </Typography>
-                      <Typography sx={{ fontSize: '0.7rem', color: brandColors.primary, fontWeight: 700 }}>
-                        +5.2x Faster
+                      <Typography sx={{ fontSize: { xs: '0.66rem', sm: '0.7rem' }, color: brandColors.primary, fontWeight: 700 }}>
+                        +45% Consistent Growth
                       </Typography>
                     </Stack>
 
                     {/* SVG Sparkline Curve */}
-                    <Box sx={{ width: '100%', height: 60 }}>
-                      <svg viewBox="0 0 320 60" width="100%" height="100%" preserveAspectRatio="none">
+                    <Box sx={{ width: '100%', height: { xs: 44, sm: 54 } }}>
+                      <svg viewBox="0 0 320 54" width="100%" height="100%" preserveAspectRatio="none">
                         <defs>
                           <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#0A66C2" stopOpacity="0.28" />
+                            <stop offset="0%" stopColor="#0A66C2" stopOpacity="0.25" />
                             <stop offset="100%" stopColor="#0A66C2" stopOpacity="0.0" />
                           </linearGradient>
                         </defs>
-                        {/* Area fill */}
                         <path
-                          d="M0,52 Q40,48 80,42 T160,32 T240,16 T320,4 L320,60 L0,60 Z"
+                          d="M0,46 Q40,42 80,38 T160,28 T240,16 T320,6 L320,54 L0,54 Z"
                           fill="url(#growthGradient)"
                         />
-                        {/* Stroke Line */}
                         <path
-                          d="M0,52 Q40,48 80,42 T160,32 T240,16 T320,4"
+                          d="M0,46 Q40,42 80,38 T160,28 T240,16 T320,6"
                           fill="none"
                           stroke="#0A66C2"
-                          strokeWidth="3"
+                          strokeWidth="2.75"
                           strokeLinecap="round"
                         />
-                        {/* Pulsing peak dot */}
-                        <circle cx="318" cy="4" r="4.5" fill="#0A66C2" />
-                        <circle cx="318" cy="4" r="8" fill="#0A66C2" fillOpacity="0.25" />
+                        <circle cx="318" cy="6" r="3.5" fill="#0A66C2" />
+                        <circle cx="318" cy="6" r="7" fill="#0A66C2" fillOpacity="0.22" />
                       </svg>
                     </Box>
                   </Box>
@@ -694,154 +702,134 @@ export default function HeroSection() {
                   {/* Strategy Post Preview Snippet */}
                   <Box
                     sx={{
-                      p: 1.75,
-                      borderRadius: '14px',
+                      p: { xs: 1.35, sm: 1.6 },
+                      borderRadius: '12px',
                       backgroundColor: '#F8FAFC',
                       border: '1px dashed rgba(203, 213, 225, 0.8)',
                     }}
                   >
-                    <Typography sx={{ fontSize: '0.75rem', color: brandColors.text, fontWeight: 500, lineHeight: 1.45, mb: 1 }}>
-                      &ldquo;Just closed 3 enterprise contracts through structured personal branding on LinkedIn. BrandIt transformed my organic inbound engine.&rdquo;
+                    <Typography sx={{ fontSize: { xs: '0.72rem', sm: '0.74rem' }, color: brandColors.text, fontWeight: 500, lineHeight: 1.45, mb: 0.8 }}>
+                      &ldquo;Optimized my LinkedIn profile and started posting weekly strategy content with BrandIt. Organic inbound inquiries grew by 45%.&rdquo;
                     </Typography>
-                    <Stack direction="row" spacing={2} sx={{ fontSize: '0.7rem', color: brandColors.muted, fontWeight: 600 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#E11D48' }}>
-                        <FiHeart size={12} /> 1,482
+                    <Stack direction="row" spacing={{ xs: 1.5, sm: 2 }} sx={{ fontSize: '0.68rem', color: brandColors.muted, fontWeight: 600 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4, color: '#E11D48' }}>
+                        <FiHeart size={11} /> 48
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <FiMessageSquare size={12} /> 294 comments
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                        <FiMessageSquare size={11} /> 14 comments
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <FiRepeat size={12} /> 86 reposts
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                        <FiRepeat size={11} /> 6 reposts
                       </Box>
                     </Stack>
                   </Box>
                 </Box>
               </motion.div>
 
-              {/* Floating Glassmorphic Pill 1: Top Right */}
+              {/* Floating Notification Pills (Cleanly Responsive) */}
+              {/* Floating Pill 1: Top Right */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                  x: 0,
-                  y: [0, -6, 0],
-                }}
-                transition={{
-                  opacity: { duration: 0.6, delay: 0.4 },
-                  scale: { duration: 0.6, delay: 0.4 },
-                  y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' },
-                }}
-                style={{
-                  position: 'absolute',
-                  top: '-14px',
-                  right: '-12px',
-                  zIndex: 2,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    px: 2,
-                    py: 1,
-                    borderRadius: '100px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid #FED7AA',
-                    boxShadow: '0 8px 24px rgba(245, 158, 11, 0.15)',
-                    color: '#9A3412',
-                    fontSize: '0.78rem',
-                    fontWeight: 750,
-                  }}
-                >
-                  🔥 +1.2K profile views this week
-                </Box>
-              </motion.div>
-
-              {/* Floating Glassmorphic Pill 2: Bottom Left */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, x: -20 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                  x: 0,
-                  y: [0, 6, 0],
-                }}
-                transition={{
-                  opacity: { duration: 0.6, delay: 0.55 },
-                  scale: { duration: 0.6, delay: 0.55 },
-                  y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
-                }}
-                style={{
-                  position: 'absolute',
-                  bottom: '-12px',
-                  left: '-14px',
-                  zIndex: 2,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    px: 2,
-                    py: 1,
-                    borderRadius: '100px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid #BBF7D0',
-                    boxShadow: '0 8px 24px rgba(34, 197, 94, 0.15)',
-                    color: '#166534',
-                    fontSize: '0.78rem',
-                    fontWeight: 750,
-                  }}
-                >
-                  🤝 14 Warm Lead Inquiries
-                </Box>
-              </motion.div>
-
-              {/* Floating Glassmorphic Pill 3: Bottom Right */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                initial={{ opacity: 0, scale: 0.8 }}
                 animate={{
                   opacity: 1,
                   scale: 1,
                   y: [0, -5, 0],
                 }}
                 transition={{
-                  opacity: { duration: 0.6, delay: 0.7 },
-                  scale: { duration: 0.6, delay: 0.7 },
-                  y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: 1 },
+                  opacity: { duration: 0.5, delay: 0.4 },
+                  scale: { duration: 0.5, delay: 0.4 },
+                  y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' },
                 }}
                 style={{
                   position: 'absolute',
-                  bottom: '30px',
-                  right: '-18px',
+                  top: '-10px',
+                  right: '4px',
                   zIndex: 2,
                 }}
               >
                 <Box
                   sx={{
-                    display: 'flex',
+                    display: { xs: 'none', sm: 'flex' },
                     alignItems: 'center',
-                    gap: 1,
+                    gap: 0.75,
                     px: 1.75,
-                    py: 0.9,
+                    py: 0.75,
                     borderRadius: '100px',
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     backdropFilter: 'blur(12px)',
-                    border: '1px solid #DDD6FE',
-                    boxShadow: '0 8px 24px rgba(124, 58, 237, 0.14)',
-                    color: '#5B21B6',
-                    fontSize: '0.76rem',
+                    border: '1px solid #FED7AA',
+                    boxShadow: '0 8px 20px rgba(245, 158, 11, 0.12)',
+                    color: '#9A3412',
+                    fontSize: '0.74rem',
                     fontWeight: 750,
                   }}
                 >
-                  ⚡ 8 Strategy Posts Queued
+                  🔥 +35% Profile Visibility
                 </Box>
               </motion.div>
+
+              {/* Floating Pill 2: Bottom Left */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  y: [0, 5, 0],
+                }}
+                transition={{
+                  opacity: { duration: 0.5, delay: 0.55 },
+                  scale: { duration: 0.5, delay: 0.55 },
+                  y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
+                }}
+                style={{
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: '4px',
+                  zIndex: 2,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: { xs: 'none', sm: 'flex' },
+                    alignItems: 'center',
+                    gap: 0.75,
+                    px: 1.75,
+                    py: 0.75,
+                    borderRadius: '100px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid #BBF7D0',
+                    boxShadow: '0 8px 20px rgba(34, 197, 94, 0.12)',
+                    color: '#166534',
+                    fontSize: '0.74rem',
+                    fontWeight: 750,
+                  }}
+                >
+                  🤝 Inbound Inquiries Active
+                </Box>
+              </motion.div>
+
+              {/* Mobile-Only Summary Bar (Visible only on xs screens) */}
+              <Box
+                sx={{
+                  display: { xs: 'flex', sm: 'none' },
+                  alignItems: 'center',
+                  justifyContent: 'space-around',
+                  mt: 1.5,
+                  p: 1.2,
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  border: '1px solid rgba(226, 232, 240, 0.8)',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+                }}
+              >
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: brandColors.primary }}>
+                  🔥 +35% Profile Visibility
+                </Typography>
+                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#166534' }}>
+                  🤝 Active Inbounds
+                </Typography>
+              </Box>
             </Box>
           </Grid>
         </Grid>
