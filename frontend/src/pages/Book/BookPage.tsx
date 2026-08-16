@@ -12,6 +12,7 @@ import { StepPickDateTime } from './components/StepPickDateTime'
 import { StepContactDetails } from './components/StepContactDetails'
 import { StepPaymentGPay } from './components/StepPaymentGPay'
 import { StepConfirmation, BookingResult } from './components/StepConfirmation'
+import SEO from '../../components/common/SEO'
 
 const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'GPay QR Payment', 'Confirmation']
 
@@ -326,6 +327,11 @@ export default function BookPage() {
 
   return (
     <Box ref={topRef} sx={{ py: { xs: 6, md: 12 }, backgroundColor: brandColors.background }}>
+      <SEO
+        title={selectedServiceObj ? `Book ${selectedServiceObj.name}` : 'Book Your Personal Branding Plan'}
+        description="Book your LinkedIn profile optimization, monthly personal branding, or outreach growth session with BrandIt."
+        canonicalUrl="https://go-brandit.vercel.app/book"
+      />
       <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 } }}>
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6 } }}>

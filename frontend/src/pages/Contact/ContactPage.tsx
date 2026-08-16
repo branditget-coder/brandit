@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { FiMail, FiPhone, FiSend, FiLinkedin, FiInstagram } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
+import SEO from '../../components/common/SEO'
 
 const services = [
   'Profile Setup + Account building advice (₹99)',
@@ -53,6 +54,12 @@ export default function ContactPage() {
 
   return (
     <Box>
+      <SEO
+        title="Contact Us — Inquiries, Advisory & Support"
+        description="Have questions about our LinkedIn personal branding packages, 1-on-1 consulting, or outreach engines? Contact the BrandIt team directly."
+        keywords="contact BrandIt, LinkedIn consulting inquiry, personal branding support"
+        canonicalUrl="https://go-brandit.vercel.app/contact"
+      />
       <Box sx={{ py: { xs: 8, md: 14 }, backgroundColor: brandColors.background }}>
         <Container maxWidth="lg">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>

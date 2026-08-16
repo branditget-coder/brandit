@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FiArrowRight, FiLinkedin, FiFeather, FiUsers, FiCompass } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
+import SEO from '../../components/common/SEO'
 
 const services = [
   {
@@ -38,6 +39,12 @@ const services = [
 export default function ServicesPage() {
   return (
     <Box>
+      <SEO
+        title="Our Services — LinkedIn Optimization, Content & Growth"
+        description="Explore BrandIt's 4 core service packages: Profile Setup & Audit, Monthly Strategy Content Publishing, Network Growth & Outreach, and 1-on-1 Consulting."
+        keywords="LinkedIn optimization services, LinkedIn content writing, personal branding services, executive career consulting"
+        canonicalUrl="https://go-brandit.vercel.app/services"
+      />
       <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: brandColors.background, textAlign: 'center' }}>
         <Container maxWidth="md">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>

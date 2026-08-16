@@ -1,6 +1,7 @@
 import { Box, Container, Typography, Alert } from '@mui/material'
 import { brandColors } from '../../theme'
 import { FiTruck } from 'react-icons/fi'
+import SEO from '../../components/common/SEO'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -14,6 +15,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function ShippingPage() {
   return (
     <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: brandColors.background }}>
+      <SEO
+        title="Shipping & Service Delivery Policy"
+        description="BrandIt's digital service delivery timelines and turnaround standards."
+        canonicalUrl="https://go-brandit.vercel.app/shipping"
+      />
       <Container maxWidth="md">
         <Typography variant="h1" sx={{ mb: 1.5, fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Shipping & Service Delivery Policy</Typography>
         <Typography variant="body2" sx={{ color: brandColors.muted, mb: 4 }}>Last updated: August 2026</Typography>

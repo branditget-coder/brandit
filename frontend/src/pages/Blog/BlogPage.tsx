@@ -11,6 +11,7 @@ import {
 } from 'react-icons/fi'
 import { useSearchParams, Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
+import SEO from '../../components/common/SEO'
 
 interface BlogPost {
   id: string
@@ -279,6 +280,12 @@ export default function BlogPage() {
 
   return (
     <Box sx={{ py: { xs: 6, md: 10 }, backgroundColor: '#FAFAFC', minHeight: '80vh' }}>
+      <SEO
+        title="Executive Branding & LinkedIn Growth Playbooks"
+        description="Actionable guides on the 2026 LinkedIn algorithm, high-stakes interview answers, viral storytelling hooks, and founder positioning strategies."
+        keywords="LinkedIn growth blog, LinkedIn algorithm guide, viral hooks, executive personal branding articles"
+        canonicalUrl="https://go-brandit.vercel.app/blogs"
+      />
       <Container maxWidth="lg">
         {/* Header & Hero Section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>

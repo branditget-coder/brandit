@@ -1,3 +1,4 @@
+import SEO from '../../components/common/SEO'
 import PricingSection from '../../components/sections/PricingSection'
 import CTABannerSection from '../../components/sections/CTABannerSection'
 import { Box, Container, Typography, Chip, alpha } from '@mui/material'
@@ -7,6 +8,12 @@ import { brandColors } from '../../theme'
 export default function PricingPage() {
   return (
     <Box>
+      <SEO
+        title="Transparent Pricing & Plans — Starting at ₹99"
+        description="Explore BrandIt's transparent packages for LinkedIn profile setup, 8 monthly strategy posts, and network outreach engines. No hidden fees."
+        keywords="BrandIt pricing, LinkedIn optimization cost, personal branding packages, career growth plans"
+        canonicalUrl="https://go-brandit.vercel.app/pricing"
+      />
       <Box sx={{ py: { xs: 10, md: 14 }, backgroundColor: brandColors.background, textAlign: 'center' }}>
         <Container maxWidth="md">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>

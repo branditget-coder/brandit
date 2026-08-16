@@ -1,5 +1,6 @@
 import { Box, Container, Typography, Alert } from '@mui/material'
 import { brandColors } from '../../theme'
+import SEO from '../../components/common/SEO'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -13,6 +14,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function TermsPage() {
   return (
     <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: brandColors.background }}>
+      <SEO
+        title="Terms & Conditions"
+        description="BrandIt's Terms & Conditions and service agreements."
+        canonicalUrl="https://go-brandit.vercel.app/terms"
+      />
       <Container maxWidth="md">
         <Typography variant="h1" sx={{ mb: 1.5, fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Terms & Conditions</Typography>
         <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>Last updated: August 2026</Typography>

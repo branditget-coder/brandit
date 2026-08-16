@@ -1,10 +1,16 @@
 import { Box, Container, Typography, Alert } from '@mui/material'
 import { brandColors } from '../../theme'
 import { FiRefreshCw } from 'react-icons/fi'
+import SEO from '../../components/common/SEO'
 
 export default function RefundPage() {
   return (
     <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: brandColors.background }}>
+      <SEO
+        title="Refund & Cancellation Policy"
+        description="BrandIt's official Refund, Return and Cancellation policies."
+        canonicalUrl="https://go-brandit.vercel.app/refund"
+      />
       <Container maxWidth="md">
         <Typography variant="h1" sx={{ mb: 1.5, fontSize: 'clamp(2rem, 4vw, 3rem)' }}>Return, Refund & Cancellation Policy</Typography>
         <Typography variant="body2" sx={{ color: brandColors.muted, mb: 4 }}>Last updated: August 2026</Typography>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FiTarget, FiHeart, FiUsers } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import TeamSection from '../../components/sections/TeamSection'
+import SEO from '../../components/common/SEO'
 
 const values = [
   { icon: FiTarget, title: 'Results-Driven', desc: 'Every strategy is built around measurable outcomes — clearer positioning, higher response rates, and career progression.', color: '#EFF6FF', iconColor: brandColors.primary },
@@ -13,6 +14,12 @@ const values = [
 export default function AboutPage() {
   return (
     <Box>
+      <SEO
+        title="About Us — Mission, Team & Core Values"
+        description="Learn about BrandIt's mission to empower professionals with LinkedIn authority, strategic storytelling, and career opportunity generation."
+        keywords="about BrandIt, LinkedIn personal branding team, career consulting firm, executive branding experts"
+        canonicalUrl="https://go-brandit.vercel.app/about"
+      />
       {/* Hero */}
       <Box sx={{ py: { xs: 8, md: 14 }, backgroundColor: brandColors.background, textAlign: 'center' }}>
         <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 } }}>
