@@ -1,6 +1,6 @@
-import { Box, Container, Grid, Typography, Button, alpha } from '@mui/material'
+import { Box, Container, Grid, Typography, Button, Stack, alpha } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiLinkedin, FiFeather, FiUsers, FiCompass, FiArrowRight } from 'react-icons/fi'
+import { FiLinkedin, FiFeather, FiUsers, FiCompass, FiArrowRight, FiCheck } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -8,9 +8,13 @@ const services = [
   {
     icon: FiLinkedin,
     title: 'Profile Setup + Account Building Advice',
-    price: '₹99',
-    period: 'one-time',
+    badge: 'Profile Foundation',
     description: 'Complete LinkedIn profile overhaul, high-impact banner alignment, headline optimization, and tailored growth blueprint advice.',
+    highlights: [
+      'Complete LinkedIn Profile Audit & Overhaul',
+      'High-Impact Banner & Bio Optimization',
+      'Keyword & Search Algorithm Alignment',
+    ],
     color: '#EFF6FF',
     iconColor: brandColors.primary,
     id: 'setup-advice',
@@ -18,31 +22,43 @@ const services = [
   {
     icon: FiFeather,
     title: 'Profile Setup + Personal Branding',
-    price: '₹320',
-    period: '/ month',
+    badge: 'Content & Authority',
     description: 'Full profile setup combined with 8 strategy-backed posts/month (2 posts/week) to consistently build your industry authority.',
-    color: '#F0FDF4',
-    iconColor: brandColors.success,
+    highlights: [
+      'Everything in Profile Setup',
+      '8 High-Impact Posts / Month (2/week)',
+      'Brand Voice, Hooks & Engagement Blueprint',
+    ],
+    color: '#F0FDFA',
+    iconColor: '#0D9488',
     id: 'branding-basic',
   },
   {
     icon: FiUsers,
     title: 'Branding + Network Growth Engine',
-    price: '₹400',
-    period: '/ month',
+    badge: 'Outreach & Pipeline',
     description: 'Full profile setup, 8 monthly posts, plus cold messaging, targeted outreach, and follow-up management to land opportunities.',
-    color: '#FFF7ED',
-    iconColor: '#F59E0B',
+    highlights: [
+      'Full Profile Setup + 8 Monthly Strategy Posts',
+      'Targeted Cold Messaging & Outbound Sequences',
+      'Follow-Up Execution & Inbound Opportunity Management',
+    ],
+    color: '#F5F3FF',
+    iconColor: '#7C3AED',
     id: 'branding-network',
   },
   {
     icon: FiCompass,
     title: 'LinkedIn Advisory & Consulting',
-    price: '₹250',
-    period: '/ month*',
-    description: 'Dedicated 1-on-1 strategic consulting sessions. Note: Pricing amendments can be made depending on how frequently you need consulting.',
-    color: '#F5F3FF',
-    iconColor: '#7C3AED',
+    badge: '1-on-1 Advisory',
+    description: 'Dedicated 1-on-1 strategic consulting sessions. Personalized advisory tailored to your exact career and industry growth trajectory.',
+    highlights: [
+      'Dedicated 1-on-1 Strategic Consulting Sessions',
+      'Career Positioning & Authority Playbook',
+      'Customized Session Schedule & Action Items',
+    ],
+    color: '#FFF7ED',
+    iconColor: '#D97706',
     id: 'linkedin-consulting',
   },
 ]
@@ -60,7 +76,7 @@ export default function ServicesSection() {
         >
           <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
             <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', mb: 1.5, letterSpacing: '0.1em', fontWeight: 700 }}>
-              CORE SERVICE PACKAGES
+              CORE SERVICE CAPABILITIES
             </Typography>
             <Typography variant="h2" sx={{ mb: 2 }}>
               Everything You Need to{' '}
@@ -69,7 +85,7 @@ export default function ServicesSection() {
               </Box>
             </Typography>
             <Typography variant="body1" sx={{ maxWidth: 560, mx: 'auto', color: brandColors.muted }}>
-              Four specialized, high-ROI programs designed specifically for career professionals and job seekers.
+              Four specialized, high-ROI programs designed specifically for career professionals, founders, and creators.
             </Typography>
           </Box>
         </motion.div>
@@ -83,54 +99,84 @@ export default function ServicesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
+                style={{ height: '100%' }}
               >
                 <Box
                   sx={{
-                    p: { xs: 3.5, sm: 4 },
+                    p: { xs: 3, sm: 4 },
                     borderRadius: '20px',
                     border: `1px solid ${brandColors.border}`,
                     backgroundColor: '#fff',
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
+                    justifyContent: 'space-between',
                     transition: 'all 0.25s ease',
                     '&:hover': {
-                      boxShadow: '0 12px 36px rgba(0,0,0,0.06)',
+                      boxShadow: `0 14px 36px -4px ${alpha(service.iconColor, 0.12)}, 0 4px 12px rgba(15, 23, 42, 0.04)`,
                       borderColor: alpha(service.iconColor, 0.4),
+                      transform: 'translateY(-3px)',
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '14px',
-                        backgroundColor: service.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <service.icon size={22} color={service.iconColor} />
+                  <Box>
+                    {/* Header Row: Icon + Deliverables Badge */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
+                      <Box
+                        sx={{
+                          width: 46,
+                          height: 46,
+                          borderRadius: '12px',
+                          backgroundColor: service.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: `1px solid ${alpha(service.iconColor, 0.2)}`,
+                        }}
+                      >
+                        <service.icon size={22} color={service.iconColor} />
+                      </Box>
+                      <Box
+                        sx={{
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: '100px',
+                          backgroundColor: service.color,
+                          border: `1px solid ${alpha(service.iconColor, 0.25)}`,
+                          color: service.iconColor,
+                          fontSize: '0.72rem',
+                          fontWeight: 750,
+                          letterSpacing: '0.02em',
+                        }}
+                      >
+                        {service.badge}
+                      </Box>
                     </Box>
-                    <Box sx={{ textAlign: 'right' }}>
-                      <Typography variant="h4" sx={{ color: brandColors.text, fontWeight: 800, lineHeight: 1 }}>
-                        {service.price}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>
-                        {service.period}
-                      </Typography>
+
+                    {/* Title & Description */}
+                    <Typography variant="h5" sx={{ mb: 1, color: brandColors.text, fontWeight: 750, fontSize: { xs: '1.05rem', sm: '1.2rem' } }}>
+                      {service.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: brandColors.muted, lineHeight: 1.65, mb: 2.5 }}>
+                      {service.description}
+                    </Typography>
+
+                    {/* Deliverables Checklist */}
+                    <Box sx={{ mb: 3, pt: 2, borderTop: `1px dashed ${brandColors.border}` }}>
+                      <Stack spacing={1.2}>
+                        {service.highlights.map((h) => (
+                          <Box key={h} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <FiCheck size={14} color={service.iconColor} style={{ flexShrink: 0 }} />
+                            <Typography sx={{ fontSize: '0.82rem', color: brandColors.text, fontWeight: 550, lineHeight: 1.35 }}>
+                              {h}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
                     </Box>
                   </Box>
 
-                  <Typography variant="h5" sx={{ mb: 1, color: brandColors.text, fontWeight: 700 }}>
-                    {service.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: brandColors.muted, lineHeight: 1.7, flexGrow: 1, mb: 3 }}>
-                    {service.description}
-                  </Typography>
-
+                  {/* Action Button */}
                   <Button
                     component={RouterLink}
                     to={`/book?plan=${service.id}`}
@@ -142,10 +188,17 @@ export default function ServicesSection() {
                       color: brandColors.text,
                       fontWeight: 600,
                       alignSelf: 'flex-start',
-                      '&:hover': { borderColor: brandColors.primary, color: brandColors.primary, backgroundColor: alpha(brandColors.primary, 0.04) },
+                      borderRadius: '10px',
+                      px: 2.5,
+                      py: 1,
+                      '&:hover': {
+                        borderColor: service.iconColor,
+                        color: service.iconColor,
+                        backgroundColor: alpha(service.iconColor, 0.04),
+                      },
                     }}
                   >
-                    Select Plan
+                    Select Program
                   </Button>
                 </Box>
               </motion.div>
