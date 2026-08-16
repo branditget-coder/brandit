@@ -547,12 +547,12 @@ export default function HeroSection() {
                       </Box>
                       <Box sx={{ minWidth: 0 }}>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
-                          <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.88rem', sm: '0.96rem' }, color: brandColors.text, noWrap: true }}>
+                          <Typography noWrap sx={{ fontWeight: 800, fontSize: { xs: '0.88rem', sm: '0.96rem' }, color: brandColors.text }}>
                             Arjun Sharma
                           </Typography>
                           <FiAward size={14} color="#0A66C2" />
                         </Stack>
-                        <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.muted, fontWeight: 500, noWrap: true }}>
+                        <Typography noWrap sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.muted, fontWeight: 500 }}>
                           Founder • LinkedIn Top Voice
                         </Typography>
                       </Box>
