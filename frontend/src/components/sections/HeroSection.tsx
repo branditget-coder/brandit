@@ -1,14 +1,47 @@
 import { Box, Container, Typography, Button, Stack, Grid, alpha } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiArrowRight, FiCheckCircle, FiTrendingUp, FiTarget, FiUsers } from 'react-icons/fi'
+import { FiArrowRight, FiCheckCircle, FiTrendingUp, FiTarget, FiUsers, FiArrowUpRight } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
 
 const featurePillars = [
-  { icon: <FiTrendingUp size={22} color={brandColors.primary} />, title: 'Profile Setup & Advice', desc: 'Complete structural overhaul & growth blueprint — ₹99' },
-  { icon: <FiTarget size={22} color={brandColors.primary} />, title: 'Personal Branding', desc: '8 strategy-backed posts/month publishing — ₹320/mo' },
-  { icon: <FiUsers size={22} color={brandColors.primary} />, title: 'Outreach & Growth Engine', desc: '8 posts/mo + cold messaging & follow-ups — ₹400/mo' },
+  {
+    icon: <FiTrendingUp size={18} />,
+    title: 'Profile Setup & Advice',
+    desc: 'Complete structural overhaul & growth blueprint',
+    tag: 'One-Time',
+    price: '₹99',
+    unit: 'setup',
+    color: '#0A66C2',
+    bgColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+    to: '/book?plan=starter',
+  },
+  {
+    icon: <FiTarget size={18} />,
+    title: 'Personal Branding',
+    desc: '8 strategy-backed posts & custom content monthly',
+    tag: 'Popular',
+    price: '₹320',
+    unit: '/mo',
+    color: '#0D9488',
+    bgColor: '#F0FDFA',
+    borderColor: '#99F6E4',
+    to: '/book?plan=growth',
+  },
+  {
+    icon: <FiUsers size={18} />,
+    title: 'Outreach Engine',
+    desc: '8 posts/mo + cold messaging & follow-ups',
+    tag: 'Full Engine',
+    price: '₹400',
+    unit: '/mo',
+    color: '#7C3AED',
+    bgColor: '#F5F3FF',
+    borderColor: '#DDD6FE',
+    to: '/book?plan=scale',
+  },
 ]
 
 const highlights = [
@@ -200,26 +233,154 @@ export default function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <Grid container spacing={2} sx={{ mt: 4 }}>
+              <Grid container spacing={{ xs: 1.75, sm: 2 }} sx={{ mt: { xs: 3.5, sm: 4.5 } }}>
                 {featurePillars.map((p) => (
                   <Grid item xs={12} sm={4} key={p.title}>
-                    <Box
-                      sx={{
-                        p: 2,
-                        borderRadius: '14px',
-                        border: `1px solid ${brandColors.border}`,
-                        backgroundColor: '#fff',
-                        height: '100%',
-                      }}
+                    <motion.div
+                      whileHover={{ y: -4 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      style={{ height: '100%' }}
                     >
-                      <Box sx={{ mb: 1 }}>{p.icon}</Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.85rem', color: brandColors.text, mb: 0.25 }}>
-                        {p.title}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: brandColors.muted, lineHeight: 1.4, display: 'block' }}>
-                        {p.desc}
-                      </Typography>
-                    </Box>
+                      <Box
+                        component={RouterLink}
+                        to={p.to}
+                        sx={{
+                          textDecoration: 'none',
+                          p: { xs: 2, sm: 2 },
+                          borderRadius: '16px',
+                          border: '1px solid rgba(226, 232, 240, 0.9)',
+                          background: 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
+                          boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            borderColor: p.borderColor,
+                            boxShadow: `0 12px 24px -4px ${alpha(p.color, 0.16)}, 0 2px 6px -1px rgba(15, 23, 42, 0.04)`,
+                            background: '#FFFFFF',
+                            '& .arrow-icon': {
+                              transform: 'translate(2px, -2px)',
+                              color: p.color,
+                            },
+                          },
+                        }}
+                      >
+                        {/* Top Row: Icon Badge + Category Tag */}
+                        <Box sx={{ mb: 1.5 }}>
+                          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+                            <Box
+                              sx={{
+                                width: 36,
+                                height: 36,
+                                borderRadius: '10px',
+                                backgroundColor: p.bgColor,
+                                color: p.color,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: `1px solid ${p.borderColor}`,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {p.icon}
+                            </Box>
+                            <Box
+                              sx={{
+                                px: 1,
+                                py: 0.35,
+                                borderRadius: '6px',
+                                backgroundColor: alpha(p.color, 0.08),
+                                color: p.color,
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                                letterSpacing: '0.02em',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              {p.tag}
+                            </Box>
+                          </Stack>
+
+                          {/* Title */}
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 750,
+                              fontSize: { xs: '0.88rem', sm: '0.9rem' },
+                              color: brandColors.text,
+                              mb: 0.5,
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            {p.title}
+                          </Typography>
+
+                          {/* Description */}
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: brandColors.muted,
+                              lineHeight: 1.45,
+                              display: 'block',
+                              fontSize: { xs: '0.76rem', sm: '0.78rem' },
+                            }}
+                          >
+                            {p.desc}
+                          </Typography>
+                        </Box>
+
+                        {/* Bottom Row: Price & Action */}
+                        <Box
+                          sx={{
+                            pt: 1.25,
+                            mt: 1,
+                            borderTop: '1px dashed rgba(226, 232, 240, 0.9)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Stack direction="row" alignItems="baseline" spacing={0.5}>
+                            <Typography
+                              sx={{
+                                fontWeight: 800,
+                                fontSize: '0.98rem',
+                                color: brandColors.text,
+                                letterSpacing: '-0.02em',
+                              }}
+                            >
+                              {p.price}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                fontSize: '0.7rem',
+                                color: brandColors.muted,
+                                fontWeight: 500,
+                              }}
+                            >
+                              {p.unit}
+                            </Typography>
+                          </Stack>
+
+                          <Box
+                            className="arrow-icon"
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              color: brandColors.muted,
+                              transition: 'all 0.2s ease',
+                            }}
+                          >
+                            <FiArrowUpRight size={16} />
+                          </Box>
+                        </Box>
+                      </Box>
+                    </motion.div>
                   </Grid>
                 ))}
               </Grid>
