@@ -28,7 +28,7 @@ const featurePillars = [
     color: '#0A66C2',
     bgColor: '#EFF6FF',
     borderColor: '#BFDBFE',
-    to: '/book?plan=starter',
+    to: '/book?plan=setup-advice',
     featured: false,
   },
   {
@@ -42,7 +42,7 @@ const featurePillars = [
     color: '#0D9488',
     bgColor: '#F0FDFA',
     borderColor: '#99F6E4',
-    to: '/book?plan=growth',
+    to: '/book?plan=branding-basic',
     featured: false,
   },
   {
@@ -56,7 +56,7 @@ const featurePillars = [
     color: '#7C3AED',
     bgColor: '#F5F3FF',
     borderColor: '#DDD6FE',
-    to: '/book?plan=scale',
+    to: '/book?plan=branding-network',
     featured: true,
   },
 ]

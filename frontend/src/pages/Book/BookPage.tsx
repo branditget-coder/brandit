@@ -22,6 +22,25 @@ const services: ServicePackage[] = [
   { id: 'linkedin-consulting', name: 'LinkedIn Consulting & Advisory', duration: '1-on-1 Sessions', price: '₹250 / mo*', rawAmount: 250, desc: 'Dedicated 1-on-1 career strategy (customizable frequency).' },
 ]
 
+const planAliases: Record<string, string> = {
+  starter: 'setup-advice',
+  'setup-advice': 'setup-advice',
+  'profile-setup': 'setup-advice',
+  '99': 'setup-advice',
+  growth: 'branding-basic',
+  'branding-basic': 'branding-basic',
+  'personal-branding': 'branding-basic',
+  '320': 'branding-basic',
+  scale: 'branding-network',
+  'growth-engine': 'branding-network',
+  'branding-network': 'branding-network',
+  'outreach-engine': 'branding-network',
+  '400': 'branding-network',
+  consulting: 'linkedin-consulting',
+  'linkedin-consulting': 'linkedin-consulting',
+  '250': 'linkedin-consulting',
+}
+
 const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM']
 
 const dates = Array.from({ length: 7 }, (_, i) => {
@@ -41,9 +60,12 @@ export default function BookPage() {
   const [searchParams] = useSearchParams()
   const planParam = searchParams.get('plan')
 
-  const validPlan = services.some(s => s.id === planParam) ? planParam : ''
+  const resolvedPlanId = planParam
+    ? (planAliases[planParam.toLowerCase()] || (services.some(s => s.id === planParam) ? planParam : ''))
+    : ''
+  const validPlan = resolvedPlanId
 
-  const [activeStep, setActiveStep] = useState<number>(validPlan ? 1 : 0)
+  const [activeStep, setActiveStep] = useState<number>(0)
   const [selected, setSelected] = useState({
     service: validPlan || 'setup-advice',
     date: '',
@@ -93,15 +115,10 @@ export default function BookPage() {
   }, [])
 
   useEffect(() => {
-    if (planParam && services.some(s => s.id === planParam)) {
-      setSelected(prev => ({ ...prev, service: planParam }))
-      if (!isAuthenticated) {
-        setShowAuthRequired(true)
-      } else {
-        setActiveStep(1)
-      }
+    if (resolvedPlanId) {
+      setSelected(prev => ({ ...prev, service: resolvedPlanId }))
     }
-  }, [planParam, isAuthenticated])
+  }, [resolvedPlanId])
 
   const selectedServiceObj = services.find(s => s.id === selected.service)
 
