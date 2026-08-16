@@ -106,7 +106,7 @@ export default function HeroSection() {
       }}
     >
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={{ xs: 4, sm: 5, md: 6 }} alignItems="center">
+        <Grid container spacing={{ xs: 4, sm: 5, md: 6 }} alignItems={{ xs: 'center', md: 'flex-start' }}>
           {/* Left Column: Copy & Actions */}
           <Grid item xs={12} md={6}>
             {/* Pill Badge */}
@@ -489,7 +489,8 @@ export default function HeroSection() {
             <Box
               sx={{
                 position: 'relative',
-                py: { xs: 2, sm: 3, md: 4 },
+                pt: { xs: 1.5, sm: 2.5, md: 5 },
+                pb: { xs: 2, sm: 2.5, md: 0 },
                 px: { xs: 0.5, sm: 1 },
                 maxWidth: '100%',
               }}
