@@ -73,7 +73,7 @@ const plans = [
 
 export default function PricingSection() {
   return (
-    <Box sx={{ py: { xs: 8, md: 14 }, backgroundColor: brandColors.background }}>
+    <Box sx={{ py: { xs: 8, md: 14 }, backgroundColor: '#fff' }}>
       <Container maxWidth="lg">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
