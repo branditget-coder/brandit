@@ -35,7 +35,7 @@ const featurePillars = [
     icon: <FiTarget size={18} />,
     title: 'Personal Branding',
     desc: '8 strategy-backed posts & custom content monthly',
-    tag: 'Best Value',
+    tag: 'Monthly',
     badge: '📈 Steady Reach Growth',
     price: '₹320',
     unit: '/mo',
@@ -43,13 +43,13 @@ const featurePillars = [
     bgColor: '#F0FDFA',
     borderColor: '#99F6E4',
     to: '/book?plan=growth',
-    featured: true,
+    featured: false,
   },
   {
     icon: <FiUsers size={18} />,
     title: 'Outreach Engine',
     desc: '8 posts/mo + cold messaging & follow-ups',
-    tag: 'Full Scale',
+    tag: 'Best Value',
     badge: '🎯 Direct Inbounds',
     price: '₹400',
     unit: '/mo',
@@ -57,7 +57,7 @@ const featurePillars = [
     bgColor: '#F5F3FF',
     borderColor: '#DDD6FE',
     to: '/book?plan=scale',
-    featured: false,
+    featured: true,
   },
 ]
 
