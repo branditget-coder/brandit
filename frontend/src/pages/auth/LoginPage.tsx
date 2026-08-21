@@ -9,6 +9,7 @@ import { FiEye, FiEyeOff, FiArrowRight, FiBriefcase, FiUsers } from 'react-icons
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
 import BrandLogo from '../../components/common/BrandLogo'
+import SEO from '../../components/common/SEO'
 
 type UserType = 'client' | 'team'
 
@@ -78,6 +79,11 @@ export default function LoginPage() {
 
   return (
     <Box sx={{ width: '100%' }}>
+      <SEO
+        title="Sign In"
+        description="Sign in to your BrandIt portal to manage your LinkedIn personal branding strategy, review upcoming posts, and track network growth."
+        canonicalUrl="https://go-brandit.vercel.app/login"
+      />
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Box sx={{ mb: 4 }}>
           <BrandLogo variant="dark" size="medium" showSlogan={true} />

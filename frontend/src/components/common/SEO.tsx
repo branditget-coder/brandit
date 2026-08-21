@@ -19,7 +19,7 @@ export default function SEO({
 }: SEOProps) {
   useEffect(() => {
     // 1. Update Document Title
-    const baseTitle = 'BrandIt — LinkedIn Personal Branding & Network Engine'
+    const baseTitle = 'BrandIt | LinkedIn Personal Branding & Growth Engine'
     document.title = title ? `${title} | BrandIt` : baseTitle
 
     // 2. Helper to set or create meta tag

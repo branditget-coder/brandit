@@ -12,6 +12,7 @@ import {
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
 import BrandLogo from '../../components/common/BrandLogo'
+import SEO from '../../components/common/SEO'
 
 type UserType = 'client' | 'team'
 
@@ -165,6 +166,11 @@ export default function RegisterPage() {
 
   return (
     <Box sx={{ width: '100%' }}>
+      <SEO
+        title="Create Account"
+        description="Create your BrandIt account to accelerate your personal brand, manage LinkedIn consultation sessions, and access growth services."
+        canonicalUrl="https://go-brandit.vercel.app/register"
+      />
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Box sx={{ mb: 4 }}>
           <BrandLogo variant="dark" size="medium" showSlogan={true} />

@@ -7,6 +7,8 @@ Allow: /pricing
 Allow: /blogs
 Allow: /contact
 Allow: /book
+Allow: /login
+Allow: /register
 Allow: /privacy
 Allow: /terms
 Allow: /refund
@@ -17,6 +19,7 @@ Disallow: /admin/
 Disallow: /team/
 Disallow: /dashboard/
 Disallow: /reset-password
+Disallow: /forgot-password
 Disallow: /api/
 
 # Sitemap location
