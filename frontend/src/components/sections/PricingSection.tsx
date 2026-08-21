@@ -1,7 +1,11 @@
-import { Box, Container, Typography, Grid, Button, Chip, Divider, Stack, alpha } from '@mui/material'
+import { useState } from 'react'
+import {
+  Box, Container, Typography, Grid, Button, Chip, Divider, Stack,
+  TextField, InputAdornment, alpha, Paper
+} from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiCheck, FiArrowRight, FiZap, FiInfo } from 'react-icons/fi'
-import { Link as RouterLink } from 'react-router-dom'
+import { FiCheck, FiArrowRight, FiZap, FiInfo, FiSliders, FiRefreshCw } from 'react-icons/fi'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { brandColors } from '../../theme'
 
 const plans = [
@@ -10,6 +14,7 @@ const plans = [
     name: 'Profile Setup & Advice',
     tagline: 'Complete profile setup & growth advice',
     priceText: '₹99',
+    rawPrice: 99,
     billingPeriod: 'one-time fee',
     popular: false,
     color: brandColors.muted,
@@ -26,6 +31,7 @@ const plans = [
     name: 'Profile Setup + Branding',
     tagline: 'Profile setup with monthly content publishing',
     priceText: '₹320',
+    rawPrice: 320,
     billingPeriod: '/ month',
     popular: false,
     color: brandColors.primary,
@@ -42,6 +48,7 @@ const plans = [
     name: 'Branding + Network Growth',
     tagline: 'Full profile, 8 posts/mo & outreach engine',
     priceText: '₹400',
+    rawPrice: 400,
     billingPeriod: '/ month',
     popular: true,
     color: brandColors.dark,
@@ -58,6 +65,7 @@ const plans = [
     name: 'LinkedIn Consulting',
     tagline: 'Strategic 1-on-1 career & branding guidance',
     priceText: '₹250',
+    rawPrice: 250,
     billingPeriod: '/ month*',
     popular: false,
     color: brandColors.muted,
@@ -71,7 +79,30 @@ const plans = [
   },
 ]
 
+const upgradeScenarios = [
+  { from: '₹250 Consulting', to: '₹320 Setup + Branding', diff: 70, note: 'Upgrade from ₹250 Consulting to ₹320 Branding Plan' },
+  { from: '₹99 Profile Setup', to: '₹320 Setup + Branding', diff: 221, note: 'Upgrade from ₹99 Setup to ₹320 Branding Plan' },
+  { from: '₹320 Setup + Branding', to: '₹400 Network Growth', diff: 80, note: 'Upgrade from ₹320 Branding to ₹400 Network Growth' },
+  { from: '₹99 Profile Setup', to: '₹400 Network Growth', diff: 301, note: 'Upgrade from ₹99 Setup to ₹400 Network Growth' },
+]
+
 export default function PricingSection() {
+  const navigate = useNavigate()
+  const [customAmount, setCustomAmount] = useState<string>('70')
+  const [customNote, setCustomNote] = useState<string>('Plan Upgrade Difference (₹250 to ₹320)')
+
+  const parsedAmount = Math.max(1, parseInt(customAmount, 10) || 0)
+
+  const handleApplyPreset = (diff: number, note: string) => {
+    setCustomAmount(diff.toString())
+    setCustomNote(note)
+  }
+
+  const handleProceedCustom = () => {
+    const encodedNote = encodeURIComponent(customNote.trim() || 'Custom Plan Upgrade / Differential Payment')
+    navigate(`/book?plan=custom-amount&amount=${parsedAmount}&note=${encodedNote}`)
+  }
+
   return (
     <Box sx={{ py: { xs: 8, md: 14 }, backgroundColor: '#fff' }}>
       <Container maxWidth="lg">
@@ -97,7 +128,8 @@ export default function PricingSection() {
           </Box>
         </motion.div>
 
-        <Grid container spacing={3} alignItems="stretch">
+        {/* Standard Tier Grid */}
+        <Grid container spacing={3} alignItems="stretch" sx={{ mb: { xs: 6, md: 8 } }}>
           {plans.map((plan, i) => (
             <Grid item xs={12} sm={6} md={3} key={plan.id}>
               <motion.div
@@ -209,6 +241,191 @@ export default function PricingSection() {
             </Grid>
           ))}
         </Grid>
+
+        {/* ── INTERACTIVE CUSTOM AMOUNT & PLAN UPGRADE SECTION ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, sm: 4, md: 5 },
+              borderRadius: '24px',
+              border: `1.5px solid ${alpha(brandColors.primary, 0.25)}`,
+              background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)',
+              boxShadow: '0 12px 36px rgba(10, 102, 194, 0.06)',
+            }}
+          >
+            <Grid container spacing={4} alignItems="center">
+              {/* Left Column: Context & Quick Select */}
+              <Grid item xs={12} md={7}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '12px',
+                      backgroundColor: brandColors.primary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                    }}
+                  >
+                    <FiSliders size={20} />
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
+                    Switching Plans or Need a Custom Top-Up?
+                  </Typography>
+                </Box>
+
+                <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.6 }}>
+                  If you already purchased a plan (e.g. <strong>₹250 Consulting</strong>) and wish to switch to the <strong>₹320 Branding Plan</strong>, you only need to pay the remaining <strong>₹70</strong> difference. Choose a quick upgrade below or enter your exact custom amount.
+                </Typography>
+
+                {/* Quick Upgrade Presets */}
+                <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, letterSpacing: '0.04em', display: 'block', mb: 1.5 }}>
+                  POPULAR PLAN SWITCH SCENARIOS:
+                </Typography>
+                <Grid container spacing={1.5}>
+                  {upgradeScenarios.map((sc, idx) => (
+                    <Grid item xs={12} sm={6} key={idx}>
+                      <Box
+                        onClick={() => handleApplyPreset(sc.diff, sc.note)}
+                        sx={{
+                          p: 1.5,
+                          borderRadius: '14px',
+                          border: customAmount === sc.diff.toString()
+                            ? `2px solid ${brandColors.primary}`
+                            : `1px solid ${brandColors.border}`,
+                          backgroundColor: customAmount === sc.diff.toString()
+                            ? alpha(brandColors.primary, 0.08)
+                            : '#fff',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          '&:hover': {
+                            borderColor: brandColors.primary,
+                            backgroundColor: alpha(brandColors.primary, 0.04),
+                          },
+                        }}
+                      >
+                        <Box sx={{ overflow: 'hidden', mr: 1 }}>
+                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', fontSize: '0.72rem' }}>
+                            {sc.from} → {sc.to}
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.85rem' }}>
+                            Pay ₹{sc.diff} difference
+                          </Typography>
+                        </Box>
+                        <FiRefreshCw size={14} color={brandColors.primary} style={{ flexShrink: 0 }} />
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Grid>
+
+              {/* Right Column: Interactive Custom Amount Input & Checkout */}
+              <Grid item xs={12} md={5}>
+                <Box
+                  sx={{
+                    p: { xs: 3, sm: 3.5 },
+                    borderRadius: '20px',
+                    backgroundColor: '#fff',
+                    border: `1px solid ${brandColors.border}`,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: brandColors.text, mb: 2 }}>
+                    Enter Custom Amount
+                  </Typography>
+
+                  {/* Amount Input */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, display: 'block', mb: 0.8 }}>
+                      AMOUNT PAYABLE (INR)
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      value={customAmount}
+                      onChange={(e) => setCustomAmount(e.target.value)}
+                      placeholder="e.g. 70"
+                      inputProps={{ min: 1 }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Typography sx={{ fontWeight: 800, color: brandColors.primary, fontSize: '1.3rem' }}>
+                              ₹
+                            </Typography>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '14px',
+                          fontSize: '1.25rem',
+                          fontWeight: 800,
+                        },
+                      }}
+                    />
+                  </Box>
+
+                  {/* Upgrade Note / Reason */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, display: 'block', mb: 0.8 }}>
+                      REASON / PREVIOUS PLAN (OPTIONAL)
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      value={customNote}
+                      onChange={(e) => setCustomNote(e.target.value)}
+                      placeholder="e.g. Upgraded from ₹250 plan to ₹320 plan"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '12px',
+                          fontSize: '0.85rem',
+                        },
+                      }}
+                    />
+                  </Box>
+
+                  {/* Action Button */}
+                  <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    onClick={handleProceedCustom}
+                    disabled={!parsedAmount || parsedAmount < 1}
+                    endIcon={<FiArrowRight />}
+                    sx={{
+                      py: 1.6,
+                      borderRadius: '14px',
+                      fontWeight: 800,
+                      fontSize: '1rem',
+                      textTransform: 'none',
+                      backgroundColor: brandColors.primary,
+                      boxShadow: '0 8px 24px rgba(10,102,194,0.25)',
+                      '&:hover': { backgroundColor: '#084e96' },
+                    }}
+                  >
+                    Proceed to Pay ₹{parsedAmount || '0'}
+                  </Button>
+
+                  <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', color: brandColors.muted, mt: 1.5, fontSize: '0.75rem' }}>
+                    🔒 Secure GPay UPI verification & direct booking confirmation
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </motion.div>
       </Container>
     </Box>
   )

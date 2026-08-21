@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Box, Container, Typography, Stepper, Step, StepLabel, Button, Alert, Paper } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -16,7 +16,7 @@ import SEO from '../../components/common/SEO'
 
 const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'GPay QR Payment', 'Confirmation']
 
-const services: ServicePackage[] = [
+const baseServices: ServicePackage[] = [
   { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Audit & Strategy', price: '₹99', rawAmount: 99, desc: 'Complete profile setup, bio optimization, and growth blueprint.' },
   { id: 'branding-basic', name: 'Profile Setup + Personal Branding', duration: 'Monthly Program', price: '₹320 / mo', rawAmount: 320, desc: 'Full profile setup + 8 strategy-backed posts/month (2 posts/week).' },
   { id: 'branding-network', name: 'Branding + Network Growth Engine', duration: 'Monthly Program', price: '₹400 / mo', rawAmount: 400, desc: 'Profile setup, 8 posts/mo, cold outreach, messages & follow-ups.' },
@@ -40,6 +40,11 @@ const planAliases: Record<string, string> = {
   consulting: 'linkedin-consulting',
   'linkedin-consulting': 'linkedin-consulting',
   '250': 'linkedin-consulting',
+  custom: 'custom-amount',
+  'custom-amount': 'custom-amount',
+  upgrade: 'custom-amount',
+  topup: 'custom-amount',
+  customamount: 'custom-amount',
 }
 
 const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM']
@@ -60,9 +65,15 @@ export default function BookPage() {
   const { user, isAuthenticated } = useAuth()
   const [searchParams] = useSearchParams()
   const planParam = searchParams.get('plan')
+  const amountParam = searchParams.get('amount') || searchParams.get('customAmount')
+  const noteParam = searchParams.get('note') || searchParams.get('notes')
+
+  const initialCustomAmount = amountParam ? Math.max(1, parseInt(amountParam, 10) || 70) : 70
+  const [customAmount, setCustomAmount] = useState<number>(initialCustomAmount)
+  const [customNote, setCustomNote] = useState<string>(noteParam || '')
 
   const resolvedPlanId = planParam
-    ? (planAliases[planParam.toLowerCase()] || (services.some(s => s.id === planParam) ? planParam : ''))
+    ? (planAliases[planParam.toLowerCase()] || (baseServices.some(s => s.id === planParam) ? planParam : ''))
     : ''
   const validPlan = resolvedPlanId
 
@@ -74,7 +85,7 @@ export default function BookPage() {
     name: '',
     email: '',
     phone: '',
-    notes: '',
+    notes: noteParam || '',
     upiRef: '',
     paymentScreenshot: '' as string | null,
   })
@@ -85,6 +96,19 @@ export default function BookPage() {
   const [bookingError, setBookingError] = useState<string | null>(null)
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
   const [showAuthRequired, setShowAuthRequired] = useState(false)
+
+  // Construct dynamic services array including Custom Amount
+  const services: ServicePackage[] = useMemo(() => [
+    ...baseServices,
+    {
+      id: 'custom-amount',
+      name: 'Custom Amount / Plan Upgrade',
+      duration: 'Flexible Top-Up / Plan Upgrade',
+      price: `₹${customAmount}`,
+      rawAmount: customAmount,
+      desc: customNote ? `Upgrade note: ${customNote}` : 'Enter custom amount for plan switching, upgrade differences, or advisory top-ups.',
+    },
+  ], [customAmount, customNote])
 
   // Pre-populate logged-in user profile details
   useEffect(() => {
@@ -192,13 +216,27 @@ export default function BookPage() {
     const formattedDate = formatBookingDate(selected.date)
     const formattedTime = formatBookingTime(selected.time)
 
+    const finalAmount = selected.service === 'custom-amount'
+      ? customAmount
+      : (selectedServiceObj?.rawAmount || 99)
+
+    const fullNotes = [
+      selected.notes ? selected.notes.trim() : '',
+      selected.service === 'custom-amount' && customNote ? `Upgrade/Top-up: ${customNote}` : '',
+      `UPI Reference: ${selected.upiRef || 'Direct GPay QR Scan'}`
+    ].filter(Boolean).join(' | ')
+
+    const finalServiceName = selected.service === 'custom-amount'
+      ? `Custom Payment / Plan Upgrade (₹${finalAmount})`
+      : (selectedServiceObj?.name || 'BrandIt Service Package')
+
     try {
       const payload = {
-        serviceName: selectedServiceObj?.name || 'BrandIt Service Package',
+        serviceName: finalServiceName,
         bookingDate: formattedDate,
         bookingTime: formattedTime,
-        notes: (selected.notes ? selected.notes + ' | ' : '') + `UPI Reference: ${selected.upiRef || 'Direct GPay QR Scan'}`,
-        amount: selectedServiceObj?.rawAmount || 99,
+        notes: fullNotes,
+        amount: finalAmount,
         paymentId: selected.upiRef ? `UPI_${selected.upiRef.trim()}` : `GPAY_SCAN_${Date.now()}`,
         paymentMethod: 'MANUAL_GPAY_UPI',
         clientName: selected.name,
@@ -221,7 +259,7 @@ export default function BookPage() {
       }
       setBookingResult({
         id: Math.floor(1000 + Math.random() * 9000),
-        serviceName: selectedServiceObj?.name,
+        serviceName: finalServiceName,
         paymentId: selected.upiRef ? `UPI_${selected.upiRef.trim()}` : `GPAY_SCAN_${Date.now()}`,
         clientName: selected.name,
         clientEmail: selected.email,
@@ -235,9 +273,7 @@ export default function BookPage() {
   const topRef = useRef<HTMLDivElement>(null)
 
   const scrollToTop = () => {
-    // Scroll the window to the absolute top
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    // Also scroll the ref element into view as a fallback
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -265,7 +301,12 @@ export default function BookPage() {
   }
 
   const canNext = () => {
-    if (activeStep === 0) return !!selected.service
+    if (activeStep === 0) {
+      if (selected.service === 'custom-amount') {
+        return !!customAmount && customAmount >= 1
+      }
+      return !!selected.service
+    }
     if (activeStep === 1) return !!selected.date && !!selected.time && !isSlotBooked(selected.date, selected.time)
     if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@') && !!selected.phone
     if (activeStep === 3) return !!selected.upiRef && selected.upiRef.trim() !== '' && !!selected.paymentScreenshot
@@ -363,7 +404,14 @@ export default function BookPage() {
                   <StepChoosePlan
                     services={services}
                     selectedService={selected.service}
+                    customAmount={customAmount}
+                    customNote={customNote}
                     onSelectService={(serviceId) => handleChangeField('service', serviceId)}
+                    onChangeCustomAmount={(amt) => setCustomAmount(amt)}
+                    onChangeCustomNote={(note) => {
+                      setCustomNote(note)
+                      handleChangeField('notes', note)
+                    }}
                   />
                 )}
 
