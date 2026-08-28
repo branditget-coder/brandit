@@ -54,7 +54,7 @@ public class Booking {
 
     private String paymentMethod;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String paymentScreenshot;
 
     @CreatedDate
