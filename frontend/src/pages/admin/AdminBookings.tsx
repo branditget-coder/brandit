@@ -570,34 +570,39 @@ export default function AdminBookings() {
               overflow: 'hidden'
             }}
           >
-            <Box sx={{ overflowX: 'auto' }}>
-              <Box sx={{ minWidth: 920 }}>
+            <Box sx={{ overflowX: 'auto', width: '100%' }}>
+              <Box sx={{ minWidth: 980 }}>
                 {/* Table Header */}
                 <Box
                   sx={{
                     display: 'grid',
-                    gridTemplateColumns: '2.5fr 2.5fr 1.8fr 1.6fr 1.4fr 1.2fr',
+                    gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
                     gap: 2,
-                    px: 3.5,
-                    py: 2.2,
+                    px: 3,
+                    py: 2,
                     borderBottom: `1px solid ${brandColors.border}`,
-                    backgroundColor: alpha(brandColors.primary, 0.02)
+                    backgroundColor: alpha(brandColors.primary, 0.03),
+                    alignItems: 'center'
                   }}
                 >
-                  {['Client & Contact', 'Consultation Plan', 'Date & Time', 'Payment Option', 'Status', 'Actions'].map((h, i) => (
-                    <Typography
-                      key={h}
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        color: brandColors.muted,
-                        letterSpacing: '0.06em',
-                        textAlign: i === 5 ? 'right' : 'left'
-                      }}
-                    >
-                      {h.toUpperCase()}
-                    </Typography>
-                  ))}
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                    CLIENT & CONTACT
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                    CONSULTATION PLAN
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                    DATE & TIME
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                    AMOUNT & METHOD
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                    STATUS
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em', textAlign: 'center' }}>
+                    ACTIONS
+                  </Typography>
                 </Box>
 
                 {/* Table Body Rows */}
@@ -608,7 +613,7 @@ export default function AdminBookings() {
                   
                   const rawMethod = (b.paymentMethod || '').toUpperCase()
                   const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
-                  const paymentLabel = isOffline ? '💵 Offline cash in person' : '🌐 Through website'
+                  const paymentLabel = isOffline ? 'Offline cash in person' : 'Through website'
                   const statusConf = STATUS_COLORS[b.status?.toUpperCase()] || STATUS_COLORS.PENDING
 
                   return (
@@ -616,69 +621,111 @@ export default function AdminBookings() {
                       key={b.id}
                       sx={{
                         display: 'grid',
-                        gridTemplateColumns: '2.5fr 2.5fr 1.8fr 1.6fr 1.4fr 1.2fr',
+                        gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
                         gap: 2,
-                        px: 3.5,
-                        py: 2.5,
+                        px: 3,
+                        py: 2.2,
                         borderBottom: i < filteredBookings.length - 1 ? `1px solid ${brandColors.border}` : 'none',
                         alignItems: 'center',
                         '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) },
                         transition: 'background 0.15s ease'
                       }}
                     >
-                      {/* Client Info */}
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {/* 1. Client Info */}
+                      <Box sx={{ pr: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, lineHeight: 1.3 }}>
                           {b.clientName || 'Valued Client'}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mt: 0.2 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: brandColors.muted,
+                            display: 'block',
+                            mt: 0.3,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
                           {b.clientEmail || 'No email provided'}
                         </Typography>
-                        {b.clientPhone && (
-                          <Typography variant="caption" sx={{ color: brandColors.primary, display: 'block', fontWeight: 600 }}>
-                            📞 {b.clientPhone}
+                        {b.clientPhone && b.clientPhone !== 'N/A' && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: brandColors.primary,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.6,
+                              fontWeight: 600,
+                              mt: 0.3
+                            }}
+                          >
+                            <FiPhone size={11} style={{ flexShrink: 0 }} />
+                            <span>{b.clientPhone}</span>
                           </Typography>
                         )}
                       </Box>
 
-                      {/* Service Plan */}
-                      <Box>
+                      {/* 2. Service Plan */}
+                      <Box sx={{ pr: 1 }}>
                         <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, lineHeight: 1.3 }}>
                           {b.serviceName}
                         </Typography>
                         {b.notes && (
-                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mt: 0.4, fontStyle: 'italic' }}>
-                            📝 {b.notes.length > 40 ? `${b.notes.substring(0, 40)}...` : b.notes}
-                          </Typography>
+                          <Tooltip title={b.notes} placement="top" arrow>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: brandColors.muted,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.6,
+                                mt: 0.4,
+                                fontStyle: 'italic',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '100%'
+                              }}
+                            >
+                              <FiFileText size={11} style={{ flexShrink: 0 }} />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {b.notes}
+                              </span>
+                            </Typography>
+                          </Tooltip>
                         )}
                         {b.meetingLink && (
-                          <Typography variant="caption" sx={{ color: '#0284C7', display: 'block', fontWeight: 600, mt: 0.2 }}>
-                            🔗 Google Meet Linked
+                          <Typography variant="caption" sx={{ color: '#0284C7', display: 'flex', alignItems: 'center', gap: 0.6, fontWeight: 600, mt: 0.2 }}>
+                            <FiVideo size={11} style={{ flexShrink: 0 }} />
+                            <span>Google Meet Linked</span>
                           </Typography>
                         )}
                       </Box>
 
-                      {/* Date & Time */}
+                      {/* 3. Date & Time */}
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                          <FiCalendar size={14} color={brandColors.primary} />
-                          {displayDate}
+                          <FiCalendar size={13} color={brandColors.primary} style={{ flexShrink: 0 }} />
+                          <span>{displayDate}</span>
                         </Typography>
                         {displayTime && (
-                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.3 }}>
-                            <FiClock size={13} />
-                            {displayTime}
+                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.4 }}>
+                            <FiClock size={12} style={{ flexShrink: 0 }} />
+                            <span>{displayTime}</span>
                           </Typography>
                         )}
                       </Box>
 
-                      {/* Payment Option & Amount */}
+                      {/* 4. Payment Option & Amount */}
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#10B981' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#10B981', fontSize: '0.95rem' }}>
                           ₹{displayAmount.toLocaleString()}
                         </Typography>
                         <Chip
                           size="small"
+                          icon={isOffline ? <FiCreditCard size={11} /> : <FiGlobe size={11} />}
                           label={paymentLabel}
                           sx={{
                             height: 22,
@@ -686,14 +733,18 @@ export default function AdminBookings() {
                             fontWeight: 700,
                             mt: 0.4,
                             borderRadius: '6px',
-                            backgroundColor: isOffline ? alpha('#10B981', 0.12) : alpha('#0284C7', 0.12),
+                            backgroundColor: isOffline ? alpha('#10B981', 0.1) : alpha('#0284C7', 0.1),
                             color: isOffline ? '#10B981' : '#0284C7',
-                            border: `1px solid ${isOffline ? alpha('#10B981', 0.3) : alpha('#0284C7', 0.3)}`
+                            border: `1px solid ${isOffline ? alpha('#10B981', 0.25) : alpha('#0284C7', 0.25)}`,
+                            '& .MuiChip-icon': {
+                              color: 'inherit',
+                              ml: '4px'
+                            }
                           }}
                         />
                       </Box>
 
-                      {/* Status Dropdown */}
+                      {/* 5. Status Dropdown */}
                       <Box>
                         <Select
                           size="small"
@@ -701,6 +752,8 @@ export default function AdminBookings() {
                           onChange={(e) => handleQuickStatusChange(b.id, e.target.value)}
                           sx={{
                             height: 32,
+                            width: '100%',
+                            maxWidth: 125,
                             fontSize: '0.75rem',
                             fontWeight: 700,
                             borderRadius: '10px',
@@ -708,7 +761,7 @@ export default function AdminBookings() {
                             color: statusConf.color,
                             border: `1px solid ${statusConf.border}`,
                             '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                            '& .MuiSelect-select': { py: 0.5, px: 1.5 }
+                            '& .MuiSelect-select': { py: 0.5, px: 1.2 }
                           }}
                         >
                           <MenuItem value="PENDING">PENDING</MenuItem>
@@ -718,20 +771,22 @@ export default function AdminBookings() {
                         </Select>
                       </Box>
 
-                      {/* Action Buttons */}
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                      {/* 6. Action Buttons */}
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.8 }}>
                         <Tooltip title="Edit Booking Details">
                           <IconButton
                             size="small"
                             onClick={() => handleOpenEdit(b)}
                             sx={{
-                              borderRadius: '10px',
-                              backgroundColor: alpha(brandColors.primary, 0.06),
+                              width: 32,
+                              height: 32,
+                              borderRadius: '9px',
+                              backgroundColor: alpha(brandColors.primary, 0.07),
                               color: brandColors.primary,
-                              '&:hover': { backgroundColor: alpha(brandColors.primary, 0.15) }
+                              '&:hover': { backgroundColor: alpha(brandColors.primary, 0.18) }
                             }}
                           >
-                            <FiEdit2 size={15} />
+                            <FiEdit2 size={14} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Delete Booking">
@@ -739,13 +794,15 @@ export default function AdminBookings() {
                             size="small"
                             onClick={() => setDeleteBooking(b)}
                             sx={{
-                              borderRadius: '10px',
-                              backgroundColor: alpha('#EF4444', 0.06),
+                              width: 32,
+                              height: 32,
+                              borderRadius: '9px',
+                              backgroundColor: alpha('#EF4444', 0.07),
                               color: '#EF4444',
-                              '&:hover': { backgroundColor: alpha('#EF4444', 0.15) }
+                              '&:hover': { backgroundColor: alpha('#EF4444', 0.18) }
                             }}
                           >
-                            <FiTrash2 size={15} />
+                            <FiTrash2 size={14} />
                           </IconButton>
                         </Tooltip>
                       </Box>
