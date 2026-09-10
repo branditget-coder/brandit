@@ -75,17 +75,18 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/bookings/public/**").permitAll()
                 .requestMatchers("/api/payments/**").permitAll()
-                // Diagnostics - publicly accessible for Railway health checks
+                // Diagnostics & Health
                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/test-email").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/list-bookings").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/resend-booking-email").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/resend-latest-booking-email").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/send-manual-payment-email").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/record-client-payment").permitAll()
+                .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
+                // Protected Diagnostics / Admin Operations (Restricted from public scraping)
+                .requestMatchers(HttpMethod.GET, "/api/test-email").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/list-bookings").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/resend-booking-email").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/resend-latest-booking-email").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/send-manual-payment-email").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/record-client-payment").hasRole("ADMIN")
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Everything else requires auth
@@ -98,11 +99,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Use allowedOriginPatterns to support wildcards (required when allowCredentials = true)
+        // Use specific patterns (required when allowCredentials = true)
         config.addAllowedOriginPattern("http://localhost:*");
+        config.addAllowedOriginPattern("http://127.0.0.1:*");
         config.addAllowedOriginPattern("https://*.vercel.app");
         config.addAllowedOriginPattern("https://*.up.railway.app");
-        config.addAllowedOriginPattern("*");
+        config.addAllowedOriginPattern("https://go-brandit.vercel.app");
+        config.addAllowedOriginPattern("https://*.go-brandit.com");
+        config.addAllowedOriginPattern("https://go-brandit.com");
         // Also add any explicitly configured origins
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
             for (String origin : allowedOrigins.split(",")) {

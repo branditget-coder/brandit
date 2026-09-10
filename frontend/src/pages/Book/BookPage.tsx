@@ -17,10 +17,10 @@ import SEO from '../../components/common/SEO'
 const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'GPay QR Payment', 'Confirmation']
 
 const baseServices: ServicePackage[] = [
-  { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Audit & Strategy', price: '₹99', rawAmount: 99, desc: 'Complete profile setup, bio optimization, and growth blueprint.' },
-  { id: 'branding-basic', name: 'Profile Setup + Personal Branding', duration: 'Monthly Program', price: '₹320 / mo', rawAmount: 320, desc: 'Full profile setup + 8 strategy-backed posts/month (2 posts/week).' },
-  { id: 'branding-network', name: 'Branding + Network Growth Engine', duration: 'Monthly Program', price: '₹400 / mo', rawAmount: 400, desc: 'Profile setup, 8 posts/mo, cold outreach, messages & follow-ups.' },
-  { id: 'linkedin-consulting', name: 'LinkedIn Consulting & Advisory', duration: '1-on-1 Sessions', price: '₹250 / mo*', rawAmount: 250, desc: 'Dedicated 1-on-1 career strategy (customizable frequency).' },
+  { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Audit & Strategy', price: '₹129', rawAmount: 129, desc: 'Complete profile setup, bio optimization, and growth blueprint.' },
+  { id: 'branding-basic', name: 'Profile Setup + Personal Branding', duration: 'Monthly Program', price: '₹349 / mo', rawAmount: 349, desc: 'Full profile setup + 8 strategy-backed posts/month (2 posts/week).' },
+  { id: 'branding-network', name: 'Branding + Network Growth Engine', duration: 'Monthly Program', price: '₹499 / mo', rawAmount: 499, desc: 'Profile setup, 8 posts/mo, cold outreach, messages & follow-ups.' },
+  { id: 'linkedin-consulting', name: 'LinkedIn Consulting & Advisory', duration: '1-on-1 Sessions', price: '₹249 / mo*', rawAmount: 249, desc: 'Dedicated 1-on-1 career strategy (customizable frequency).' },
 ]
 
 const planAliases: Record<string, string> = {
@@ -28,18 +28,22 @@ const planAliases: Record<string, string> = {
   'setup-advice': 'setup-advice',
   'profile-setup': 'setup-advice',
   '99': 'setup-advice',
+  '129': 'setup-advice',
   growth: 'branding-basic',
   'branding-basic': 'branding-basic',
   'personal-branding': 'branding-basic',
   '320': 'branding-basic',
+  '349': 'branding-basic',
   scale: 'branding-network',
   'growth-engine': 'branding-network',
   'branding-network': 'branding-network',
   'outreach-engine': 'branding-network',
   '400': 'branding-network',
+  '499': 'branding-network',
   consulting: 'linkedin-consulting',
   'linkedin-consulting': 'linkedin-consulting',
   '250': 'linkedin-consulting',
+  '249': 'linkedin-consulting',
   custom: 'custom-amount',
   'custom-amount': 'custom-amount',
   upgrade: 'custom-amount',
@@ -218,7 +222,7 @@ export default function BookPage() {
 
     const finalAmount = selected.service === 'custom-amount'
       ? customAmount
-      : (selectedServiceObj?.rawAmount || 99)
+      : (selectedServiceObj?.rawAmount || 129)
 
     const fullNotes = [
       selected.notes ? selected.notes.trim() : '',

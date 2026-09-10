@@ -158,6 +158,10 @@ public class CommonDtos {
         private String phone;
         private String role;
         private boolean emailVerified;
+        private Integer birthDay;
+        private Integer birthMonth;
+        private Integer birthYear;
+        private java.time.LocalDate dateOfBirth;
         private LocalDateTime createdAt;
     }
 
@@ -170,6 +174,9 @@ public class CommonDtos {
         private String phone;
         private String role; // USER, ADMIN, TEAM
         private boolean emailVerified = true;
+        private Integer birthDay;
+        private Integer birthMonth;
+        private Integer birthYear;
     }
 
     @Data
@@ -180,6 +187,17 @@ public class CommonDtos {
         private String phone;
         private String role;
         private Boolean emailVerified;
+        private Integer birthDay;
+        private Integer birthMonth;
+        private Integer birthYear;
+        private String password;
+    }
+
+    @Data
+    public static class AdminResetUserPasswordRequest {
+        @NotBlank(message = "Password is required")
+        @Size(min = 6, message = "Password must be at least 6 characters")
+        private String newPassword;
     }
 
     @Data

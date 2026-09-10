@@ -8,28 +8,28 @@ import SEO from '../../components/common/SEO'
 const services = [
   {
     icon: FiLinkedin, id: 'setup-advice', title: 'Profile Setup + Account Building Advice',
-    price: '₹99', period: 'one-time fee',
+    price: '₹129', period: 'one-time fee',
     description: 'A complete structural profile overhaul for professionals and freshers. Includes headline optimization, bio alignment, keyword insertion, and a step-by-step account building roadmap.',
     deliverables: ['LinkedIn Profile Audit & Diagnostics', 'Optimized Headline & Custom Bio', 'Banner & Visual Alignment', 'ATS & Industry Keyword Tagging', 'Account Growth & Strategy Blueprint'],
     color: '#EFF6FF', iconColor: brandColors.primary,
   },
   {
     icon: FiFeather, id: 'branding-basic', title: 'Profile Setup + Personal Branding',
-    price: '₹320', period: '/ month',
+    price: '₹349', period: '/ month',
     description: 'Combines the complete profile setup package with monthly content publishing. We craft and schedule 8 strategy-backed posts every month (2 posts/week) to establish your industry authority.',
     deliverables: ['Everything in Profile Setup Plan', '8 Thought Leadership Posts / month', 'Brand Voice & Tone Calibration', 'Visual Formatting & Carousels', 'Monthly Performance Insights'],
     color: '#F0FDF4', iconColor: brandColors.success,
   },
   {
     icon: FiUsers, id: 'branding-network', title: 'Profile Setup + Personal Branding + Network Growth',
-    price: '₹400', period: '/ month',
+    price: '₹499', period: '/ month',
     description: 'Our most popular end-to-end growth package. Includes profile setup, 8 posts/month, plus proactive cold messaging, targeted outreach, and follow-ups to turn profile views into opportunities.',
     deliverables: ['Everything in Profile Setup + Branding Plan', '8 Strategy-Backed Posts / month', 'Cold Messaging & Outreach Campaign', 'Connection Growth & Lead Follow-ups', '1-on-1 Strategic Network Positioning'],
     color: '#FFF7ED', iconColor: '#F59E0B',
   },
   {
     icon: FiCompass, id: 'linkedin-consulting', title: 'LinkedIn Consulting & Advisory',
-    price: '₹250', period: '/ month*',
+    price: '₹249', period: '/ month*',
     description: 'Dedicated 1-on-1 strategic consulting for executives, founders, and ambitious career seekers. Note: Pricing amendments can be made depending on how frequently you need consulting.',
     deliverables: ['1-on-1 Strategic Consultation Sessions', 'Career Brand Positioning Review', 'Content Strategy & Campaign Feedback', 'Customized Frequency & Schedule Options'],
     color: '#F5F3FF', iconColor: '#7C3AED',

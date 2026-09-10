@@ -41,6 +41,21 @@ public class AuthDtos {
         private User.Role role;
         private String otp;
 
+        @jakarta.validation.constraints.NotNull(message = "Birth date (day) is required")
+        @jakarta.validation.constraints.Min(value = 1, message = "Day must be between 1 and 31")
+        @jakarta.validation.constraints.Max(value = 31, message = "Day must be between 1 and 31")
+        private Integer birthDay;
+
+        @jakarta.validation.constraints.NotNull(message = "Birth month is required")
+        @jakarta.validation.constraints.Min(value = 1, message = "Month must be between 1 and 12")
+        @jakarta.validation.constraints.Max(value = 12, message = "Month must be between 1 and 12")
+        private Integer birthMonth;
+
+        @jakarta.validation.constraints.NotNull(message = "Birth year is required")
+        @jakarta.validation.constraints.Min(value = 1920, message = "Please enter a valid birth year")
+        @jakarta.validation.constraints.Max(value = 2026, message = "Please enter a valid birth year")
+        private Integer birthYear;
+
         public void setEmail(String email) {
             this.email = email != null ? email.trim().toLowerCase() : null;
         }
@@ -119,6 +134,10 @@ public class AuthDtos {
         private User.Role role;
         private boolean emailVerified;
         private String avatarUrl;
+        private Integer birthDay;
+        private Integer birthMonth;
+        private Integer birthYear;
+        private java.time.LocalDate dateOfBirth;
     }
 
     @Data
@@ -130,6 +149,9 @@ public class AuthDtos {
         private String currentRole;
         private String bio;
         private String avatarUrl;
+        private Integer birthDay;
+        private Integer birthMonth;
+        private Integer birthYear;
     }
 
     @Data

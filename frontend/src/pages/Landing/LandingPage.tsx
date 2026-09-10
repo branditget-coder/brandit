@@ -12,7 +12,7 @@ export default function LandingPage() {
     <>
       <SEO
         title="Your Profile, Your Brand, Your Opportunity"
-        description="Turn your LinkedIn profile into continuous inbound career opportunities with profile overhauls, 8 monthly strategy posts, and cold outreach engines from ₹99."
+        description="Turn your LinkedIn profile into continuous inbound career opportunities with profile overhauls, 8 monthly strategy posts, and cold outreach engines from ₹129."
         keywords="LinkedIn personal branding, profile setup, career growth, executive branding, LinkedIn outreach engine"
         canonicalUrl="https://go-brandit.vercel.app/"
       />

@@ -68,7 +68,7 @@ export default function CTABannerSection() {
                 variant="body1"
                 sx={{ color: alpha('#fff', 0.65), mb: 4, maxWidth: 520, mx: 'auto' }}
               >
-                Choose from our transparent services starting at ₹99. Tailored personal branding and outreach built to open real opportunities.
+                Choose from our transparent services starting at ₹129. Tailored personal branding and outreach built to open real opportunities.
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
                 <Button

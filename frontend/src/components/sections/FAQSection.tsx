@@ -15,11 +15,11 @@ const primaryFaqs = [
   },
   {
     q: 'Are there any hidden costs or recurring setup charges?',
-    a: 'No. Pricing is completely transparent. Profile Setup + Account Building Advice is a flat one-time ₹99 fee. Monthly programs (₹320/mo, ₹400/mo, ₹250/mo) are fixed monthly rates.',
+    a: 'No. Pricing is completely transparent. Profile Setup + Account Building Advice is a flat one-time ₹129 fee. Monthly programs (₹349/mo, ₹499/mo, ₹249/mo) are fixed monthly rates.',
   },
   {
-    q: 'How does the ₹250/month LinkedIn Consulting pricing work?',
-    a: 'The base rate for 1-on-1 strategic consulting starts at ₹250/month. Pricing amendments can be made depending on how frequently you request strategic sessions or personal brand coaching.',
+    q: 'How does the ₹249/month LinkedIn Consulting pricing work?',
+    a: 'The base rate for 1-on-1 strategic consulting starts at ₹249/month. Pricing amendments can be made depending on how frequently you request strategic sessions or personal brand coaching.',
   },
 ]
 
@@ -29,7 +29,7 @@ const secondaryFaqs = [
     a: 'Your profile audit and initial setup suggestions are delivered within 48 to 72 hours of onboarding. Content calendars and post publishing begin immediately following strategy approval.',
   },
   {
-    q: 'What is included in the ₹400/month Outreach Engine plan?',
+    q: 'What is included in the ₹499/month Outreach Engine plan?',
     a: 'You get full profile setup, 8 strategy-backed posts/month, plus dedicated cold messaging, targeted connection outreach, and follow-up management to land opportunities.',
   },
   {

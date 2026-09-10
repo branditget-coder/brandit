@@ -8,7 +8,7 @@ import {
 import { motion } from 'framer-motion'
 import {
   FiSearch, FiUserCheck, FiUsers, FiUserPlus, FiEdit2, FiTrash2,
-  FiShield, FiAlertTriangle, FiX
+  FiShield, FiAlertTriangle, FiX, FiKey
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -22,6 +22,10 @@ interface UserItem {
   phone?: string
   role: string
   emailVerified: boolean
+  birthDay?: number
+  birthMonth?: number
+  birthYear?: number
+  dateOfBirth?: string
   createdAt: string
 }
 
@@ -34,8 +38,10 @@ export default function AdminUsers() {
   // Modals state
   const [createOpen, setCreateOpen] = useState<boolean>(false)
   const [editUser, setEditUser] = useState<UserItem | null>(null)
+  const [passwordUser, setPasswordUser] = useState<UserItem | null>(null)
   const [deleteUser, setDeleteUser] = useState<UserItem | null>(null)
   const [submitting, setSubmitting] = useState<boolean>(false)
+  const [newPasswordVal, setNewPasswordVal] = useState<string>('')
 
   // Toast notification
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
@@ -53,6 +59,9 @@ export default function AdminUsers() {
     phone: '',
     role: 'USER',
     emailVerified: true,
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
   })
 
   // Edit form state
@@ -63,6 +72,10 @@ export default function AdminUsers() {
     phone: '',
     role: 'USER',
     emailVerified: true,
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
+    password: '',
   })
 
   const fetchUsers = async () => {
@@ -79,6 +92,10 @@ export default function AdminUsers() {
           phone: currentUser.phone,
           role: currentUser.role || 'ADMIN',
           emailVerified: true,
+          birthDay: currentUser.birthDay,
+          birthMonth: currentUser.birthMonth,
+          birthYear: currentUser.birthYear,
+          dateOfBirth: currentUser.dateOfBirth,
           createdAt: new Date().toISOString(),
         }])
       }
@@ -92,6 +109,10 @@ export default function AdminUsers() {
           phone: currentUser.phone,
           role: currentUser.role || 'ADMIN',
           emailVerified: true,
+          birthDay: currentUser.birthDay,
+          birthMonth: currentUser.birthMonth,
+          birthYear: currentUser.birthYear,
+          dateOfBirth: currentUser.dateOfBirth,
           createdAt: new Date().toISOString(),
         }])
       }
@@ -113,6 +134,10 @@ export default function AdminUsers() {
       phone: u.phone || '',
       role: u.role || 'USER',
       emailVerified: u.emailVerified ?? true,
+      birthDay: u.birthDay ? String(u.birthDay) : '',
+      birthMonth: u.birthMonth ? String(u.birthMonth) : '',
+      birthYear: u.birthYear ? String(u.birthYear) : '',
+      password: '',
     })
   }
 
@@ -124,7 +149,12 @@ export default function AdminUsers() {
     }
     setSubmitting(true)
     try {
-      await api.post('/admin/users', createForm)
+      await api.post('/admin/users', {
+        ...createForm,
+        birthDay: createForm.birthDay ? parseInt(createForm.birthDay, 10) : null,
+        birthMonth: createForm.birthMonth ? parseInt(createForm.birthMonth, 10) : null,
+        birthYear: createForm.birthYear ? parseInt(createForm.birthYear, 10) : null,
+      })
       setSnackbar({ open: true, message: 'User created successfully!', severity: 'success' })
       setCreateOpen(false)
       setCreateForm({
@@ -135,6 +165,9 @@ export default function AdminUsers() {
         phone: '',
         role: 'USER',
         emailVerified: true,
+        birthDay: '',
+        birthMonth: '',
+        birthYear: '',
       })
       await fetchUsers()
     } catch (err: any) {
@@ -150,12 +183,37 @@ export default function AdminUsers() {
     if (!editUser) return
     setSubmitting(true)
     try {
-      await api.put(`/admin/users/${editUser.id}`, editForm)
+      await api.put(`/admin/users/${editUser.id}`, {
+        ...editForm,
+        birthDay: editForm.birthDay ? parseInt(editForm.birthDay, 10) : null,
+        birthMonth: editForm.birthMonth ? parseInt(editForm.birthMonth, 10) : null,
+        birthYear: editForm.birthYear ? parseInt(editForm.birthYear, 10) : null,
+      })
       setSnackbar({ open: true, message: 'User updated successfully!', severity: 'success' })
       setEditUser(null)
       await fetchUsers()
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Failed to update user.'
+      setSnackbar({ open: true, message: msg, severity: 'error' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!passwordUser || !newPasswordVal || newPasswordVal.length < 6) {
+      setSnackbar({ open: true, message: 'Password must be at least 6 characters long.', severity: 'error' })
+      return
+    }
+    setSubmitting(true)
+    try {
+      await api.post(`/admin/users/${passwordUser.id}/password`, { newPassword: newPasswordVal })
+      setSnackbar({ open: true, message: `Password for ${passwordUser.firstName} reset successfully!`, severity: 'success' })
+      setPasswordUser(null)
+      setNewPasswordVal('')
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Failed to reset password.'
       setSnackbar({ open: true, message: msg, severity: 'error' })
     } finally {
       setSubmitting(false)
@@ -220,7 +278,7 @@ export default function AdminUsers() {
           <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflowX: 'auto' }}>
             <Box sx={{ minWidth: 800 }}>
               {/* Header */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
                 {['User', 'Email', 'Role', 'Joined', 'Status', 'Actions'].map(h => (
                   <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
                 ))}
@@ -240,7 +298,7 @@ export default function AdminUsers() {
                   const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
 
                   return (
-                    <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1fr', gap: 2, px: 3, py: 2.5, borderBottom: i < filteredUsers.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) }, transition: 'background-color 0.15s' }}>
+                    <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2.5, borderBottom: i < filteredUsers.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) }, transition: 'background-color 0.15s' }}>
                       {/* User Avatar & Name */}
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(u.role === 'ADMIN' ? '#7C3AED' : brandColors.primary, 0.1), color: u.role === 'ADMIN' ? '#7C3AED' : brandColors.primary, fontSize: '0.8rem', fontWeight: 700 }}>
@@ -248,9 +306,18 @@ export default function AdminUsers() {
                         </Avatar>
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{u.firstName} {u.lastName}</Typography>
-                          {isCurrentSession && (
-                            <Chip label="Active Session" size="small" icon={<FiUserCheck size={12} />} sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, border: 'none' }} />
-                          )}
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.2 }}>
+                            {isCurrentSession && (
+                              <Chip label="Active Session" size="small" icon={<FiUserCheck size={12} />} sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, border: 'none' }} />
+                            )}
+                            {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
+                              <Chip
+                                label={`DOB: ${u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}`}
+                                size="small"
+                                sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600, backgroundColor: alpha(brandColors.muted, 0.08), color: brandColors.muted, border: 'none' }}
+                              />
+                            )}
+                          </Box>
                         </Box>
                       </Box>
 
@@ -282,10 +349,16 @@ export default function AdminUsers() {
                       />
 
                       {/* Action Buttons */}
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        <Tooltip title="Edit User">
+                      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                        <Tooltip title="Edit User Details">
                           <IconButton size="small" onClick={() => handleOpenEdit(u)} sx={{ color: brandColors.muted, '&:hover': { color: brandColors.primary } }}>
-                            <FiEdit2 size={16} />
+                            <FiEdit2 size={15} />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Reset Password">
+                          <IconButton size="small" onClick={() => { setPasswordUser(u); setNewPasswordVal('') }} sx={{ color: brandColors.muted, '&:hover': { color: '#F59E0B' } }}>
+                            <FiKey size={15} />
                           </IconButton>
                         </Tooltip>
 
@@ -293,14 +366,14 @@ export default function AdminUsers() {
                           <Tooltip title="You cannot delete your own active session account">
                             <span>
                               <IconButton size="small" disabled sx={{ opacity: 0.3 }}>
-                                <FiTrash2 size={16} />
+                                <FiTrash2 size={15} />
                               </IconButton>
                             </span>
                           </Tooltip>
                         ) : (
                           <Tooltip title="Delete User Account">
                             <IconButton size="small" onClick={() => setDeleteUser(u)} sx={{ color: brandColors.muted, '&:hover': { color: '#EF4444' } }}>
-                              <FiTrash2 size={16} />
+                              <FiTrash2 size={15} />
                             </IconButton>
                           </Tooltip>
                         )}
@@ -333,7 +406,6 @@ export default function AdminUsers() {
               <TextField
                 label="Last Name"
                 fullWidth
-                required
                 value={createForm.lastName}
                 onChange={(e) => setCreateForm({ ...createForm, lastName: e.target.value })}
               />
@@ -363,6 +435,59 @@ export default function AdminUsers() {
               value={createForm.phone}
               onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
             />
+
+            {/* Birth Date Selectors */}
+            <Box>
+              <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.muted, mb: 0.5, display: 'block' }}>
+                DATE OF BIRTH (OPTIONAL FOR ADMIN CREATION)
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
+                <FormControl sx={{ flex: 1 }}>
+                  <InputLabel id="create-dob-day-label">Day</InputLabel>
+                  <Select
+                    labelId="create-dob-day-label"
+                    label="Day"
+                    value={createForm.birthDay}
+                    onChange={(e) => setCreateForm({ ...createForm, birthDay: e.target.value })}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                      <MenuItem key={d} value={String(d)}>{String(d).padStart(2, '0')}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ flex: 1.5 }}>
+                  <InputLabel id="create-dob-month-label">Month</InputLabel>
+                  <Select
+                    labelId="create-dob-month-label"
+                    label="Month"
+                    value={createForm.birthMonth}
+                    onChange={(e) => setCreateForm({ ...createForm, birthMonth: e.target.value })}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, idx) => (
+                      <MenuItem key={idx + 1} value={String(idx + 1)}>{m}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ flex: 1.2 }}>
+                  <InputLabel id="create-dob-year-label">Year</InputLabel>
+                  <Select
+                    labelId="create-dob-year-label"
+                    label="Year"
+                    value={createForm.birthYear}
+                    onChange={(e) => setCreateForm({ ...createForm, birthYear: e.target.value })}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    {Array.from({ length: 80 }, (_, i) => 2026 - i).map((y) => (
+                      <MenuItem key={y} value={String(y)}>{y}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
 
             <FormControl fullWidth>
               <InputLabel id="create-role-label">Role</InputLabel>
@@ -438,6 +563,68 @@ export default function AdminUsers() {
               onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
             />
 
+            {/* Birth Date Selectors */}
+            <Box>
+              <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.muted, mb: 0.5, display: 'block' }}>
+                DATE OF BIRTH
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
+                <FormControl sx={{ flex: 1 }}>
+                  <InputLabel id="edit-dob-day-label">Day</InputLabel>
+                  <Select
+                    labelId="edit-dob-day-label"
+                    label="Day"
+                    value={editForm.birthDay}
+                    onChange={(e) => setEditForm({ ...editForm, birthDay: e.target.value })}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                      <MenuItem key={d} value={String(d)}>{String(d).padStart(2, '0')}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ flex: 1.5 }}>
+                  <InputLabel id="edit-dob-month-label">Month</InputLabel>
+                  <Select
+                    labelId="edit-dob-month-label"
+                    label="Month"
+                    value={editForm.birthMonth}
+                    onChange={(e) => setEditForm({ ...editForm, birthMonth: e.target.value })}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, idx) => (
+                      <MenuItem key={idx + 1} value={String(idx + 1)}>{m}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ flex: 1.2 }}>
+                  <InputLabel id="edit-dob-year-label">Year</InputLabel>
+                  <Select
+                    labelId="edit-dob-year-label"
+                    label="Year"
+                    value={editForm.birthYear}
+                    onChange={(e) => setEditForm({ ...editForm, birthYear: e.target.value })}
+                  >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                    {Array.from({ length: 80 }, (_, i) => 2026 - i).map((y) => (
+                      <MenuItem key={y} value={String(y)}>{y}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
+
+            <TextField
+              label="Update Password (Optional)"
+              type="password"
+              placeholder="Leave blank to keep unchanged"
+              fullWidth
+              value={editForm.password}
+              onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+            />
+
             <FormControl fullWidth>
               <InputLabel id="edit-role-label">System Role</InputLabel>
               <Select
@@ -467,6 +654,39 @@ export default function AdminUsers() {
             <Button onClick={() => setEditUser(null)} disabled={submitting}>Cancel</Button>
             <Button type="submit" variant="contained" disabled={submitting} startIcon={submitting ? <CircularProgress size={16} /> : undefined}>
               {submitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      {/* RESET PASSWORD DIALOG */}
+      <Dialog open={Boolean(passwordUser)} onClose={() => setPasswordUser(null)} maxWidth="xs" fullWidth PaperProps={{ style: { borderRadius: 16 } }}>
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <FiKey color={brandColors.primary} size={20} />
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>Reset Password</Typography>
+          </Box>
+          <IconButton onClick={() => setPasswordUser(null)} size="small"><FiX /></IconButton>
+        </DialogTitle>
+        <form onSubmit={handlePasswordSubmit}>
+          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Typography variant="body2" sx={{ color: brandColors.text }}>
+              Set a new password for <strong>{passwordUser?.firstName} {passwordUser?.lastName}</strong> ({passwordUser?.email}):
+            </Typography>
+            <TextField
+              label="New Password"
+              type="password"
+              fullWidth
+              required
+              value={newPasswordVal}
+              onChange={(e) => setNewPasswordVal(e.target.value)}
+              helperText="Minimum 6 characters"
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 2 }}>
+            <Button onClick={() => setPasswordUser(null)} disabled={submitting}>Cancel</Button>
+            <Button type="submit" variant="contained" color="warning" disabled={submitting} startIcon={submitting ? <CircularProgress size={16} /> : <FiKey />}>
+              {submitting ? 'Resetting...' : 'Set Password'}
             </Button>
           </DialogActions>
         </form>

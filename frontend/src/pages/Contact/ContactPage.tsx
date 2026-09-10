@@ -7,10 +7,10 @@ import api from '../../services/api'
 import SEO from '../../components/common/SEO'
 
 const services = [
-  'Profile Setup + Account building advice (₹99)',
-  'Profile setup + Personal Branding (8 posts/mo - ₹320)',
-  'Profile setup + personal branding + building network (₹400/mo)',
-  'LinkedIn Consulting (₹250/mo)',
+  'Profile Setup + Account building advice (₹129)',
+  'Profile setup + Personal Branding (8 posts/mo - ₹349)',
+  'Profile setup + personal branding + building network (₹499/mo)',
+  'LinkedIn Consulting (₹249/mo)',
   'Other Query'
 ]
 

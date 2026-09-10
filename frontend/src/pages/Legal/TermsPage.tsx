@@ -40,7 +40,7 @@ export function TermsPage() {
 
           <Section title="2. Line of Business (LOB) & Services Scope">
             <Typography variant="body1" sx={{ lineHeight: 1.8, color: brandColors.muted }}>
-              BrandIt operates strictly in a single Line of Business: <strong>Career & Personal Branding Consulting Services</strong>. Our offerings include LinkedIn profile setup & structural audit (₹99), monthly personal branding content publishing (₹320/mo), targeted network outreach campaign management (₹400/mo), and 1-on-1 strategic career advisory sessions (₹250/mo). All services are priced in Indian Rupees (INR).
+              BrandIt operates strictly in a single Line of Business: <strong>Career & Personal Branding Consulting Services</strong>. Our offerings include LinkedIn profile setup & structural audit (₹129), monthly personal branding content publishing (₹349/mo), targeted network outreach campaign management (₹499/mo), and 1-on-1 strategic career advisory sessions (₹249/mo). All services are priced in Indian Rupees (INR).
             </Typography>
           </Section>
 

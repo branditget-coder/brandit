@@ -271,6 +271,22 @@ export default function ProfilePage() {
                     <TextField label="Phone Number" name="phone" value={formData.phone} onChange={handleProfileChange} fullWidth placeholder="+91 82644XXXXX" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                   </Grid>
                   <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Date of Birth"
+                      value={
+                        user?.dateOfBirth
+                          ? user.dateOfBirth
+                          : user?.birthDay && user?.birthMonth && user?.birthYear
+                          ? `${user.birthDay < 10 ? '0' + user.birthDay : user.birthDay}/${user.birthMonth < 10 ? '0' + user.birthMonth : user.birthMonth}/${user.birthYear}`
+                          : 'Not Provided'
+                      }
+                      disabled
+                      fullWidth
+                      helperText="Birth details recorded during registration."
+                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
                     <TextField label="Current Role" name="currentRole" value={formData.currentRole} onChange={handleProfileChange} fullWidth placeholder="e.g. Founder / Senior Product Lead" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                   </Grid>
                   <Grid item xs={12}>

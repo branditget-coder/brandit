@@ -65,6 +65,14 @@ public class User {
 
     private String avatarUrl;
 
+    private Integer birthDay;
+
+    private Integer birthMonth;
+
+    private Integer birthYear;
+
+    private java.time.LocalDate dateOfBirth;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

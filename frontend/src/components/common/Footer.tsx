@@ -6,10 +6,10 @@ import BrandLogo from './BrandLogo'
 
 const footerLinks = {
   Services: [
-    { label: 'Profile Setup & Advice (₹99)', href: '/services#setup-advice' },
-    { label: 'Profile Setup + Branding (₹320/mo)', href: '/services#branding-basic' },
-    { label: 'Branding + Network Growth (₹400/mo)', href: '/services#branding-network' },
-    { label: 'LinkedIn Consulting (₹250/mo)', href: '/services#linkedin-consulting' },
+    { label: 'Profile Setup & Advice (₹129)', href: '/services#setup-advice' },
+    { label: 'Profile Setup + Branding (₹349/mo)', href: '/services#branding-basic' },
+    { label: 'Branding + Network Growth (₹499/mo)', href: '/services#branding-network' },
+    { label: 'LinkedIn Consulting (₹249/mo)', href: '/services#linkedin-consulting' },
   ],
   Company: [
     { label: 'About Us & Team', href: '/about' },

@@ -23,7 +23,7 @@ const featurePillars = [
     desc: 'Complete structural overhaul & growth blueprint',
     tag: 'One-Time',
     badge: '⚡ 48-hr Turnaround',
-    price: '₹99',
+    price: '₹129',
     unit: 'setup',
     color: '#0A66C2',
     bgColor: '#EFF6FF',
@@ -37,7 +37,7 @@ const featurePillars = [
     desc: '8 strategy-backed posts & custom content monthly',
     tag: 'Monthly',
     badge: '📈 Steady Reach Growth',
-    price: '₹320',
+    price: '₹349',
     unit: '/mo',
     color: '#0D9488',
     bgColor: '#F0FDFA',
@@ -51,7 +51,7 @@ const featurePillars = [
     desc: '8 posts/mo + cold messaging & follow-ups',
     tag: 'Best Value',
     badge: '🎯 Direct Inbounds',
-    price: '₹400',
+    price: '₹499',
     unit: '/mo',
     color: '#7C3AED',
     bgColor: '#F5F3FF',
@@ -62,7 +62,7 @@ const featurePillars = [
 ]
 
 const highlights = [
-  '₹99 One-Time Setup',
+  '₹129 One-Time Setup',
   '8 Strategy Posts / month',
   'Cold Outreach & Growth Engine',
   '1-on-1 LinkedIn Advisory',
@@ -148,7 +148,7 @@ export default function HeroSection() {
                       flexShrink: 0,
                     }}
                   />
-                  Your Profile, Your Brand, Your Opportunity — Plans From ₹99
+                  Your Profile, Your Brand, Your Opportunity — Plans From ₹129
                 </Box>
               </Stack>
             </motion.div>

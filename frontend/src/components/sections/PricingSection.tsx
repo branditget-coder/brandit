@@ -13,8 +13,8 @@ const plans = [
     id: 'setup-advice',
     name: 'Profile Setup & Advice',
     tagline: 'Complete profile setup & growth advice',
-    priceText: '₹99',
-    rawPrice: 99,
+    priceText: '₹129',
+    rawPrice: 129,
     billingPeriod: 'one-time fee',
     popular: false,
     color: brandColors.muted,
@@ -30,8 +30,8 @@ const plans = [
     id: 'branding-basic',
     name: 'Profile Setup + Branding',
     tagline: 'Profile setup with monthly content publishing',
-    priceText: '₹320',
-    rawPrice: 320,
+    priceText: '₹349',
+    rawPrice: 349,
     billingPeriod: '/ month',
     popular: false,
     color: brandColors.primary,
@@ -47,8 +47,8 @@ const plans = [
     id: 'branding-network',
     name: 'Branding + Network Growth',
     tagline: 'Full profile, 8 posts/mo & outreach engine',
-    priceText: '₹400',
-    rawPrice: 400,
+    priceText: '₹499',
+    rawPrice: 499,
     billingPeriod: '/ month',
     popular: true,
     color: brandColors.dark,
@@ -64,8 +64,8 @@ const plans = [
     id: 'linkedin-consulting',
     name: 'LinkedIn Consulting',
     tagline: 'Strategic 1-on-1 career & branding guidance',
-    priceText: '₹250',
-    rawPrice: 250,
+    priceText: '₹249',
+    rawPrice: 249,
     billingPeriod: '/ month*',
     popular: false,
     color: brandColors.muted,
@@ -80,16 +80,16 @@ const plans = [
 ]
 
 const upgradeScenarios = [
-  { from: '₹250 Consulting', to: '₹320 Setup + Branding', diff: 70, note: 'Upgrade from ₹250 Consulting to ₹320 Branding Plan' },
-  { from: '₹99 Profile Setup', to: '₹320 Setup + Branding', diff: 221, note: 'Upgrade from ₹99 Setup to ₹320 Branding Plan' },
-  { from: '₹320 Setup + Branding', to: '₹400 Network Growth', diff: 80, note: 'Upgrade from ₹320 Branding to ₹400 Network Growth' },
-  { from: '₹99 Profile Setup', to: '₹400 Network Growth', diff: 301, note: 'Upgrade from ₹99 Setup to ₹400 Network Growth' },
+  { from: '₹249 Consulting', to: '₹349 Setup + Branding', diff: 100, note: 'Upgrade from ₹249 Consulting to ₹349 Branding Plan' },
+  { from: '₹129 Profile Setup', to: '₹349 Setup + Branding', diff: 220, note: 'Upgrade from ₹129 Setup to ₹349 Branding Plan' },
+  { from: '₹349 Setup + Branding', to: '₹499 Network Growth', diff: 150, note: 'Upgrade from ₹349 Branding to ₹499 Network Growth' },
+  { from: '₹129 Profile Setup', to: '₹499 Network Growth', diff: 370, note: 'Upgrade from ₹129 Setup to ₹499 Network Growth' },
 ]
 
 export default function PricingSection() {
   const navigate = useNavigate()
-  const [customAmount, setCustomAmount] = useState<string>('70')
-  const [customNote, setCustomNote] = useState<string>('Plan Upgrade Difference (₹250 to ₹320)')
+  const [customAmount, setCustomAmount] = useState<string>('100')
+  const [customNote, setCustomNote] = useState<string>('Plan Upgrade Difference (₹249 to ₹349)')
 
   const parsedAmount = Math.max(1, parseInt(customAmount, 10) || 0)
 
@@ -283,7 +283,7 @@ export default function PricingSection() {
                 </Box>
 
                 <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.6 }}>
-                  If you already purchased a plan (e.g. <strong>₹250 Consulting</strong>) and wish to switch to the <strong>₹320 Branding Plan</strong>, you only need to pay the remaining <strong>₹70</strong> difference. Choose a quick upgrade below or enter your exact custom amount.
+                  If you already purchased a plan (e.g. <strong>₹249 Consulting</strong>) and wish to switch to the <strong>₹349 Branding Plan</strong>, you only need to pay the remaining <strong>₹100</strong> difference. Choose a quick upgrade below or enter your exact custom amount.
                 </Typography>
 
                 {/* Quick Upgrade Presets */}
@@ -355,7 +355,7 @@ export default function PricingSection() {
                       type="number"
                       value={customAmount}
                       onChange={(e) => setCustomAmount(e.target.value)}
-                      placeholder="e.g. 70"
+                      placeholder="e.g. 100"
                       inputProps={{ min: 1 }}
                       InputProps={{
                         startAdornment: (
@@ -386,7 +386,7 @@ export default function PricingSection() {
                       size="small"
                       value={customNote}
                       onChange={(e) => setCustomNote(e.target.value)}
-                      placeholder="e.g. Upgraded from ₹250 plan to ₹320 plan"
+                      placeholder="e.g. Upgraded from ₹249 plan to ₹349 plan"
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: '12px',

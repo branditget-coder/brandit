@@ -40,10 +40,10 @@ export default function ShippingPage() {
               Service delivery timelines depend on the specific package purchased:
             </Typography>
             <Typography variant="body1" component="div" sx={{ lineHeight: 1.8, color: brandColors.muted }}>
-              • <strong>Profile Setup & Advice (₹99)</strong>: Complete structural profile audit and actionable growth advice delivered via email within <strong>2 to 3 business days</strong>.<br />
-              • <strong>Personal Branding (₹320/mo)</strong>: Profile setup completed within 3 days; monthly content calendar (8 posts/mo) delivered in weekly batches starting within <strong>3 to 5 business days</strong>.<br />
-              • <strong>Network Growth Engine (₹400/mo)</strong>: Full setup, 8 monthly posts, and cold messaging strategy initiated within <strong>3 to 5 business days</strong>.<br />
-              • <strong>LinkedIn Consulting (₹250/mo)</strong>: 1-on-1 strategy sessions scheduled within <strong>24 to 48 hours</strong> of booking based on client availability.
+              • <strong>Profile Setup & Advice (₹129)</strong>: Complete structural profile audit and actionable growth advice delivered via email within <strong>2 to 3 business days</strong>.<br />
+              • <strong>Personal Branding (₹349/mo)</strong>: Profile setup completed within 3 days; monthly content calendar (8 posts/mo) delivered in weekly batches starting within <strong>3 to 5 business days</strong>.<br />
+              • <strong>Network Growth Engine (₹499/mo)</strong>: Full setup, 8 monthly posts, and cold messaging strategy initiated within <strong>3 to 5 business days</strong>.<br />
+              • <strong>LinkedIn Consulting (₹249/mo)</strong>: 1-on-1 strategy sessions scheduled within <strong>24 to 48 hours</strong> of booking based on client availability.
             </Typography>
           </Section>
 

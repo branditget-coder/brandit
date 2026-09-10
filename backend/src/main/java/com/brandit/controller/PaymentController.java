@@ -23,7 +23,7 @@ public class PaymentController {
     public ResponseEntity<Map<String, String>> createCheckoutSession(@RequestBody StripeCheckoutRequest request,
                                                                    @RequestHeader(value = "Origin", required = false) String origin) {
         log.info("Creating Stripe Payment Gateway session for plan: {}", request.getPlanName());
-        BigDecimal amount = request.getAmount() != null ? request.getAmount() : new BigDecimal(99);
+        BigDecimal amount = request.getAmount() != null ? request.getAmount() : new BigDecimal(129);
         Map<String, String> response = stripeService.createCheckoutSession(
                 request.getPlanName() != null ? request.getPlanName() : "BrandIt Package",
                 amount,

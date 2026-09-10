@@ -124,6 +124,13 @@ public class AuthService {
             assignedRole = isRaghavAdmin ? User.Role.ADMIN : User.Role.TEAM;
         }
 
+        java.time.LocalDate dob = null;
+        if (request.getBirthYear() != null && request.getBirthMonth() != null && request.getBirthDay() != null) {
+            try {
+                dob = java.time.LocalDate.of(request.getBirthYear(), request.getBirthMonth(), request.getBirthDay());
+            } catch (Exception ignored) {}
+        }
+
         User user = User.builder()
                 .firstName(request.getFirstName() != null ? request.getFirstName().trim() : "")
                 .lastName(request.getLastName() != null ? request.getLastName().trim() : "")
@@ -134,6 +141,10 @@ public class AuthService {
                 .provider(User.AuthProvider.LOCAL)
                 .emailVerified(true)
                 .verificationToken(UUID.randomUUID().toString())
+                .birthDay(request.getBirthDay())
+                .birthMonth(request.getBirthMonth())
+                .birthYear(request.getBirthYear())
+                .dateOfBirth(dob)
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -315,6 +326,14 @@ public class AuthService {
         if (request.getCurrentRole() != null) user.setCurrentRole(request.getCurrentRole());
         if (request.getBio() != null) user.setBio(request.getBio());
         if (request.getAvatarUrl() != null) user.setAvatarUrl(request.getAvatarUrl());
+        if (request.getBirthDay() != null) user.setBirthDay(request.getBirthDay());
+        if (request.getBirthMonth() != null) user.setBirthMonth(request.getBirthMonth());
+        if (request.getBirthYear() != null) user.setBirthYear(request.getBirthYear());
+        if (user.getBirthYear() != null && user.getBirthMonth() != null && user.getBirthDay() != null) {
+            try {
+                user.setDateOfBirth(java.time.LocalDate.of(user.getBirthYear(), user.getBirthMonth(), user.getBirthDay()));
+            } catch (Exception ignored) {}
+        }
 
         User updatedUser = userRepository.save(user);
 
@@ -360,6 +379,10 @@ public class AuthService {
         dto.setRole(user.getRole());
         dto.setEmailVerified(user.isEmailVerified());
         dto.setAvatarUrl(user.getAvatarUrl());
+        dto.setBirthDay(user.getBirthDay());
+        dto.setBirthMonth(user.getBirthMonth());
+        dto.setBirthYear(user.getBirthYear());
+        dto.setDateOfBirth(user.getDateOfBirth());
         return dto;
     }
 }

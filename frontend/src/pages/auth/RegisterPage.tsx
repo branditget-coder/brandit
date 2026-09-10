@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import {
   Box, Typography, TextField, Button, Link, InputAdornment,
-  IconButton, alpha, CircularProgress, Grid, Alert, Chip
+  IconButton, alpha, CircularProgress, Grid, Alert, Chip,
+  FormControl, Select, MenuItem
 } from '@mui/material'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiEye, FiEyeOff, FiArrowRight, FiBriefcase, FiUsers,
-  FiCheckCircle, FiMail, FiRefreshCw, FiKey
+  FiCheckCircle, FiMail, FiRefreshCw, FiKey, FiCalendar
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -24,6 +25,9 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [birthDay, setBirthDay] = useState<string>('')
+  const [birthMonth, setBirthMonth] = useState<string>('')
+  const [birthYear, setBirthYear] = useState<string>('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
 
@@ -61,6 +65,27 @@ export default function RegisterPage() {
     if (!firstName.trim()) { setError('First name is required.'); return false }
     if (!lastName.trim()) { setError('Last name is required.'); return false }
     if (!email || !email.includes('@') || !email.includes('.')) { setError('Please enter a valid email address.'); return false }
+    
+    if (!birthDay || !birthMonth || !birthYear) {
+      setError('Date of birth (Day, Month, and Year) is mandatory. Please fill in all 3 fields.');
+      return false
+    }
+
+    const d = parseInt(birthDay, 10)
+    const m = parseInt(birthMonth, 10)
+    const y = parseInt(birthYear, 10)
+    if (isNaN(d) || d < 1 || d > 31 || isNaN(m) || m < 1 || m > 12 || isNaN(y) || y < 1920 || y > 2026) {
+      setError('Please select a valid Date of Birth.');
+      return false
+    }
+
+    // Days in month validation
+    const maxDays = new Date(y, m, 0).getDate()
+    if (d > maxDays) {
+      setError(`Invalid date: Selected month only has ${maxDays} days.`);
+      return false
+    }
+
     if (!password || password.length < 8) { setError('Password must be at least 8 characters.'); return false }
     return true
   }
@@ -125,6 +150,9 @@ export default function RegisterPage() {
         lastName,
         email,
         password,
+        parseInt(birthDay, 10),
+        parseInt(birthMonth, 10),
+        parseInt(birthYear, 10),
         phone,
         userType === 'team' ? 'TEAM' : 'USER',
         cleanOtp
@@ -359,6 +387,103 @@ export default function RegisterPage() {
                     variant="outlined" size="medium"
                     sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                   />
+
+                  {/* ── MANDATORY DATE OF BIRTH (DAY, MONTH, YEAR) ── */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <FiCalendar size={14} color={brandColors.primary} />
+                      Date of Birth * (Mandatory)
+                    </Typography>
+                    <Grid container spacing={1.5}>
+                      {/* Day */}
+                      <Grid item xs={4}>
+                        <FormControl fullWidth size="medium">
+                          <Select
+                            id="register-birth-day"
+                            displayEmpty
+                            value={birthDay}
+                            onChange={(e) => setBirthDay(e.target.value as string)}
+                            sx={{
+                              borderRadius: '12px',
+                              '& .MuiSelect-select': { py: 1.6, fontSize: '0.9rem' },
+                            }}
+                          >
+                            <MenuItem value="" disabled>
+                              <em>Day *</em>
+                            </MenuItem>
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                              <MenuItem key={d} value={d.toString()}>
+                                {d < 10 ? `0${d}` : d}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      {/* Month */}
+                      <Grid item xs={4}>
+                        <FormControl fullWidth size="medium">
+                          <Select
+                            id="register-birth-month"
+                            displayEmpty
+                            value={birthMonth}
+                            onChange={(e) => setBirthMonth(e.target.value as string)}
+                            sx={{
+                              borderRadius: '12px',
+                              '& .MuiSelect-select': { py: 1.6, fontSize: '0.9rem' },
+                            }}
+                          >
+                            <MenuItem value="" disabled>
+                              <em>Month *</em>
+                            </MenuItem>
+                            {[
+                              { val: '1', label: '01 - Jan' },
+                              { val: '2', label: '02 - Feb' },
+                              { val: '3', label: '03 - Mar' },
+                              { val: '4', label: '04 - Apr' },
+                              { val: '5', label: '05 - May' },
+                              { val: '6', label: '06 - Jun' },
+                              { val: '7', label: '07 - Jul' },
+                              { val: '8', label: '08 - Aug' },
+                              { val: '9', label: '09 - Sep' },
+                              { val: '10', label: '10 - Oct' },
+                              { val: '11', label: '11 - Nov' },
+                              { val: '12', label: '12 - Dec' },
+                            ].map((m) => (
+                              <MenuItem key={m.val} value={m.val}>
+                                {m.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      {/* Year */}
+                      <Grid item xs={4}>
+                        <FormControl fullWidth size="medium">
+                          <Select
+                            id="register-birth-year"
+                            displayEmpty
+                            value={birthYear}
+                            onChange={(e) => setBirthYear(e.target.value as string)}
+                            sx={{
+                              borderRadius: '12px',
+                              '& .MuiSelect-select': { py: 1.6, fontSize: '0.9rem' },
+                            }}
+                          >
+                            <MenuItem value="" disabled>
+                              <em>Year *</em>
+                            </MenuItem>
+                            {Array.from({ length: 90 }, (_, i) => 2026 - i).map((y) => (
+                              <MenuItem key={y} value={y.toString()}>
+                                {y}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+                  </Box>
 
                   <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, mb: 0.5, display: 'block' }}>
                     Password (Min 8 characters) *

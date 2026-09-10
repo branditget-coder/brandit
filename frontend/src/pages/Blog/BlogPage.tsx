@@ -518,7 +518,7 @@ export default function BlogPage() {
               '&:hover': { backgroundColor: '#F8FAFC' },
             }}
           >
-            Book Strategy Call (₹99)
+            Book Strategy Call (₹129)
           </Button>
         </Paper>
 

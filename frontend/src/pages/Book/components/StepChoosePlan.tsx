@@ -24,7 +24,7 @@ interface StepChoosePlanProps {
 export function StepChoosePlan({
   services,
   selectedService,
-  customAmount = 70,
+  customAmount = 100,
   customNote = '',
   onSelectService,
   onChangeCustomAmount,
@@ -130,7 +130,7 @@ export function StepChoosePlan({
                       size="small"
                       value={customNote}
                       onChange={(e) => onChangeCustomNote && onChangeCustomNote(e.target.value)}
-                      placeholder="e.g. Upgrading from ₹250 to ₹320 plan"
+                      placeholder="e.g. Upgrading from ₹249 to ₹349 plan"
                       sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                     />
                   </Box>

@@ -23,7 +23,7 @@ export default function RefundPage() {
           {[
             {
               title: '1. Cancellation Policy & Duration',
-              body: 'Clients may request cancellation of any service package (Profile Setup ₹99, Personal Branding ₹320/mo, Growth Engine ₹400/mo, or Consulting ₹250/mo) within 24 hours of placing the order or at least 24 hours prior to a scheduled 1-on-1 consultation session. For monthly subscription programs, clients may cancel upcoming renewal cycles at any time before the billing date.'
+              body: 'Clients may request cancellation of any service package (Profile Setup ₹129, Personal Branding ₹349/mo, Growth Engine ₹499/mo, or Consulting ₹249/mo) within 24 hours of placing the order or at least 24 hours prior to a scheduled 1-on-1 consultation session. For monthly subscription programs, clients may cancel upcoming renewal cycles at any time before the billing date.'
             },
             {
               title: '2. Refund Request Duration & Eligibility',

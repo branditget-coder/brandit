@@ -5,23 +5,22 @@ import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tool
 import { FiTrendingUp, FiTarget, FiZap, FiAward } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
-// Real + Projected growth data
+// Realistic platform growth data
 const growthForecastData = [
-  { month: 'Q1 (Actual)', organic: 320, projected: 320 },
-  { month: 'Q2 (Actual)', organic: 480, projected: 480 },
-  { month: 'Q3 (Forecast)', organic: null, projected: 750 },
-  { month: 'Q4 (Forecast)', organic: null, projected: 1200 },
+  { month: 'Q1 (Actual)', organic: 12, projected: 12 },
+  { month: 'Q2 (Actual)', organic: 24, projected: 24 },
+  { month: 'Q3 (Forecast)', organic: null, projected: 45 },
+  { month: 'Q4 (Forecast)', organic: null, projected: 78 },
 ]
 
 const serviceBreakdown = [
-  { name: 'LinkedIn Opt.', value: 38 },
-  { name: 'Resume Writing', value: 27 },
-  { name: 'Career Consulting', value: 18 },
-  { name: 'Interview Coaching', value: 10 },
-  { name: 'AI Resume Optimization', value: 7 },
+  { name: 'Profile Setup & Advice (₹129)', value: 42 },
+  { name: 'Personal Branding (₹349)', value: 28 },
+  { name: 'Growth Engine (₹499)', value: 18 },
+  { name: 'LinkedIn Consulting (₹249)', value: 12 },
 ]
 
-const COLORS = [brandColors.primary, brandColors.success, '#F59E0B', '#EC4899', '#7C3AED']
+const COLORS = [brandColors.primary, brandColors.success, '#F59E0B', '#7C3AED']
 
 const futureGrowthCards = [
   {

@@ -14,6 +14,10 @@ export interface User {
   role: 'USER' | 'ADMIN' | 'TEAM'
   emailVerified: boolean
   avatarUrl?: string
+  birthDay?: number
+  birthMonth?: number
+  birthYear?: number
+  dateOfBirth?: string
 }
 
 interface AuthContextType {
@@ -23,7 +27,18 @@ interface AuthContextType {
   isSessionExpired: boolean
   login: (email: string, password: string) => Promise<User>
   sendOtp: (email: string, firstName?: string) => Promise<void>
-  register: (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM', otp?: string) => Promise<User>
+  register: (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    birthDay: number,
+    birthMonth: number,
+    birthYear: number,
+    phone?: string,
+    role?: 'USER' | 'TEAM',
+    otp?: string
+  ) => Promise<User>
   loginWithSocial: (provider: 'google', tokenOrCode: string) => Promise<void>
   logout: () => void
   updateProfile: (data: Partial<User>) => Promise<void>
@@ -169,9 +184,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await api.post('/auth/send-otp', { email: cleanEmail, firstName })
   }
 
-  const register = async (firstName: string, lastName: string, email: string, password: string, phone?: string, role?: 'USER' | 'TEAM', otp?: string): Promise<User> => {
+  const register = async (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    birthDay: number,
+    birthMonth: number,
+    birthYear: number,
+    phone?: string,
+    role?: 'USER' | 'TEAM',
+    otp?: string
+  ): Promise<User> => {
     const cleanEmail = email ? email.trim().toLowerCase() : ''
-    const res = await api.post('/auth/register', { firstName, lastName, email: cleanEmail, password, phone, role, otp })
+    const res = await api.post('/auth/register', {
+      firstName,
+      lastName,
+      email: cleanEmail,
+      password,
+      birthDay,
+      birthMonth,
+      birthYear,
+      phone,
+      role,
+      otp,
+    })
     saveAuthSession(res.data.accessToken, res.data.refreshToken, res.data.user)
     return res.data.user
   }
