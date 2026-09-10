@@ -533,7 +533,7 @@ export default function AdminBookings() {
         ) : filteredBookings.length === 0 ? (
           <Paper
             sx={{
-              p: { xs: 4, sm: 6 },
+              p: { xs: 3, sm: 6 },
               borderRadius: '24px',
               border: `1px dashed ${brandColors.border}`,
               textAlign: 'center',
@@ -541,8 +541,8 @@ export default function AdminBookings() {
               backdropFilter: 'blur(12px)'
             }}
           >
-            <Box sx={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
-              <FiCalendar size={28} />
+            <Box sx={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: alpha(brandColors.primary, 0.08), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
+              <FiCalendar size={26} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: brandColors.text, mb: 1 }}>No bookings found</Typography>
             <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 450, mx: 'auto', mb: 3 }}>
@@ -554,264 +554,435 @@ export default function AdminBookings() {
               onClick={() => setCreateOpen(true)}
               variant="contained"
               startIcon={<FiPlus />}
-              sx={{ borderRadius: '12px', px: 3, fontWeight: 700, background: brandColors.primary }}
+              sx={{ borderRadius: '12px', px: 3, py: 1.2, fontWeight: 700, background: brandColors.primary }}
             >
               Add Booking (Offline Cash / Walk-in)
             </Button>
           </Paper>
         ) : (
-          <Paper
-            sx={{
-              borderRadius: '24px',
-              border: `1px solid ${brandColors.border}`,
-              boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.03)',
-              background: 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(16px)',
-              overflow: 'hidden'
-            }}
-          >
-            <Box sx={{ overflowX: 'auto', width: '100%' }}>
-              <Box sx={{ minWidth: 980 }}>
-                {/* Table Header */}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
-                    gap: 2,
-                    px: 3,
-                    py: 2,
-                    borderBottom: `1px solid ${brandColors.border}`,
-                    backgroundColor: alpha(brandColors.primary, 0.03),
-                    alignItems: 'center'
-                  }}
-                >
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
-                    CLIENT & CONTACT
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
-                    CONSULTATION PLAN
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
-                    DATE & TIME
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
-                    AMOUNT & METHOD
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
-                    STATUS
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em', textAlign: 'center' }}>
-                    ACTIONS
-                  </Typography>
-                </Box>
+          <Box>
+            {/* 1. MOBILE CARD VIEW (< md breakpoints) */}
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+              {filteredBookings.map((b) => {
+                const displayDate = b.bookingDate || b.preferredDate || 'Confirmed'
+                const displayTime = b.bookingTime || b.preferredTime || ''
+                const displayAmount = b.amount !== undefined ? b.amount : (b.amountPaid || 129)
+                const rawMethod = (b.paymentMethod || '').toUpperCase()
+                const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
+                const paymentLabel = isOffline ? 'Offline cash in person' : 'Through website'
+                const statusConf = STATUS_COLORS[b.status?.toUpperCase()] || STATUS_COLORS.PENDING
 
-                {/* Table Body Rows */}
-                {filteredBookings.map((b, i) => {
-                  const displayDate = b.bookingDate || b.preferredDate || 'Confirmed'
-                  const displayTime = b.bookingTime || b.preferredTime || ''
-                  const displayAmount = b.amount !== undefined ? b.amount : (b.amountPaid || 129)
-                  
-                  const rawMethod = (b.paymentMethod || '').toUpperCase()
-                  const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
-                  const paymentLabel = isOffline ? 'Offline cash in person' : 'Through website'
-                  const statusConf = STATUS_COLORS[b.status?.toUpperCase()] || STATUS_COLORS.PENDING
-
-                  return (
-                    <Box
-                      key={b.id}
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
-                        gap: 2,
-                        px: 3,
-                        py: 2.2,
-                        borderBottom: i < filteredBookings.length - 1 ? `1px solid ${brandColors.border}` : 'none',
-                        alignItems: 'center',
-                        '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) },
-                        transition: 'background 0.15s ease'
-                      }}
-                    >
-                      {/* 1. Client Info */}
-                      <Box sx={{ pr: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, lineHeight: 1.3 }}>
+                return (
+                  <Paper
+                    key={b.id}
+                    elevation={0}
+                    sx={{
+                      p: 2.2,
+                      borderRadius: '20px',
+                      background: 'rgba(255, 255, 255, 0.85)',
+                      backdropFilter: 'blur(16px)',
+                      border: `1px solid ${brandColors.border}`,
+                      boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.04)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1.5
+                    }}
+                  >
+                    {/* Header: Client & Actions */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: brandColors.text, lineHeight: 1.2 }}>
                           {b.clientName || 'Valued Client'}
                         </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: brandColors.muted,
-                            display: 'block',
-                            mt: 0.3,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}
-                        >
+                        <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mt: 0.2, wordBreak: 'break-all' }}>
                           {b.clientEmail || 'No email provided'}
                         </Typography>
                         {b.clientPhone && b.clientPhone !== 'N/A' && (
-                          <Typography
-                            variant="caption"
+                          <Box
+                            component="a"
+                            href={`tel:${b.clientPhone}`}
                             sx={{
-                              color: brandColors.primary,
-                              display: 'flex',
+                              display: 'inline-flex',
                               alignItems: 'center',
                               gap: 0.6,
-                              fontWeight: 600,
+                              color: brandColors.primary,
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              textDecoration: 'none',
                               mt: 0.3
                             }}
                           >
-                            <FiPhone size={11} style={{ flexShrink: 0 }} />
+                            <FiPhone size={11} />
                             <span>{b.clientPhone}</span>
-                          </Typography>
+                          </Box>
                         )}
                       </Box>
 
-                      {/* 2. Service Plan */}
-                      <Box sx={{ pr: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, lineHeight: 1.3 }}>
-                          {b.serviceName}
+                      {/* Edit & Delete Action Buttons */}
+                      <Stack direction="row" spacing={0.8} sx={{ flexShrink: 0 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenEdit(b)}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '9px',
+                            backgroundColor: alpha(brandColors.primary, 0.08),
+                            color: brandColors.primary
+                          }}
+                        >
+                          <FiEdit2 size={14} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => setDeleteBooking(b)}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '9px',
+                            backgroundColor: alpha('#EF4444', 0.08),
+                            color: '#EF4444'
+                          }}
+                        >
+                          <FiTrash2 size={14} />
+                        </IconButton>
+                      </Stack>
+                    </Box>
+
+                    {/* Service Plan */}
+                    <Box sx={{ backgroundColor: alpha(brandColors.primary, 0.02), p: 1.4, borderRadius: '12px', border: `1px solid ${alpha(brandColors.border, 0.6)}` }}>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text }}>
+                        {b.serviceName}
+                      </Typography>
+                      {b.notes && (
+                        <Typography variant="caption" sx={{ color: brandColors.muted, display: 'flex', alignItems: 'center', gap: 0.6, mt: 0.5, fontStyle: 'italic' }}>
+                          <FiFileText size={11} style={{ flexShrink: 0 }} />
+                          <span>{b.notes}</span>
                         </Typography>
-                        {b.notes && (
-                          <Tooltip title={b.notes} placement="top" arrow>
+                      )}
+                      {b.meetingLink && (
+                        <Typography variant="caption" sx={{ color: '#0284C7', display: 'flex', alignItems: 'center', gap: 0.6, fontWeight: 700, mt: 0.4 }}>
+                          <FiVideo size={11} style={{ flexShrink: 0 }} />
+                          <span>Google Meet Linked</span>
+                        </Typography>
+                      )}
+                    </Box>
+
+                    {/* Meta Row: Date/Time, Amount & Payment */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                          <FiCalendar size={12} color={brandColors.primary} />
+                          <span>{displayDate} {displayTime ? `· ${displayTime}` : ''}</span>
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 800, color: '#10B981', lineHeight: 1.1 }}>
+                          ₹{displayAmount.toLocaleString()}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Footer Row: Payment Chip & Status Selector */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1, borderTop: `1px solid ${alpha(brandColors.border, 0.5)}`, gap: 1 }}>
+                      <Chip
+                        size="small"
+                        icon={isOffline ? <FiCreditCard size={11} /> : <FiGlobe size={11} />}
+                        label={paymentLabel}
+                        sx={{
+                          height: 24,
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          backgroundColor: isOffline ? alpha('#10B981', 0.1) : alpha('#0284C7', 0.1),
+                          color: isOffline ? '#10B981' : '#0284C7',
+                          border: `1px solid ${isOffline ? alpha('#10B981', 0.25) : alpha('#0284C7', 0.25)}`,
+                          '& .MuiChip-icon': { color: 'inherit', ml: '4px' }
+                        }}
+                      />
+
+                      <Select
+                        size="small"
+                        value={b.status || 'CONFIRMED'}
+                        onChange={(e) => handleQuickStatusChange(b.id, e.target.value)}
+                        sx={{
+                          height: 30,
+                          minWidth: 115,
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          borderRadius: '8px',
+                          backgroundColor: statusConf.bg,
+                          color: statusConf.color,
+                          border: `1px solid ${statusConf.border}`,
+                          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                          '& .MuiSelect-select': { py: 0.4, px: 1 }
+                        }}
+                      >
+                        <MenuItem value="PENDING">PENDING</MenuItem>
+                        <MenuItem value="CONFIRMED">CONFIRMED</MenuItem>
+                        <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+                        <MenuItem value="CANCELLED">CANCELLED</MenuItem>
+                      </Select>
+                    </Box>
+                  </Paper>
+                )
+              })}
+            </Box>
+
+            {/* 2. DESKTOP & TABLET TABLE VIEW (>= md breakpoints) */}
+            <Paper
+              sx={{
+                display: { xs: 'none', md: 'block' },
+                borderRadius: '24px',
+                border: `1px solid ${brandColors.border}`,
+                boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.03)',
+                background: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(16px)',
+                overflow: 'hidden'
+              }}
+            >
+              <Box sx={{ overflowX: 'auto', width: '100%' }}>
+                <Box sx={{ minWidth: 980 }}>
+                  {/* Table Header */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
+                      gap: 2,
+                      px: 3,
+                      py: 2,
+                      borderBottom: `1px solid ${brandColors.border}`,
+                      backgroundColor: alpha(brandColors.primary, 0.03),
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                      CLIENT & CONTACT
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                      CONSULTATION PLAN
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                      DATE & TIME
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                      AMOUNT & METHOD
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                      STATUS
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em', textAlign: 'center' }}>
+                      ACTIONS
+                    </Typography>
+                  </Box>
+
+                  {/* Table Body Rows */}
+                  {filteredBookings.map((b, i) => {
+                    const displayDate = b.bookingDate || b.preferredDate || 'Confirmed'
+                    const displayTime = b.bookingTime || b.preferredTime || ''
+                    const displayAmount = b.amount !== undefined ? b.amount : (b.amountPaid || 129)
+                    
+                    const rawMethod = (b.paymentMethod || '').toUpperCase()
+                    const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
+                    const paymentLabel = isOffline ? 'Offline cash in person' : 'Through website'
+                    const statusConf = STATUS_COLORS[b.status?.toUpperCase()] || STATUS_COLORS.PENDING
+
+                    return (
+                      <Box
+                        key={b.id}
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
+                          gap: 2,
+                          px: 3,
+                          py: 2.2,
+                          borderBottom: i < filteredBookings.length - 1 ? `1px solid ${brandColors.border}` : 'none',
+                          alignItems: 'center',
+                          '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) },
+                          transition: 'background 0.15s ease'
+                        }}
+                      >
+                        {/* 1. Client Info */}
+                        <Box sx={{ pr: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, lineHeight: 1.3 }}>
+                            {b.clientName || 'Valued Client'}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: brandColors.muted,
+                              display: 'block',
+                              mt: 0.3,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {b.clientEmail || 'No email provided'}
+                          </Typography>
+                          {b.clientPhone && b.clientPhone !== 'N/A' && (
                             <Typography
                               variant="caption"
                               sx={{
-                                color: brandColors.muted,
+                                color: brandColors.primary,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.6,
-                                mt: 0.4,
-                                fontStyle: 'italic',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                maxWidth: '100%'
+                                fontWeight: 600,
+                                mt: 0.3
                               }}
                             >
-                              <FiFileText size={11} style={{ flexShrink: 0 }} />
-                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {b.notes}
-                              </span>
+                              <FiPhone size={11} style={{ flexShrink: 0 }} />
+                              <span>{b.clientPhone}</span>
                             </Typography>
+                          )}
+                        </Box>
+
+                        {/* 2. Service Plan */}
+                        <Box sx={{ pr: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, lineHeight: 1.3 }}>
+                            {b.serviceName}
+                          </Typography>
+                          {b.notes && (
+                            <Tooltip title={b.notes} placement="top" arrow>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: brandColors.muted,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.6,
+                                  mt: 0.4,
+                                  fontStyle: 'italic',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  maxWidth: '100%'
+                                }}
+                              >
+                                <FiFileText size={11} style={{ flexShrink: 0 }} />
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {b.notes}
+                                </span>
+                              </Typography>
+                            </Tooltip>
+                          )}
+                          {b.meetingLink && (
+                            <Typography variant="caption" sx={{ color: '#0284C7', display: 'flex', alignItems: 'center', gap: 0.6, fontWeight: 600, mt: 0.2 }}>
+                              <FiVideo size={11} style={{ flexShrink: 0 }} />
+                              <span>Google Meet Linked</span>
+                            </Typography>
+                          )}
+                        </Box>
+
+                        {/* 3. Date & Time */}
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                            <FiCalendar size={13} color={brandColors.primary} style={{ flexShrink: 0 }} />
+                            <span>{displayDate}</span>
+                          </Typography>
+                          {displayTime && (
+                            <Typography variant="caption" sx={{ color: brandColors.muted, display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.4 }}>
+                              <FiClock size={12} style={{ flexShrink: 0 }} />
+                              <span>{displayTime}</span>
+                            </Typography>
+                          )}
+                        </Box>
+
+                        {/* 4. Payment Option & Amount */}
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 800, color: '#10B981', fontSize: '0.95rem' }}>
+                            ₹{displayAmount.toLocaleString()}
+                          </Typography>
+                          <Chip
+                            size="small"
+                            icon={isOffline ? <FiCreditCard size={11} /> : <FiGlobe size={11} />}
+                            label={paymentLabel}
+                            sx={{
+                              height: 22,
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              mt: 0.4,
+                              borderRadius: '6px',
+                              backgroundColor: isOffline ? alpha('#10B981', 0.1) : alpha('#0284C7', 0.1),
+                              color: isOffline ? '#10B981' : '#0284C7',
+                              border: `1px solid ${isOffline ? alpha('#10B981', 0.25) : alpha('#0284C7', 0.25)}`,
+                              '& .MuiChip-icon': {
+                                color: 'inherit',
+                                ml: '4px'
+                              }
+                            }}
+                          />
+                        </Box>
+
+                        {/* 5. Status Dropdown */}
+                        <Box>
+                          <Select
+                            size="small"
+                            value={b.status || 'CONFIRMED'}
+                            onChange={(e) => handleQuickStatusChange(b.id, e.target.value)}
+                            sx={{
+                              height: 32,
+                              width: '100%',
+                              maxWidth: 125,
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              borderRadius: '10px',
+                              backgroundColor: statusConf.bg,
+                              color: statusConf.color,
+                              border: `1px solid ${statusConf.border}`,
+                              '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                              '& .MuiSelect-select': { py: 0.5, px: 1.2 }
+                            }}
+                          >
+                            <MenuItem value="PENDING">PENDING</MenuItem>
+                            <MenuItem value="CONFIRMED">CONFIRMED</MenuItem>
+                            <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+                            <MenuItem value="CANCELLED">CANCELLED</MenuItem>
+                          </Select>
+                        </Box>
+
+                        {/* 6. Action Buttons */}
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.8 }}>
+                          <Tooltip title="Edit Booking Details">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleOpenEdit(b)}
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '9px',
+                                backgroundColor: alpha(brandColors.primary, 0.07),
+                                color: brandColors.primary,
+                                '&:hover': { backgroundColor: alpha(brandColors.primary, 0.18) }
+                              }}
+                            >
+                              <FiEdit2 size={14} />
+                            </IconButton>
                           </Tooltip>
-                        )}
-                        {b.meetingLink && (
-                          <Typography variant="caption" sx={{ color: '#0284C7', display: 'flex', alignItems: 'center', gap: 0.6, fontWeight: 600, mt: 0.2 }}>
-                            <FiVideo size={11} style={{ flexShrink: 0 }} />
-                            <span>Google Meet Linked</span>
-                          </Typography>
-                        )}
+                          <Tooltip title="Delete Booking">
+                            <IconButton
+                              size="small"
+                              onClick={() => setDeleteBooking(b)}
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '9px',
+                                backgroundColor: alpha('#EF4444', 0.07),
+                                color: '#EF4444',
+                                '&:hover': { backgroundColor: alpha('#EF4444', 0.18) }
+                              }}
+                            >
+                              <FiTrash2 size={14} />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </Box>
-
-                      {/* 3. Date & Time */}
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text, display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                          <FiCalendar size={13} color={brandColors.primary} style={{ flexShrink: 0 }} />
-                          <span>{displayDate}</span>
-                        </Typography>
-                        {displayTime && (
-                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'flex', alignItems: 'center', gap: 0.8, mt: 0.4 }}>
-                            <FiClock size={12} style={{ flexShrink: 0 }} />
-                            <span>{displayTime}</span>
-                          </Typography>
-                        )}
-                      </Box>
-
-                      {/* 4. Payment Option & Amount */}
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#10B981', fontSize: '0.95rem' }}>
-                          ₹{displayAmount.toLocaleString()}
-                        </Typography>
-                        <Chip
-                          size="small"
-                          icon={isOffline ? <FiCreditCard size={11} /> : <FiGlobe size={11} />}
-                          label={paymentLabel}
-                          sx={{
-                            height: 22,
-                            fontSize: '0.68rem',
-                            fontWeight: 700,
-                            mt: 0.4,
-                            borderRadius: '6px',
-                            backgroundColor: isOffline ? alpha('#10B981', 0.1) : alpha('#0284C7', 0.1),
-                            color: isOffline ? '#10B981' : '#0284C7',
-                            border: `1px solid ${isOffline ? alpha('#10B981', 0.25) : alpha('#0284C7', 0.25)}`,
-                            '& .MuiChip-icon': {
-                              color: 'inherit',
-                              ml: '4px'
-                            }
-                          }}
-                        />
-                      </Box>
-
-                      {/* 5. Status Dropdown */}
-                      <Box>
-                        <Select
-                          size="small"
-                          value={b.status || 'CONFIRMED'}
-                          onChange={(e) => handleQuickStatusChange(b.id, e.target.value)}
-                          sx={{
-                            height: 32,
-                            width: '100%',
-                            maxWidth: 125,
-                            fontSize: '0.75rem',
-                            fontWeight: 700,
-                            borderRadius: '10px',
-                            backgroundColor: statusConf.bg,
-                            color: statusConf.color,
-                            border: `1px solid ${statusConf.border}`,
-                            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                            '& .MuiSelect-select': { py: 0.5, px: 1.2 }
-                          }}
-                        >
-                          <MenuItem value="PENDING">PENDING</MenuItem>
-                          <MenuItem value="CONFIRMED">CONFIRMED</MenuItem>
-                          <MenuItem value="COMPLETED">COMPLETED</MenuItem>
-                          <MenuItem value="CANCELLED">CANCELLED</MenuItem>
-                        </Select>
-                      </Box>
-
-                      {/* 6. Action Buttons */}
-                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.8 }}>
-                        <Tooltip title="Edit Booking Details">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleOpenEdit(b)}
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: '9px',
-                              backgroundColor: alpha(brandColors.primary, 0.07),
-                              color: brandColors.primary,
-                              '&:hover': { backgroundColor: alpha(brandColors.primary, 0.18) }
-                            }}
-                          >
-                            <FiEdit2 size={14} />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Booking">
-                          <IconButton
-                            size="small"
-                            onClick={() => setDeleteBooking(b)}
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: '9px',
-                              backgroundColor: alpha('#EF4444', 0.07),
-                              color: '#EF4444',
-                              '&:hover': { backgroundColor: alpha('#EF4444', 0.18) }
-                            }}
-                          >
-                            <FiTrash2 size={14} />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </Box>
-                  )
-                })}
+                    )
+                  })}
+                </Box>
               </Box>
-            </Box>
-          </Paper>
+            </Paper>
+          </Box>
         )}
 
         {/* ----------------- CREATE BOOKING MODAL ----------------- */}

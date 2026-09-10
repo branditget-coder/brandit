@@ -242,25 +242,127 @@ export default function AdminUsers() {
   )
 
   const renderUserTable = (userList: UserItem[], emptyMessage: string, roleAccentColor: string) => {
-    return (
-      <Box sx={{ overflowX: 'auto' }}>
-        <Box sx={{ minWidth: 800 }}>
-          {/* Header */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: alpha(roleAccentColor, 0.04), borderRadius: '12px' }}>
-            {['User', 'Email', 'Role & DOB', 'Joined', 'Status', 'Actions'].map(h => (
-              <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
-            ))}
-          </Box>
+    if (userList.length === 0) {
+      return (
+        <Box sx={{ p: { xs: 3, sm: 5 }, textAlign: 'center' }}>
+          <FiUsers size={32} color={brandColors.muted} style={{ marginBottom: 12 }} />
+          <Typography variant="h6" sx={{ color: brandColors.text, mb: 0.5 }}>{emptyMessage}</Typography>
+          <Typography variant="body2" sx={{ color: brandColors.muted }}>Try refining your search terms.</Typography>
+        </Box>
+      )
+    }
 
-          {/* Rows */}
-          {userList.length === 0 ? (
-            <Box sx={{ p: 5, textAlign: 'center' }}>
-              <FiUsers size={32} color={brandColors.muted} style={{ marginBottom: 12 }} />
-              <Typography variant="h6" sx={{ color: brandColors.text, mb: 0.5 }}>{emptyMessage}</Typography>
-              <Typography variant="body2" sx={{ color: brandColors.muted }}>Try refining your search terms.</Typography>
+    return (
+      <Box>
+        {/* 1. MOBILE CARDS VIEW (< md breakpoints) */}
+        <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 1.8, p: { xs: 1.5, sm: 2 } }}>
+          {userList.map((u) => {
+            const initials = `${u.firstName?.[0] || 'U'}${u.lastName?.[0] || ''}`.toUpperCase()
+            const formattedDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'
+            const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
+
+            return (
+              <Paper
+                key={u.id}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: '16px',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(12px)',
+                  border: `1px solid ${brandColors.border}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.2
+                }}
+              >
+                {/* User Top Row: Avatar + Name + Current session */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                    <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(roleAccentColor, 0.15), color: roleAccentColor, fontSize: '0.82rem', fontWeight: 700 }}>
+                      {initials}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text }}>
+                        {u.firstName} {u.lastName}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', wordBreak: 'break-all' }}>
+                        {u.email}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Actions */}
+                  <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                    <Tooltip title="Edit User">
+                      <IconButton size="small" onClick={() => handleOpenEdit(u)} sx={{ width: 30, height: 30, color: brandColors.primary, bgcolor: alpha(brandColors.primary, 0.06) }}>
+                        <FiEdit2 size={13} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Reset Password">
+                      <IconButton size="small" onClick={() => { setPasswordUser(u); setNewPasswordVal('') }} sx={{ width: 30, height: 30, color: '#F59E0B', bgcolor: alpha('#F59E0B', 0.06) }}>
+                        <FiKey size={13} />
+                      </IconButton>
+                    </Tooltip>
+                    {!isCurrentSession && (
+                      <Tooltip title="Delete User">
+                        <IconButton size="small" onClick={() => setDeleteUser(u)} sx={{ width: 30, height: 30, color: '#EF4444', bgcolor: alpha('#EF4444', 0.06) }}>
+                          <FiTrash2 size={13} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* Badges & Meta */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1, pt: 0.8, borderTop: `1px solid ${alpha(brandColors.border, 0.6)}` }}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Chip
+                      label={u.role}
+                      size="small"
+                      icon={u.role === 'ADMIN' ? <FiShield size={11} /> : undefined}
+                      sx={{
+                        backgroundColor: alpha(u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary, 0.1),
+                        color: u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary,
+                        fontWeight: 700,
+                        fontSize: '0.68rem',
+                        height: 22
+                      }}
+                    />
+                    <Chip
+                      label={u.emailVerified ? 'Verified' : 'Active'}
+                      size="small"
+                      sx={{ backgroundColor: alpha(brandColors.success, 0.1), color: '#059669', fontWeight: 600, fontSize: '0.68rem', height: 22 }}
+                    />
+                  </Stack>
+
+                  <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.72rem' }}>
+                    Joined: {formattedDate}
+                  </Typography>
+                </Box>
+
+                {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
+                  <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.72rem' }}>
+                    🎂 DOB: {u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}
+                  </Typography>
+                )}
+              </Paper>
+            )
+          })}
+        </Box>
+
+        {/* 2. DESKTOP TABLE VIEW (>= md breakpoints) */}
+        <Box sx={{ display: { xs: 'none', md: 'block' }, overflowX: 'auto' }}>
+          <Box sx={{ minWidth: 800 }}>
+            {/* Header */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: alpha(roleAccentColor, 0.04), borderRadius: '12px' }}>
+              {['User', 'Email', 'Role & DOB', 'Joined', 'Status', 'Actions'].map(h => (
+                <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
+              ))}
             </Box>
-          ) : (
-            userList.map((u, i) => {
+
+            {/* Rows */}
+            {userList.map((u, i) => {
               const initials = `${u.firstName?.[0] || 'U'}${u.lastName?.[0] || ''}`.toUpperCase()
               const formattedDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'
               const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
@@ -346,8 +448,8 @@ export default function AdminUsers() {
                   </Box>
                 </Box>
               )
-            })
-          )}
+            })}
+          </Box>
         </Box>
       </Box>
     )
