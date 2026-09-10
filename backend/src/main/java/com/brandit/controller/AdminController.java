@@ -54,10 +54,8 @@ public class AdminController {
         try {
             List<com.brandit.entity.Booking> bookings = bookingRepository.findAll();
             for (com.brandit.entity.Booking b : bookings) {
-                if (b.getAmount() != null && b.getAmount() > 0) {
-                    calculatedRevenue += b.getAmount();
-                } else if (b.getAmountPaid() != null && b.getAmountPaid() > 0) {
-                    calculatedRevenue += b.getAmountPaid();
+                if (b.getAmount() != null && b.getAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+                    calculatedRevenue += b.getAmount().longValue();
                 } else {
                     calculatedRevenue += 349L;
                 }
