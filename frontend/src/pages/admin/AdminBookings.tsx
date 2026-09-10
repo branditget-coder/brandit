@@ -5,11 +5,11 @@ import {
   IconButton, TextField, InputAdornment, FormControl, InputLabel,
   Snackbar, Alert, Tooltip, Grid
 } from '@mui/material'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   FiCalendar, FiRefreshCw, FiPlus, FiEdit2, FiTrash2, FiSearch,
   FiClock, FiDollarSign, FiUser, FiMail, FiPhone, FiVideo,
-  FiFileText, FiCreditCard, FiX, FiCheckCircle, FiAlertCircle, FiLayers
+  FiFileText, FiCreditCard, FiX, FiCheckCircle, FiAlertCircle, FiGlobe
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
@@ -51,13 +51,10 @@ const STATUS_COLORS: Record<string, { bg: string; color: string; border: string 
   CANCELLED: { bg: alpha('#EF4444', 0.12), color: '#EF4444', border: alpha('#EF4444', 0.3) },
 }
 
+// Exactly 2 payment options as requested
 const PAYMENT_METHODS = [
-  { value: 'CASH', label: '💵 Cash (In-Person / Offline)' },
-  { value: 'UPI_OFFLINE', label: '📱 Offline UPI / QR Scan' },
-  { value: 'BANK_TRANSFER', label: '🏛️ Direct Bank Transfer / NEFT' },
-  { value: 'ONLINE', label: '⚡ Online Razorpay Gateway' },
-  { value: 'CARD', label: '💳 POS Card Swipe' },
-  { value: 'OTHER', label: '📝 Other / Manual Waiver' }
+  { value: 'THROUGH_WEBSITE', label: '🌐 Through website' },
+  { value: 'OFFLINE_CASH', label: '💵 Offline cash in person' }
 ]
 
 export default function AdminBookings() {
@@ -65,6 +62,7 @@ export default function AdminBookings() {
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [paymentFilter, setPaymentFilter] = useState<string>('ALL')
 
   // Modals state
   const [createOpen, setCreateOpen] = useState<boolean>(false)
@@ -88,7 +86,7 @@ export default function AdminBookings() {
     bookingDate: new Date().toISOString().split('T')[0],
     bookingTime: '11:00:00',
     amount: 129,
-    paymentMethod: 'CASH',
+    paymentMethod: 'OFFLINE_CASH',
     paymentId: '',
     status: 'CONFIRMED',
     meetingLink: '',
@@ -104,7 +102,7 @@ export default function AdminBookings() {
     bookingDate: '',
     bookingTime: '',
     amount: 0,
-    paymentMethod: 'CASH',
+    paymentMethod: 'OFFLINE_CASH',
     paymentId: '',
     status: 'CONFIRMED',
     meetingLink: '',
@@ -146,11 +144,13 @@ export default function AdminBookings() {
     }
     setSubmitting(true)
     try {
+      const isOffline = createForm.paymentMethod === 'OFFLINE_CASH'
+      const prefix = isOffline ? 'CASH_' : 'WEB_'
       const payload = {
         ...createForm,
         amount: Number(createForm.amount) || 0,
         bookingTime: createForm.bookingTime.length === 5 ? `${createForm.bookingTime}:00` : createForm.bookingTime,
-        paymentId: createForm.paymentId.trim() || `${createForm.paymentMethod}_${Date.now()}`
+        paymentId: createForm.paymentId.trim() || `${prefix}${Date.now()}`
       }
       await api.post('/bookings/admin', payload)
       setSnackbar({ open: true, message: 'New booking registered successfully!', severity: 'success' })
@@ -164,7 +164,7 @@ export default function AdminBookings() {
         bookingDate: new Date().toISOString().split('T')[0],
         bookingTime: '11:00:00',
         amount: 129,
-        paymentMethod: 'CASH',
+        paymentMethod: 'OFFLINE_CASH',
         paymentId: '',
         status: 'CONFIRMED',
         meetingLink: '',
@@ -181,6 +181,10 @@ export default function AdminBookings() {
 
   const handleOpenEdit = (b: BookingItem) => {
     setEditBooking(b)
+    const rawMethod = (b.paymentMethod || '').toUpperCase()
+    const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
+    const normalizedMethod = isOffline ? 'OFFLINE_CASH' : 'THROUGH_WEBSITE'
+
     setEditForm({
       clientName: b.clientName || '',
       clientEmail: b.clientEmail || '',
@@ -189,7 +193,7 @@ export default function AdminBookings() {
       bookingDate: b.bookingDate || b.preferredDate || new Date().toISOString().split('T')[0],
       bookingTime: b.bookingTime || b.preferredTime || '11:00:00',
       amount: b.amount || b.amountPaid || 0,
-      paymentMethod: b.paymentMethod || 'CASH',
+      paymentMethod: normalizedMethod,
       paymentId: b.paymentId || '',
       status: b.status || 'CONFIRMED',
       meetingLink: b.meetingLink || '',
@@ -247,25 +251,32 @@ export default function AdminBookings() {
 
   // Filter and search
   const filteredBookings = bookings.filter(b => {
+    const rawMethod = (b.paymentMethod || '').toUpperCase()
+    const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
     const matchesSearch =
       (b.clientName || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.clientEmail || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.serviceName || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.paymentId || '').toLowerCase().includes(search.toLowerCase()) ||
-      (b.paymentMethod || '').toLowerCase().includes(search.toLowerCase())
+      (isOffline ? 'offline cash in person' : 'through website').includes(search.toLowerCase())
 
     const matchesStatus = statusFilter === 'ALL' || (b.status || '').toUpperCase() === statusFilter
 
-    return matchesSearch && matchesStatus
+    const matchesPayment =
+      paymentFilter === 'ALL' ||
+      (paymentFilter === 'OFFLINE_CASH' && isOffline) ||
+      (paymentFilter === 'THROUGH_WEBSITE' && !isOffline)
+
+    return matchesSearch && matchesStatus && matchesPayment
   })
 
   // Summary Metrics
   const totalRevenue = bookings.reduce((sum, b) => sum + (Number(b.amount || b.amountPaid) || 0), 0)
-  const cashOfflineCount = bookings.filter(b => {
+  const offlineCashCount = bookings.filter(b => {
     const m = (b.paymentMethod || '').toUpperCase()
-    return m.includes('CASH') || m.includes('OFFLINE') || m.includes('BANK')
+    return m.includes('CASH') || m.includes('OFFLINE')
   }).length
-  const confirmedCount = bookings.filter(b => b.status === 'CONFIRMED').length
+  const throughWebsiteCount = bookings.length - offlineCashCount
 
   return (
     <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
@@ -277,7 +288,7 @@ export default function AdminBookings() {
               Bookings & Appointments ({bookings.length})
             </Typography>
             <Typography variant="body2" sx={{ color: brandColors.muted }}>
-              Manage online consultations, record offline cash walk-ins, and update client session statuses.
+              Manage online consultations, record offline cash clients in person, and adjust bookings.
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} sx={{ width: { xs: '100%', sm: 'auto' } }}>
@@ -311,7 +322,7 @@ export default function AdminBookings() {
                 '&:hover': { background: 'linear-gradient(135deg, #0369A1 0%, #075985 100%)' }
               }}
             >
-              Add Booking (Cash / Offline)
+              Add Booking (Offline Cash / Walk-in)
             </Button>
           </Stack>
         </Box>
@@ -367,7 +378,7 @@ export default function AdminBookings() {
               </Box>
               <Box>
                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Total Booking Revenue
+                  Total Revenue
                 </Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
                   ₹{totalRevenue.toLocaleString()}
@@ -391,15 +402,15 @@ export default function AdminBookings() {
                 gap: 2
               }}
             >
-              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#8B5CF6', 0.1), color: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
-                <FiCreditCard />
+              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#0284C7', 0.1), color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+                <FiGlobe />
               </Box>
               <Box>
                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Cash / Offline Deals
+                  Through Website
                 </Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
-                  {cashOfflineCount}
+                  {throughWebsiteCount}
                 </Typography>
               </Box>
             </Paper>
@@ -420,15 +431,15 @@ export default function AdminBookings() {
                 gap: 2
               }}
             >
-              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#F59E0B', 0.1), color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
-                <FiCheckCircle />
+              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#10B981', 0.1), color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+                <FiCreditCard />
               </Box>
               <Box>
                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Confirmed Slots
+                  Offline Cash In Person
                 </Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
-                  {confirmedCount}
+                  {offlineCashCount}
                 </Typography>
               </Box>
             </Paper>
@@ -455,7 +466,7 @@ export default function AdminBookings() {
           {/* Search Field */}
           <TextField
             size="small"
-            placeholder="Search by client, email, plan, or UTR/Ref..."
+            placeholder="Search by client, email, plan, or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -466,34 +477,50 @@ export default function AdminBookings() {
               ),
               sx: { borderRadius: '12px', background: '#fff', fontSize: '0.9rem' }
             }}
-            sx={{ width: { xs: '100%', md: 380 } }}
+            sx={{ width: { xs: '100%', md: 320 } }}
           />
 
-          {/* Status Filter Pills */}
-          <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: { xs: 1, md: 0 } }}>
-            {['ALL', 'CONFIRMED', 'PENDING', 'COMPLETED', 'CANCELLED'].map(tab => {
-              const isActive = statusFilter === tab
-              return (
-                <Chip
-                  key={tab}
-                  label={tab}
-                  onClick={() => setStatusFilter(tab)}
-                  sx={{
-                    borderRadius: '10px',
-                    fontWeight: 700,
-                    fontSize: '0.78rem',
-                    cursor: 'pointer',
-                    px: 1,
-                    backgroundColor: isActive ? brandColors.primary : alpha(brandColors.primary, 0.04),
-                    color: isActive ? '#fff' : brandColors.text,
-                    border: `1px solid ${isActive ? brandColors.primary : brandColors.border}`,
-                    '&:hover': {
-                      backgroundColor: isActive ? brandColors.primary : alpha(brandColors.primary, 0.08),
-                    }
-                  }}
-                />
-              )
-            })}
+          {/* Payment Method & Status Filter Pills */}
+          <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: { xs: 1, md: 0 }, flexWrap: { xs: 'nowrap', md: 'wrap' } }}>
+            {/* Payment Method Filter */}
+            <Chip
+              label="All Payment Modes"
+              onClick={() => setPaymentFilter('ALL')}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                backgroundColor: paymentFilter === 'ALL' ? brandColors.text : alpha(brandColors.primary, 0.04),
+                color: paymentFilter === 'ALL' ? '#fff' : brandColors.text,
+              }}
+            />
+            <Chip
+              label="🌐 Through Website"
+              onClick={() => setPaymentFilter('THROUGH_WEBSITE')}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                backgroundColor: paymentFilter === 'THROUGH_WEBSITE' ? '#0284C7' : alpha('#0284C7', 0.08),
+                color: paymentFilter === 'THROUGH_WEBSITE' ? '#fff' : '#0284C7',
+                border: `1px solid ${alpha('#0284C7', 0.3)}`
+              }}
+            />
+            <Chip
+              label="💵 Offline Cash in Person"
+              onClick={() => setPaymentFilter('OFFLINE_CASH')}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                backgroundColor: paymentFilter === 'OFFLINE_CASH' ? '#10B981' : alpha('#10B981', 0.08),
+                color: paymentFilter === 'OFFLINE_CASH' ? '#fff' : '#10B981',
+                border: `1px solid ${alpha('#10B981', 0.3)}`
+              }}
+            />
           </Stack>
         </Paper>
 
@@ -519,9 +546,9 @@ export default function AdminBookings() {
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: brandColors.text, mb: 1 }}>No bookings found</Typography>
             <Typography variant="body2" sx={{ color: brandColors.muted, maxWidth: 450, mx: 'auto', mb: 3 }}>
-              {search || statusFilter !== 'ALL'
+              {search || statusFilter !== 'ALL' || paymentFilter !== 'ALL'
                 ? 'No consultation bookings match your current search and filter criteria.'
-                : 'No bookings recorded in the system yet. Click below to add an offline or cash client.'}
+                : 'No bookings recorded in the system yet. Click below to add an offline cash client.'}
             </Typography>
             <Button
               onClick={() => setCreateOpen(true)}
@@ -529,7 +556,7 @@ export default function AdminBookings() {
               startIcon={<FiPlus />}
               sx={{ borderRadius: '12px', px: 3, fontWeight: 700, background: brandColors.primary }}
             >
-              Add Cash / Walk-in Booking
+              Add Booking (Offline Cash / Walk-in)
             </Button>
           </Paper>
         ) : (
@@ -544,12 +571,12 @@ export default function AdminBookings() {
             }}
           >
             <Box sx={{ overflowX: 'auto' }}>
-              <Box sx={{ minWidth: 900 }}>
+              <Box sx={{ minWidth: 920 }}>
                 {/* Table Header */}
                 <Box
                   sx={{
                     display: 'grid',
-                    gridTemplateColumns: '2.5fr 2.5fr 1.8fr 1.3fr 1.5fr 1.2fr',
+                    gridTemplateColumns: '2.5fr 2.5fr 1.8fr 1.6fr 1.4fr 1.2fr',
                     gap: 2,
                     px: 3.5,
                     py: 2.2,
@@ -557,7 +584,7 @@ export default function AdminBookings() {
                     backgroundColor: alpha(brandColors.primary, 0.02)
                   }}
                 >
-                  {['Client & Contact', 'Consultation Plan', 'Date & Time', 'Payment / Method', 'Status', 'Actions'].map((h, i) => (
+                  {['Client & Contact', 'Consultation Plan', 'Date & Time', 'Payment Option', 'Status', 'Actions'].map((h, i) => (
                     <Typography
                       key={h}
                       variant="caption"
@@ -578,7 +605,10 @@ export default function AdminBookings() {
                   const displayDate = b.bookingDate || b.preferredDate || 'Confirmed'
                   const displayTime = b.bookingTime || b.preferredTime || ''
                   const displayAmount = b.amount !== undefined ? b.amount : (b.amountPaid || 129)
-                  const pMethod = (b.paymentMethod || 'CASH').toUpperCase()
+                  
+                  const rawMethod = (b.paymentMethod || '').toUpperCase()
+                  const isOffline = rawMethod.includes('CASH') || rawMethod.includes('OFFLINE')
+                  const paymentLabel = isOffline ? '💵 Offline cash in person' : '🌐 Through website'
                   const statusConf = STATUS_COLORS[b.status?.toUpperCase()] || STATUS_COLORS.PENDING
 
                   return (
@@ -586,7 +616,7 @@ export default function AdminBookings() {
                       key={b.id}
                       sx={{
                         display: 'grid',
-                        gridTemplateColumns: '2.5fr 2.5fr 1.8fr 1.3fr 1.5fr 1.2fr',
+                        gridTemplateColumns: '2.5fr 2.5fr 1.8fr 1.6fr 1.4fr 1.2fr',
                         gap: 2,
                         px: 3.5,
                         py: 2.5,
@@ -642,22 +672,23 @@ export default function AdminBookings() {
                         )}
                       </Box>
 
-                      {/* Payment & Amount */}
+                      {/* Payment Option & Amount */}
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 800, color: '#10B981' }}>
                           ₹{displayAmount.toLocaleString()}
                         </Typography>
                         <Chip
                           size="small"
-                          label={pMethod}
+                          label={paymentLabel}
                           sx={{
-                            height: 20,
-                            fontSize: '0.65rem',
+                            height: 22,
+                            fontSize: '0.68rem',
                             fontWeight: 700,
                             mt: 0.4,
                             borderRadius: '6px',
-                            backgroundColor: pMethod.includes('CASH') ? alpha('#10B981', 0.12) : alpha('#6366F1', 0.12),
-                            color: pMethod.includes('CASH') ? '#10B981' : '#6366F1',
+                            backgroundColor: isOffline ? alpha('#10B981', 0.12) : alpha('#0284C7', 0.12),
+                            color: isOffline ? '#10B981' : '#0284C7',
+                            border: `1px solid ${isOffline ? alpha('#10B981', 0.3) : alpha('#0284C7', 0.3)}`
                           }}
                         />
                       </Box>
@@ -726,7 +757,7 @@ export default function AdminBookings() {
           </Paper>
         )}
 
-        {/* ----------------- CREATE BOOKING MODAL (Offline / Cash / Online) ----------------- */}
+        {/* ----------------- CREATE BOOKING MODAL ----------------- */}
         <Dialog
           open={createOpen}
           onClose={() => !submitting && setCreateOpen(false)}
@@ -746,10 +777,10 @@ export default function AdminBookings() {
           <DialogTitle sx={{ px: 3, pt: 3, pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
-                Add Offline / Cash Booking
+                Add Booking (Offline Cash / Through Website)
               </Typography>
               <Typography variant="body2" sx={{ color: brandColors.muted }}>
-                Create a consultation booking for clients who visit in person, book via WhatsApp, or pay offline.
+                Create a consultation booking for clients paying in person or through the website.
               </Typography>
             </Box>
             <IconButton onClick={() => setCreateOpen(false)} disabled={submitting}>
@@ -882,12 +913,12 @@ export default function AdminBookings() {
                   />
                 </Grid>
 
-                {/* Payment Method */}
-                <Grid item xs={12} sm={4}>
+                {/* Payment Option: Exactly 2 Choices */}
+                <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Payment Method</InputLabel>
+                    <InputLabel>Payment Option</InputLabel>
                     <Select
-                      label="Payment Method"
+                      label="Payment Option"
                       value={createForm.paymentMethod}
                       onChange={(e) => setCreateForm({ ...createForm, paymentMethod: e.target.value })}
                       sx={{ borderRadius: '14px' }}
@@ -900,11 +931,11 @@ export default function AdminBookings() {
                 </Grid>
 
                 {/* Payment Reference ID */}
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Payment ID / UTR / Cash Memo"
-                    placeholder="Auto-generated if empty"
+                    label="Payment Ref / Transaction ID"
+                    placeholder="Auto-generated if left blank"
                     value={createForm.paymentId}
                     onChange={(e) => setCreateForm({ ...createForm, paymentId: e.target.value })}
                     InputProps={{ sx: { borderRadius: '14px' } }}
@@ -912,7 +943,7 @@ export default function AdminBookings() {
                 </Grid>
 
                 {/* Status */}
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Status</InputLabel>
                     <Select
@@ -945,7 +976,7 @@ export default function AdminBookings() {
                 </Grid>
 
                 {/* Notes */}
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
                     label="Internal Notes / Client Requirements"
@@ -1007,7 +1038,7 @@ export default function AdminBookings() {
                 Edit Booking #{editBooking?.id}
               </Typography>
               <Typography variant="body2" sx={{ color: brandColors.muted }}>
-                Modify client details, session date/time, fee, payment info, or appointment status.
+                Modify client details, session date/time, fee, payment option, or appointment status.
               </Typography>
             </Box>
             <IconButton onClick={() => setEditBooking(null)} disabled={submitting}>
@@ -1116,12 +1147,12 @@ export default function AdminBookings() {
                   </FormControl>
                 </Grid>
 
-                {/* Payment Method */}
+                {/* Payment Option: Exactly 2 Choices */}
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Payment Method</InputLabel>
+                    <InputLabel>Payment Option</InputLabel>
                     <Select
-                      label="Payment Method"
+                      label="Payment Option"
                       value={editForm.paymentMethod}
                       onChange={(e) => setEditForm({ ...editForm, paymentMethod: e.target.value })}
                       sx={{ borderRadius: '14px' }}

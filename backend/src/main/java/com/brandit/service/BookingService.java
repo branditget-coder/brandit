@@ -387,9 +387,14 @@ public class BookingService {
             } catch (Exception ignored) {}
         }
 
+        String pMethod = request.getPaymentMethod() != null && !request.getPaymentMethod().isBlank()
+                ? request.getPaymentMethod().trim()
+                : "OFFLINE_CASH";
+
         String paymentId = request.getPaymentId();
         if (paymentId == null || paymentId.isBlank()) {
-            String prefix = "CASH".equalsIgnoreCase(request.getPaymentMethod()) ? "CASH_" : "OFFLINE_";
+            boolean isOffline = pMethod.toUpperCase().contains("CASH") || pMethod.toUpperCase().contains("OFFLINE");
+            String prefix = isOffline ? "CASH_" : "WEB_";
             paymentId = prefix + System.currentTimeMillis();
         }
 
@@ -399,7 +404,7 @@ public class BookingService {
                 .bookingDate(request.getBookingDate())
                 .bookingTime(request.getBookingTime())
                 .amount(request.getAmount())
-                .paymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : "CASH")
+                .paymentMethod(pMethod)
                 .paymentId(paymentId)
                 .status(status)
                 .meetingLink(request.getMeetingLink())

@@ -11,7 +11,7 @@ const primaryFaqs = [
   },
   {
     q: 'What payment methods do you accept?',
-    a: 'We accept all major credit/debit cards, UPI, Net Banking, Razorpay, and Stripe payments. Subscriptions are billed transparently with zero hidden fees.',
+    a: 'We accept payments through 2 flexible methods: directly Through the website (Online/UPI) and Offline cash in person.',
   },
   {
     q: 'Are there any hidden costs or recurring setup charges?',
