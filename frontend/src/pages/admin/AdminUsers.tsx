@@ -3,12 +3,12 @@ import {
   Box, Typography, Paper, Avatar, Chip, alpha, TextField, InputAdornment,
   CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions,
   IconButton, MenuItem, Select, FormControl, InputLabel, Switch, FormControlLabel,
-  Alert, Snackbar, Tooltip
+  Alert, Snackbar, Tooltip, Stack
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import {
   FiSearch, FiUserCheck, FiUsers, FiUserPlus, FiEdit2, FiTrash2,
-  FiShield, FiAlertTriangle, FiX, FiKey
+  FiShield, FiAlertTriangle, FiX, FiKey, FiBriefcase, FiLayers
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -34,6 +34,7 @@ export default function AdminUsers() {
   const [users, setUsers] = useState<UserItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
+  const [activeRoleTab, setActiveRoleTab] = useState<'ALL' | 'ADMIN' | 'TEAM' | 'USER'>('ALL')
 
   // Modals state
   const [createOpen, setCreateOpen] = useState<boolean>(false)
@@ -240,11 +241,123 @@ export default function AdminUsers() {
     `${u.firstName} ${u.lastName} ${u.email} ${u.role}`.toLowerCase().includes(search.toLowerCase())
   )
 
+  const renderUserTable = (userList: UserItem[], emptyMessage: string, roleAccentColor: string) => {
+    return (
+      <Box sx={{ overflowX: 'auto' }}>
+        <Box sx={{ minWidth: 800 }}>
+          {/* Header */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: alpha(roleAccentColor, 0.04), borderRadius: '12px' }}>
+            {['User', 'Email', 'Role & DOB', 'Joined', 'Status', 'Actions'].map(h => (
+              <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
+            ))}
+          </Box>
+
+          {/* Rows */}
+          {userList.length === 0 ? (
+            <Box sx={{ p: 5, textAlign: 'center' }}>
+              <FiUsers size={32} color={brandColors.muted} style={{ marginBottom: 12 }} />
+              <Typography variant="h6" sx={{ color: brandColors.text, mb: 0.5 }}>{emptyMessage}</Typography>
+              <Typography variant="body2" sx={{ color: brandColors.muted }}>Try refining your search terms.</Typography>
+            </Box>
+          ) : (
+            userList.map((u, i) => {
+              const initials = `${u.firstName?.[0] || 'U'}${u.lastName?.[0] || ''}`.toUpperCase()
+              const formattedDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'
+              const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
+
+              return (
+                <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2.5, borderBottom: i < userList.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(roleAccentColor, 0.03) }, transition: 'background-color 0.15s' }}>
+                  {/* User Avatar & Name */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(roleAccentColor, 0.12), color: roleAccentColor, fontSize: '0.8rem', fontWeight: 700 }}>
+                      {initials}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{u.firstName} {u.lastName}</Typography>
+                      {isCurrentSession && (
+                        <Chip label="Active Session" size="small" icon={<FiUserCheck size={12} />} sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, border: 'none', mt: 0.3 }} />
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* Email */}
+                  <Typography variant="body2" sx={{ color: brandColors.muted, overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.email}</Typography>
+
+                  {/* Role Chip & DOB */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
+                    <Chip
+                      label={u.role}
+                      size="small"
+                      icon={u.role === 'ADMIN' ? <FiShield size={12} /> : undefined}
+                      sx={{
+                        backgroundColor: alpha(u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary, 0.1),
+                        color: u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary,
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        width: 'fit-content'
+                      }}
+                    />
+                    {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
+                      <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.7rem' }}>
+                        DOB: {u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Joined Date */}
+                  <Typography variant="caption" sx={{ color: brandColors.muted }}>{formattedDate}</Typography>
+
+                  {/* Status Chip */}
+                  <Chip
+                    label={u.emailVerified ? 'Verified' : 'Active'}
+                    size="small"
+                    sx={{ backgroundColor: alpha(brandColors.success, 0.1), color: '#059669', fontWeight: 600, fontSize: '0.72rem', width: 'fit-content' }}
+                  />
+
+                  {/* Action Buttons */}
+                  <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                    <Tooltip title="Edit User Details">
+                      <IconButton size="small" onClick={() => handleOpenEdit(u)} sx={{ color: brandColors.muted, '&:hover': { color: brandColors.primary } }}>
+                        <FiEdit2 size={15} />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Reset Password">
+                      <IconButton size="small" onClick={() => { setPasswordUser(u); setNewPasswordVal('') }} sx={{ color: brandColors.muted, '&:hover': { color: '#F59E0B' } }}>
+                        <FiKey size={15} />
+                      </IconButton>
+                    </Tooltip>
+
+                    {isCurrentSession ? (
+                      <Tooltip title="You cannot delete your own active session account">
+                        <span>
+                          <IconButton size="small" disabled sx={{ opacity: 0.3 }}>
+                            <FiTrash2 size={15} />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Delete User Account">
+                        <IconButton size="small" onClick={() => setDeleteUser(u)} sx={{ color: brandColors.muted, '&:hover': { color: '#EF4444' } }}>
+                          <FiTrash2 size={15} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
+                </Box>
+              )
+            })
+          )}
+        </Box>
+      </Box>
+    )
+  }
+
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Page Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
           <Box>
             <Typography variant="h3" sx={{ mb: 0.5 }}>Registered Users ({users.length})</Typography>
             <Typography variant="body1" sx={{ color: brandColors.muted }}>Manage all accounts, administrative privileges, and registered clients on BrandIt.</Typography>
@@ -256,18 +369,52 @@ export default function AdminUsers() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch size={16} color={brandColors.muted} /></InputAdornment> }}
-              sx={{ width: 260, '& .MuiOutlinedInput-root': { backgroundColor: '#fff' } }}
+              sx={{ width: 260, '& .MuiOutlinedInput-root': { backgroundColor: '#fff', borderRadius: '10px' } }}
             />
             <Button
               variant="contained"
               color="primary"
               startIcon={<FiUserPlus size={18} />}
               onClick={() => setCreateOpen(true)}
-              sx={{ borderRadius: '10px', textTransform: 'none', px: 3, fontWeight: 600 }}
+              sx={{ borderRadius: '10px', textTransform: 'none', px: 3, fontWeight: 700 }}
             >
               Add New User
             </Button>
           </Box>
+        </Box>
+
+        {/* Role Category Filter Tabs */}
+        <Box sx={{ display: 'flex', gap: 1, mb: 3.5, flexWrap: 'wrap' }}>
+          {[
+            { id: 'ALL', label: 'All Roles', count: filteredUsers.length, icon: FiLayers, color: brandColors.primary },
+            { id: 'ADMIN', label: 'Admin (Admin)', count: filteredUsers.filter(u => u.role === 'ADMIN').length, icon: FiShield, color: '#7C3AED' },
+            { id: 'TEAM', label: 'Team (Team + Admin)', count: filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN').length, icon: FiBriefcase, color: '#0284C7' },
+            { id: 'USER', label: 'Users (Client Users)', count: filteredUsers.filter(u => u.role === 'USER').length, icon: FiUserCheck, color: brandColors.success },
+          ].map(tab => {
+            const isActive = (activeRoleTab || 'ALL') === tab.id
+            return (
+              <Chip
+                key={tab.id}
+                icon={<tab.icon size={14} color={isActive ? '#fff' : tab.color} />}
+                label={`${tab.label} (${tab.count})`}
+                clickable
+                onClick={() => setActiveRoleTab(tab.id as any)}
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  py: 2.2,
+                  px: 1.2,
+                  borderRadius: '10px',
+                  backgroundColor: isActive ? tab.color : alpha(tab.color, 0.08),
+                  color: isActive ? '#fff' : tab.color,
+                  border: `1px solid ${isActive ? tab.color : alpha(tab.color, 0.2)}`,
+                  '&:hover': {
+                    backgroundColor: isActive ? tab.color : alpha(tab.color, 0.15),
+                  }
+                }}
+              />
+            )
+          })}
         </Box>
 
         {loading ? (
@@ -275,115 +422,91 @@ export default function AdminUsers() {
             <CircularProgress color="primary" />
           </Box>
         ) : (
-          <Paper sx={{ borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none', overflowX: 'auto' }}>
-            <Box sx={{ minWidth: 800 }}>
-              {/* Header */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background }}>
-                {['User', 'Email', 'Role', 'Joined', 'Status', 'Actions'].map(h => (
-                  <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
-                ))}
-              </Box>
-
-              {/* Rows */}
-              {filteredUsers.length === 0 ? (
-                <Box sx={{ p: 5, textAlign: 'center' }}>
-                  <FiUsers size={32} color={brandColors.muted} style={{ marginBottom: 12 }} />
-                  <Typography variant="h6" sx={{ color: brandColors.text, mb: 0.5 }}>No registered users match your search</Typography>
-                  <Typography variant="body2" sx={{ color: brandColors.muted }}>Try refining your search terms.</Typography>
-                </Box>
-              ) : (
-                filteredUsers.map((u, i) => {
-                  const initials = `${u.firstName?.[0] || 'U'}${u.lastName?.[0] || ''}`.toUpperCase()
-                  const formattedDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'
-                  const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
-
-                  return (
-                    <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2.5, borderBottom: i < filteredUsers.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) }, transition: 'background-color 0.15s' }}>
-                      {/* User Avatar & Name */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(u.role === 'ADMIN' ? '#7C3AED' : brandColors.primary, 0.1), color: u.role === 'ADMIN' ? '#7C3AED' : brandColors.primary, fontSize: '0.8rem', fontWeight: 700 }}>
-                          {initials}
-                        </Avatar>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 600, color: brandColors.text }}>{u.firstName} {u.lastName}</Typography>
-                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.2 }}>
-                            {isCurrentSession && (
-                              <Chip label="Active Session" size="small" icon={<FiUserCheck size={12} />} sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700, backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, border: 'none' }} />
-                            )}
-                            {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
-                              <Chip
-                                label={`DOB: ${u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}`}
-                                size="small"
-                                sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600, backgroundColor: alpha(brandColors.muted, 0.08), color: brandColors.muted, border: 'none' }}
-                              />
-                            )}
-                          </Box>
-                        </Box>
-                      </Box>
-
-                      {/* Email */}
-                      <Typography variant="body2" sx={{ color: brandColors.muted, overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.email}</Typography>
-
-                      {/* Role Chip */}
-                      <Chip
-                        label={u.role}
-                        size="small"
-                        icon={u.role === 'ADMIN' ? <FiShield size={12} /> : undefined}
-                        sx={{
-                          backgroundColor: alpha(u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary, 0.1),
-                          color: u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary,
-                          fontWeight: 600,
-                          fontSize: '0.72rem',
-                          width: 'fit-content'
-                        }}
-                      />
-
-                      {/* Joined Date */}
-                      <Typography variant="caption" sx={{ color: brandColors.muted }}>{formattedDate}</Typography>
-
-                      {/* Status Chip */}
-                      <Chip
-                        label={u.emailVerified ? 'Verified' : 'Active'}
-                        size="small"
-                        sx={{ backgroundColor: alpha(brandColors.success, 0.1), color: '#059669', fontWeight: 600, fontSize: '0.72rem', width: 'fit-content' }}
-                      />
-
-                      {/* Action Buttons */}
-                      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                        <Tooltip title="Edit User Details">
-                          <IconButton size="small" onClick={() => handleOpenEdit(u)} sx={{ color: brandColors.muted, '&:hover': { color: brandColors.primary } }}>
-                            <FiEdit2 size={15} />
-                          </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="Reset Password">
-                          <IconButton size="small" onClick={() => { setPasswordUser(u); setNewPasswordVal('') }} sx={{ color: brandColors.muted, '&:hover': { color: '#F59E0B' } }}>
-                            <FiKey size={15} />
-                          </IconButton>
-                        </Tooltip>
-
-                        {isCurrentSession ? (
-                          <Tooltip title="You cannot delete your own active session account">
-                            <span>
-                              <IconButton size="small" disabled sx={{ opacity: 0.3 }}>
-                                <FiTrash2 size={15} />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                        ) : (
-                          <Tooltip title="Delete User Account">
-                            <IconButton size="small" onClick={() => setDeleteUser(u)} sx={{ color: brandColors.muted, '&:hover': { color: '#EF4444' } }}>
-                              <FiTrash2 size={15} />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Box>
+          <Stack spacing={3.5}>
+            {/* 1. ADMIN CARD */}
+            {((activeRoleTab || 'ALL') === 'ALL' || activeRoleTab === 'ADMIN') && (
+              <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${alpha('#7C3AED', 0.25)}`, boxShadow: '0 4px 20px rgba(124, 58, 237, 0.05)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '12px', backgroundColor: alpha('#7C3AED', 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <FiShield size={20} color="#7C3AED" />
                     </Box>
-                  )
-                })
-              )}
-            </Box>
-          </Paper>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+                        Admin: Platform Administrators
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                        Super-users with elevated administrative controls, system management, and financial overview access.
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip label={`${filteredUsers.filter(u => u.role === 'ADMIN').length} Admins`} sx={{ backgroundColor: alpha('#7C3AED', 0.1), color: '#7C3AED', fontWeight: 800, fontSize: '0.75rem' }} />
+                </Box>
+
+                {renderUserTable(
+                  filteredUsers.filter(u => u.role === 'ADMIN'),
+                  'No administrator accounts match your search.',
+                  '#7C3AED'
+                )}
+              </Paper>
+            )}
+
+            {/* 2. TEAM CARD (Team + Admin) */}
+            {((activeRoleTab || 'ALL') === 'ALL' || activeRoleTab === 'TEAM') && (
+              <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${alpha('#0284C7', 0.25)}`, boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '12px', backgroundColor: alpha('#0284C7', 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <FiBriefcase size={20} color="#0284C7" />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+                        Team: BrandIt Staff & Team (Team + Admin)
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                        Official internal team members and administrators responsible for consultation sessions and operations.
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip label={`${filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN').length} Team & Staff`} sx={{ backgroundColor: alpha('#0284C7', 0.1), color: '#0284C7', fontWeight: 800, fontSize: '0.75rem' }} />
+                </Box>
+
+                {renderUserTable(
+                  filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN'),
+                  'No team or staff members match your search.',
+                  '#0284C7'
+                )}
+              </Paper>
+            )}
+
+            {/* 3. USERS CARD (Client Users) */}
+            {((activeRoleTab || 'ALL') === 'ALL' || activeRoleTab === 'USER') && (
+              <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${alpha(brandColors.primary, 0.25)}`, boxShadow: '0 4px 20px rgba(37, 99, 235, 0.05)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '12px', backgroundColor: alpha(brandColors.primary, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <FiUserCheck size={20} color={brandColors.primary} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+                        Users: Registered Clients & Customers (User)
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                        Standard clients registered on BrandIt for personal branding, consulting, and growth packages.
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip label={`${filteredUsers.filter(u => u.role === 'USER').length} Clients`} sx={{ backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, fontWeight: 800, fontSize: '0.75rem' }} />
+                </Box>
+
+                {renderUserTable(
+                  filteredUsers.filter(u => u.role === 'USER'),
+                  'No client user accounts match your search.',
+                  brandColors.primary
+                )}
+              </Paper>
+            )}
+          </Stack>
         )}
       </motion.div>
 

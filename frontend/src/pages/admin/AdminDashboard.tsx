@@ -3,13 +3,14 @@ import {
   Box, Grid, Typography, Paper, alpha, CircularProgress, Button,
   Avatar, Chip, IconButton, Tooltip, TextField, InputAdornment,
   Dialog, DialogTitle, DialogContent, DialogActions, FormControl,
-  InputLabel, Select, MenuItem, FormControlLabel, Switch, Alert, Snackbar
+  InputLabel, Select, MenuItem, FormControlLabel, Switch, Alert, Snackbar, Stack
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import {
   FiUsers, FiCalendar, FiDollarSign, FiTrendingUp, FiUserPlus,
-  FiEdit2, FiTrash2, FiKey, FiSearch, FiX, FiShield, FiUserCheck, FiAlertTriangle
+  FiEdit2, FiTrash2, FiKey, FiSearch, FiX, FiShield, FiUserCheck, FiAlertTriangle,
+  FiBriefcase, FiLayers
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -63,6 +64,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [userSearch, setUserSearch] = useState<string>('')
+  const [activeRoleTab, setActiveRoleTab] = useState<'ALL' | 'ADMIN' | 'TEAM' | 'USER'>('ALL')
 
   // Modals state for CRUD directly on dashboard
   const [createOpen, setCreateOpen] = useState<boolean>(false)
@@ -271,6 +273,114 @@ export default function AdminDashboard() {
     { label: 'Monthly Growth Target', value: '₹7,800', change: '+24% Forecast', icon: FiTrendingUp, color: '#F5F3FF', iconColor: '#7C3AED' },
   ]
 
+  const renderUserTable = (userList: UserItem[], emptyMessage: string, roleAccentColor: string) => {
+    return (
+      <Box sx={{ overflowX: 'auto' }}>
+        <Box sx={{ minWidth: 700 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1.2fr', gap: 2, px: 2, py: 1.5, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: alpha(roleAccentColor, 0.04), borderRadius: '10px' }}>
+            {['User', 'Email', 'Role & DOB', 'Status', 'Actions'].map(h => (
+              <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.05em' }}>{h.toUpperCase()}</Typography>
+            ))}
+          </Box>
+
+          {userList.length === 0 ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="body2" sx={{ color: brandColors.muted }}>{emptyMessage}</Typography>
+            </Box>
+          ) : (
+            userList.map((u, i) => {
+              const initials = `${u.firstName?.[0] || 'U'}${u.lastName?.[0] || ''}`.toUpperCase()
+              const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
+
+              return (
+                <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1.2fr', gap: 2, px: 2, py: 2, borderBottom: i < userList.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(roleAccentColor, 0.03) } }}>
+                  {/* Name & Avatar */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar sx={{ width: 34, height: 34, bgcolor: alpha(roleAccentColor, 0.12), color: roleAccentColor, fontSize: '0.75rem', fontWeight: 700 }}>
+                      {initials}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text }}>{u.firstName} {u.lastName}</Typography>
+                      {isCurrentSession && (
+                        <Chip label="Active Session" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary }} />
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* Email */}
+                  <Typography variant="body2" sx={{ color: brandColors.muted, overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.email}</Typography>
+
+                  {/* Role & DOB */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
+                    <Chip
+                      label={u.role}
+                      size="small"
+                      icon={u.role === 'ADMIN' ? <FiShield size={11} /> : undefined}
+                      sx={{
+                        backgroundColor: alpha(u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary, 0.1),
+                        color: u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary,
+                        fontWeight: 700,
+                        fontSize: '0.7rem',
+                        width: 'fit-content'
+                      }}
+                    />
+                    {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
+                      <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.7rem' }}>
+                        DOB: {u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Status */}
+                  <Chip
+                    label={u.emailVerified ? 'Verified' : 'Active'}
+                    size="small"
+                    sx={{
+                      backgroundColor: u.emailVerified ? alpha(brandColors.success, 0.1) : alpha(brandColors.muted, 0.1),
+                      color: u.emailVerified ? brandColors.success : brandColors.muted,
+                      fontWeight: 600,
+                      fontSize: '0.7rem',
+                      width: 'fit-content',
+                    }}
+                  />
+
+                  {/* CRUD Action Buttons */}
+                  <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                    <Tooltip title="Edit User">
+                      <IconButton size="small" onClick={() => handleOpenEdit(u)} sx={{ color: brandColors.primary }}>
+                        <FiEdit2 size={15} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Reset Password">
+                      <IconButton size="small" onClick={() => { setPasswordUser(u); setNewPasswordVal('') }} sx={{ color: '#F59E0B' }}>
+                        <FiKey size={15} />
+                      </IconButton>
+                    </Tooltip>
+                    {isCurrentSession ? (
+                      <Tooltip title="You cannot delete your active session">
+                        <span>
+                          <IconButton size="small" disabled sx={{ opacity: 0.3 }}>
+                            <FiTrash2 size={15} />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Delete User">
+                        <IconButton size="small" onClick={() => setDeleteUser(u)} sx={{ color: '#EF4444' }}>
+                          <FiTrash2 size={15} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
+                </Box>
+              )
+            })
+          )}
+        </Box>
+      </Box>
+    )
+  }
+
   return (
     <Box>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -377,25 +487,25 @@ export default function AdminDashboard() {
               </Grid>
             </Grid>
 
-            {/* DIRECT USER CRUD MANAGEMENT UNDER DASHBOARD TAB */}
-            <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${brandColors.border}`, boxShadow: 'none' }}>
+            {/* DIRECT USER CRUD MANAGEMENT UNDER DASHBOARD TAB - SEPARATE ROLE CARDS */}
+            <Box sx={{ mb: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
                 <Box>
                   <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
                     User Management & Accounts ({users.length})
                   </Typography>
                   <Typography variant="body2" sx={{ color: brandColors.muted }}>
-                    Perform CRUD operations on any registered client, team member, or administrator directly.
+                    Segmented user directory by role. Perform live CRUD operations on administrators, team members, or registered clients.
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
                     size="small"
-                    placeholder="Search users..."
+                    placeholder="Search any user or role..."
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
                     InputProps={{ startAdornment: <InputAdornment position="start"><FiSearch size={15} color={brandColors.muted} /></InputAdornment> }}
-                    sx={{ width: 220, '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
+                    sx={{ width: { xs: '100%', sm: 240 }, '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                   />
                   <Button
                     variant="contained"
@@ -403,113 +513,134 @@ export default function AdminDashboard() {
                     size="small"
                     startIcon={<FiUserPlus size={16} />}
                     onClick={() => setCreateOpen(true)}
-                    sx={{ borderRadius: '10px', textTransform: 'none', px: 2, fontWeight: 700 }}
+                    sx={{ borderRadius: '10px', textTransform: 'none', px: 2.5, py: 0.9, fontWeight: 700 }}
                   >
                     Add User
                   </Button>
                 </Box>
               </Box>
 
-              <Box sx={{ overflowX: 'auto' }}>
-                <Box sx={{ minWidth: 700 }}>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1.2fr', gap: 2, px: 2, py: 1.5, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: brandColors.background, borderRadius: '10px' }}>
-                    {['User', 'Email', 'Role & DOB', 'Status', 'Actions'].map(h => (
-                      <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.05em' }}>{h.toUpperCase()}</Typography>
-                    ))}
-                  </Box>
-
-                  {filteredUsers.length === 0 ? (
-                    <Box sx={{ p: 4, textAlign: 'center' }}>
-                      <Typography variant="body2" sx={{ color: brandColors.muted }}>No users found matching your search.</Typography>
-                    </Box>
-                  ) : (
-                    filteredUsers.map((u, i) => {
-                      const initials = `${u.firstName?.[0] || 'U'}${u.lastName?.[0] || ''}`.toUpperCase()
-                      const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
-
-                      return (
-                        <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1.2fr', gap: 2, px: 2, py: 2, borderBottom: i < filteredUsers.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(brandColors.primary, 0.02) } }}>
-                          {/* Name & Avatar */}
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Avatar sx={{ width: 34, height: 34, bgcolor: alpha(u.role === 'ADMIN' ? '#7C3AED' : brandColors.primary, 0.1), color: u.role === 'ADMIN' ? '#7C3AED' : brandColors.primary, fontSize: '0.75rem', fontWeight: 700 }}>
-                              {initials}
-                            </Avatar>
-                            <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text }}>{u.firstName} {u.lastName}</Typography>
-                              {isCurrentSession && (
-                                <Chip label="Current Admin" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 700, backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary }} />
-                              )}
-                            </Box>
-                          </Box>
-
-                          {/* Email */}
-                          <Typography variant="body2" sx={{ color: brandColors.muted, overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.email}</Typography>
-
-                          {/* Role & DOB */}
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
-                            <Chip
-                              label={u.role}
-                              size="small"
-                              icon={u.role === 'ADMIN' ? <FiShield size={11} /> : undefined}
-                              sx={{
-                                backgroundColor: alpha(u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary, 0.1),
-                                color: u.role === 'ADMIN' ? '#7C3AED' : u.role === 'TEAM' ? '#0284C7' : brandColors.primary,
-                                fontWeight: 700,
-                                fontSize: '0.7rem',
-                                width: 'fit-content'
-                              }}
-                            />
-                            {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
-                              <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.7rem' }}>
-                                DOB: {u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}
-                              </Typography>
-                            )}
-                          </Box>
-
-                          {/* Status */}
-                          <Chip
-                            label={u.emailVerified ? 'Verified' : 'Active'}
-                            size="small"
-                            sx={{
-                              backgroundColor: u.emailVerified ? alpha(brandColors.success, 0.1) : alpha(brandColors.muted, 0.1),
-                              color: u.emailVerified ? brandColors.success : brandColors.muted,
-                              fontWeight: 600,
-                              fontSize: '0.7rem',
-                              width: 'fit-content',
-                            }}
-                          />
-
-                          {/* CRUD Action Buttons */}
-                          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                            <Tooltip title="Edit User">
-                              <IconButton size="small" onClick={() => handleOpenEdit(u)} sx={{ color: brandColors.primary }}>
-                                <FiEdit2 size={15} />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Reset Password">
-                              <IconButton size="small" onClick={() => { setPasswordUser(u); setNewPasswordVal('') }} sx={{ color: '#F59E0B' }}>
-                                <FiKey size={15} />
-                              </IconButton>
-                            </Tooltip>
-                            {isCurrentSession ? (
-                              <IconButton size="small" disabled sx={{ opacity: 0.3 }}>
-                                <FiTrash2 size={15} />
-                              </IconButton>
-                            ) : (
-                              <Tooltip title="Delete User">
-                                <IconButton size="small" onClick={() => setDeleteUser(u)} sx={{ color: '#EF4444' }}>
-                                  <FiTrash2 size={15} />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                          </Box>
-                        </Box>
-                      )
-                    })
-                  )}
-                </Box>
+              {/* Role Category Filter Tabs */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 3, flexWrap: 'wrap' }}>
+                {[
+                  { id: 'ALL', label: 'All Roles', count: filteredUsers.length, icon: FiLayers, color: brandColors.primary },
+                  { id: 'ADMIN', label: 'Admin (Admin)', count: filteredUsers.filter(u => u.role === 'ADMIN').length, icon: FiShield, color: '#7C3AED' },
+                  { id: 'TEAM', label: 'Team (Team + Admin)', count: filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN').length, icon: FiBriefcase, color: '#0284C7' },
+                  { id: 'USER', label: 'Users (Client Users)', count: filteredUsers.filter(u => u.role === 'USER').length, icon: FiUserCheck, color: brandColors.success },
+                ].map(tab => {
+                  const isActive = (activeRoleTab || 'ALL') === tab.id
+                  return (
+                    <Chip
+                      key={tab.id}
+                      icon={<tab.icon size={14} color={isActive ? '#fff' : tab.color} />}
+                      label={`${tab.label} (${tab.count})`}
+                      clickable
+                      onClick={() => setActiveRoleTab(tab.id as any)}
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '0.78rem',
+                        py: 2,
+                        px: 1,
+                        borderRadius: '10px',
+                        backgroundColor: isActive ? tab.color : alpha(tab.color, 0.08),
+                        color: isActive ? '#fff' : tab.color,
+                        border: `1px solid ${isActive ? tab.color : alpha(tab.color, 0.2)}`,
+                        '&:hover': {
+                          backgroundColor: isActive ? tab.color : alpha(tab.color, 0.15),
+                        }
+                      }}
+                    />
+                  )
+                })}
               </Box>
-            </Paper>
+
+              {/* ROLE SEPARATED CARDS */}
+              <Stack spacing={3.5}>
+                {/* 1. ADMIN CARD */}
+                {((activeRoleTab || 'ALL') === 'ALL' || activeRoleTab === 'ADMIN') && (
+                  <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${alpha('#7C3AED', 0.25)}`, boxShadow: '0 4px 20px rgba(124, 58, 237, 0.05)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ width: 40, height: 40, borderRadius: '12px', backgroundColor: alpha('#7C3AED', 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FiShield size={20} color="#7C3AED" />
+                        </Box>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+                            Admin: Platform Administrators
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                            Super-users with elevated administrative controls, system management, and financial overview access.
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Chip label={`${filteredUsers.filter(u => u.role === 'ADMIN').length} Admins`} sx={{ backgroundColor: alpha('#7C3AED', 0.1), color: '#7C3AED', fontWeight: 800, fontSize: '0.75rem' }} />
+                    </Box>
+
+                    {renderUserTable(
+                      filteredUsers.filter(u => u.role === 'ADMIN'),
+                      'No administrator accounts match your search.',
+                      '#7C3AED'
+                    )}
+                  </Paper>
+                )}
+
+                {/* 2. TEAM CARD (Team + Admin) */}
+                {((activeRoleTab || 'ALL') === 'ALL' || activeRoleTab === 'TEAM') && (
+                  <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${alpha('#0284C7', 0.25)}`, boxShadow: '0 4px 20px rgba(2, 132, 199, 0.05)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ width: 40, height: 40, borderRadius: '12px', backgroundColor: alpha('#0284C7', 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FiBriefcase size={20} color="#0284C7" />
+                        </Box>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+                            Team: BrandIt Staff & Team (Team + Admin)
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                            Official internal team members and administrators responsible for consultation sessions and operations.
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Chip label={`${filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN').length} Team & Staff`} sx={{ backgroundColor: alpha('#0284C7', 0.1), color: '#0284C7', fontWeight: 800, fontSize: '0.75rem' }} />
+                    </Box>
+
+                    {renderUserTable(
+                      filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN'),
+                      'No team or staff members match your search.',
+                      '#0284C7'
+                    )}
+                  </Paper>
+                )}
+
+                {/* 3. USERS CARD (Client Users) */}
+                {((activeRoleTab || 'ALL') === 'ALL' || activeRoleTab === 'USER') && (
+                  <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: '20px', border: `1px solid ${alpha(brandColors.primary, 0.25)}`, boxShadow: '0 4px 20px rgba(37, 99, 235, 0.05)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ width: 40, height: 40, borderRadius: '12px', backgroundColor: alpha(brandColors.primary, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FiUserCheck size={20} color={brandColors.primary} />
+                        </Box>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text }}>
+                            Users: Registered Clients & Customers (User)
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: brandColors.muted }}>
+                            Standard clients registered on BrandIt for personal branding, consulting, and growth packages.
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Chip label={`${filteredUsers.filter(u => u.role === 'USER').length} Clients`} sx={{ backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, fontWeight: 800, fontSize: '0.75rem' }} />
+                    </Box>
+
+                    {renderUserTable(
+                      filteredUsers.filter(u => u.role === 'USER'),
+                      'No client user accounts match your search.',
+                      brandColors.primary
+                    )}
+                  </Paper>
+                )}
+              </Stack>
+            </Box>
           </>
         )}
       </motion.div>
