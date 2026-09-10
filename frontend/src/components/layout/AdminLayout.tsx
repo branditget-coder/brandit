@@ -138,31 +138,82 @@ export default function AdminLayout() {
   )
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: brandColors.background }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: brandColors.background, position: 'relative', overflow: 'hidden' }}>
+      {/* Ambient Glassmorphic Background Glow Blobs */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: '-5%',
+          right: '10%',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${alpha(brandColors.primary, 0.08)} 0%, ${alpha('#7C3AED', 0.03)} 60%, transparent 80%)`,
+          filter: 'blur(80px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '5%',
+          left: '20%',
+          width: '550px',
+          height: '550px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${alpha('#0284C7', 0.06)} 0%, transparent 70%)`,
+          filter: 'blur(90px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
       <Drawer
         variant="permanent"
         sx={{
           display: { xs: 'none', md: 'block' },
           width: DRAWER_WIDTH,
           flexShrink: 0,
-          '& .MuiDrawer-paper': { width: DRAWER_WIDTH, boxSizing: 'border-box', border: 'none', borderRight: `1px solid ${brandColors.border}`, backgroundColor: '#fff' },
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            border: 'none',
+            borderRight: `1px solid rgba(229, 231, 235, 0.8)`,
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+          },
         }}
       >
         <DrawerContent />
       </Drawer>
 
-      <Drawer variant="temporary" open={mobileOpen} onClose={() => setMobileOpen(false)} ModalProps={{ keepMounted: true }} sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: DRAWER_WIDTH } }}>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(24px)',
+          }
+        }}
+      >
         <DrawerContent />
       </Drawer>
 
-      <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden' }}>
-        <AppBar position="sticky" elevation={0} sx={{ backgroundColor: alpha('#fff', 0.85), backdropFilter: 'blur(20px)', borderBottom: `1px solid ${brandColors.border}`, color: brandColors.text }}>
+      <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden', position: 'relative', zIndex: 1 }}>
+        <AppBar position="sticky" elevation={0} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)', borderBottom: `1px solid rgba(229, 231, 235, 0.8)`, color: brandColors.text, boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.03)' }}>
           <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 } }}>
             <IconButton sx={{ display: { md: 'none' } }} onClick={() => setMobileOpen(true)} aria-label="Open menu">
               <FiMenu size={20} />
             </IconButton>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Chip label="Admin Portal" color="primary" size="small" sx={{ fontWeight: 700 }} />
+              <Chip label="Admin Portal" color="primary" size="small" sx={{ fontWeight: 700, borderRadius: '8px' }} />
               <Typography variant="caption" sx={{ color: brandColors.muted }}>
                 Authorized for {user?.email}
               </Typography>

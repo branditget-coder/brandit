@@ -113,7 +113,37 @@ export default function DashboardLayout() {
   )
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: brandColors.background }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: brandColors.background, position: 'relative', overflow: 'hidden' }}>
+      {/* Ambient Glassmorphic Glow Background */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: '-8%',
+          right: '5%',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${alpha(brandColors.primary, 0.08)} 0%, transparent 70%)`,
+          filter: 'blur(80px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '5%',
+          left: '15%',
+          width: '550px',
+          height: '550px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${alpha(brandColors.secondary, 0.06)} 0%, transparent 70%)`,
+          filter: 'blur(90px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
       {/* Desktop Drawer */}
       <Drawer
         variant="permanent"
@@ -125,8 +155,10 @@ export default function DashboardLayout() {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
             border: 'none',
-            borderRight: `1px solid ${brandColors.border}`,
-            backgroundColor: '#fff',
+            borderRight: `1px solid rgba(229, 231, 235, 0.8)`,
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
           },
         }}
       >
@@ -141,23 +173,30 @@ export default function DashboardLayout() {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { width: DRAWER_WIDTH, boxSizing: 'border-box' },
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(24px)',
+          },
         }}
       >
         <DrawerContent />
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden' }}>
+      <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden', position: 'relative', zIndex: 1 }}>
         {/* Top Bar */}
         <AppBar
           position="sticky"
           elevation={0}
           sx={{
-            backgroundColor: alpha('#fff', 0.85),
-            backdropFilter: 'blur(20px)',
-            borderBottom: `1px solid ${brandColors.border}`,
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            borderBottom: `1px solid rgba(229, 231, 235, 0.8)`,
             color: brandColors.text,
+            boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.03)',
             zIndex: (t) => t.zIndex.drawer + 1,
           }}
         >

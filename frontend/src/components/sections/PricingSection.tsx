@@ -142,14 +142,32 @@ export default function PricingSection() {
                 <Box
                   sx={{
                     p: { xs: 3, sm: 3.5 },
-                    borderRadius: '20px',
-                    border: plan.popular ? `2px solid ${brandColors.primary}` : `1px solid ${brandColors.border}`,
-                    backgroundColor: plan.popular ? brandColors.dark : '#fff',
+                    borderRadius: '24px',
+                    border: plan.popular
+                      ? `1.5px solid rgba(124, 58, 237, 0.65)`
+                      : `1px solid rgba(255, 255, 255, 0.9)`,
+                    backgroundColor: plan.popular
+                      ? '#0F172A'
+                      : 'rgba(255, 255, 255, 0.82)',
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
-                    boxShadow: plan.popular ? '0 16px 48px rgba(10,102,194,0.18)' : 'none',
+                    boxShadow: plan.popular
+                      ? '0 20px 50px -10px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                      : '0 10px 30px -4px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: plan.popular
+                        ? '0 28px 60px -10px rgba(124, 58, 237, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)'
+                        : '0 20px 40px -8px rgba(10, 102, 194, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+                      borderColor: plan.popular
+                        ? '#7C3AED'
+                        : alpha(brandColors.primary, 0.35),
+                    }
                   }}
                 >
                   {plan.popular && (
@@ -253,10 +271,12 @@ export default function PricingSection() {
             elevation={0}
             sx={{
               p: { xs: 3, sm: 4, md: 5 },
-              borderRadius: '24px',
-              border: `1.5px solid ${alpha(brandColors.primary, 0.25)}`,
-              background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)',
-              boxShadow: '0 12px 36px rgba(10, 102, 194, 0.06)',
+              borderRadius: '26px',
+              border: `1.5px solid rgba(255, 255, 255, 0.95)`,
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(239, 246, 255, 0.78) 100%)',
+              backdropFilter: 'blur(24px) saturate(190%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+              boxShadow: '0 16px 45px -8px rgba(10, 102, 194, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
             }}
           >
             <Grid container spacing={4} alignItems="center">

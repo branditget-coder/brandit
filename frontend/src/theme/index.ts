@@ -41,6 +41,15 @@ export const brandColors = {
   muted: '#6B7280',
   border: '#E5E7EB',
   success: '#22C55E',
+  // Modern Glassmorphic Design Tokens
+  glassBackground: 'rgba(255, 255, 255, 0.82)',
+  glassBackgroundSubtle: 'rgba(255, 255, 255, 0.65)',
+  glassBackgroundDark: 'rgba(15, 23, 42, 0.75)',
+  glassBorder: 'rgba(255, 255, 255, 0.85)',
+  glassBorderDark: 'rgba(255, 255, 255, 0.12)',
+  glassShadow: '0 12px 36px -6px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04)',
+  glassHighlight: 'inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+  glassBlur: 'blur(20px) saturate(180%)',
 };
 
 const theme = createTheme({
@@ -250,12 +259,17 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 20,
-          boxShadow: '0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.04)',
-          border: `1px solid ${brandColors.border}`,
-          transition: 'box-shadow 0.25s ease, transform 0.25s ease',
+          borderRadius: 22,
+          backgroundColor: brandColors.glassBackground,
+          backdropFilter: brandColors.glassBlur,
+          WebkitBackdropFilter: brandColors.glassBlur,
+          boxShadow: '0 8px 30px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+          border: `1px solid rgba(229, 231, 235, 0.85)`,
+          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           '&:hover': {
-            boxShadow: '0 10px 30px -5px rgba(0,0,0,0.1)',
+            boxShadow: '0 16px 40px -8px rgba(10, 102, 194, 0.12), 0 0 1px rgba(10, 102, 194, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+            borderColor: alpha(brandColors.primary, 0.25),
+            transform: 'translateY(-2px)',
           },
         },
       },
@@ -274,11 +288,17 @@ const theme = createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             borderRadius: 12,
+            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            backdropFilter: 'blur(10px)',
             '& fieldset': {
               borderColor: brandColors.border,
             },
             '&:hover fieldset': {
               borderColor: brandColors.primary,
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: brandColors.primary,
+              boxShadow: '0 0 0 3px rgba(10, 102, 194, 0.12)',
             },
           },
         },
@@ -288,23 +308,43 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
+          backgroundColor: brandColors.glassBackground,
+          backdropFilter: brandColors.glassBlur,
+          WebkitBackdropFilter: brandColors.glassBlur,
+          border: '1px solid rgba(255, 255, 255, 0.85)',
+          boxShadow: '0 8px 32px -4px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
         },
         rounded: {
-          borderRadius: 20,
+          borderRadius: 22,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'rgba(255, 255, 255, 0.92) !important',
+          backdropFilter: 'blur(24px) saturate(190%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+          border: '1px solid rgba(255, 255, 255, 0.95)',
+          boxShadow: '0 24px 60px -12px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+          borderRadius: '22px !important',
         },
       },
     },
     MuiAccordion: {
       styleOverrides: {
         root: {
-          boxShadow: 'none',
+          boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(16px)',
           border: `1px solid ${brandColors.border}`,
-          borderRadius: '16px !important',
+          borderRadius: '18px !important',
           '&:before': {
             display: 'none',
           },
           '&.Mui-expanded': {
             margin: '0',
+            borderColor: alpha(brandColors.primary, 0.25),
           },
         },
       },
