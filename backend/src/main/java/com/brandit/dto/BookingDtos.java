@@ -33,6 +33,51 @@ public class BookingDtos {
     }
 
     @Data
+    public static class AdminCreateBookingRequest {
+        @NotBlank(message = "Client name is required")
+        private String clientName;
+
+        @NotBlank(message = "Client email is required")
+        private String clientEmail;
+
+        private String clientPhone;
+
+        @NotBlank(message = "Service name is required")
+        private String serviceName;
+
+        @NotNull(message = "Booking date is required")
+        private LocalDate bookingDate;
+
+        @NotNull(message = "Booking time is required")
+        private LocalTime bookingTime;
+
+        @NotNull(message = "Amount is required")
+        private BigDecimal amount;
+
+        private String paymentMethod = "CASH";
+        private String paymentId;
+        private String status = "CONFIRMED";
+        private String meetingLink;
+        private String notes;
+    }
+
+    @Data
+    public static class AdminUpdateBookingRequest {
+        private String clientName;
+        private String clientEmail;
+        private String clientPhone;
+        private String serviceName;
+        private LocalDate bookingDate;
+        private LocalTime bookingTime;
+        private BigDecimal amount;
+        private String paymentMethod;
+        private String paymentId;
+        private String status;
+        private String meetingLink;
+        private String notes;
+    }
+
+    @Data
     public static class BookingResponse {
         private Long id;
         private String serviceName;

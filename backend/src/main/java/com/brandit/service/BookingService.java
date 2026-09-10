@@ -360,6 +360,138 @@ public class BookingService {
         return res;
     }
 
+    @Transactional
+    public BookingResponse adminCreateBooking(AdminCreateBookingRequest request) {
+        String email = request.getClientEmail().trim().toLowerCase();
+        User user = userRepository.findByEmailIgnoreCase(email).orElseGet(() -> {
+            String fullName = request.getClientName() != null ? request.getClientName().trim() : "Valued Client";
+            String[] parts = fullName.split(" ", 2);
+            String fName = parts[0];
+            String lName = parts.length > 1 ? parts[1] : "";
+            User newUser = User.builder()
+                    .firstName(fName)
+                    .lastName(lName)
+                    .email(email)
+                    .phone(request.getClientPhone() != null ? request.getClientPhone() : "N/A")
+                    .role(User.Role.USER)
+                    .provider(User.AuthProvider.LOCAL)
+                    .emailVerified(true)
+                    .build();
+            return userRepository.save(newUser);
+        });
+
+        Booking.Status status = Booking.Status.CONFIRMED;
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            try {
+                status = Booking.Status.valueOf(request.getStatus().toUpperCase());
+            } catch (Exception ignored) {}
+        }
+
+        String paymentId = request.getPaymentId();
+        if (paymentId == null || paymentId.isBlank()) {
+            String prefix = "CASH".equalsIgnoreCase(request.getPaymentMethod()) ? "CASH_" : "OFFLINE_";
+            paymentId = prefix + System.currentTimeMillis();
+        }
+
+        Booking booking = Booking.builder()
+                .user(user)
+                .serviceName(request.getServiceName())
+                .bookingDate(request.getBookingDate())
+                .bookingTime(request.getBookingTime())
+                .amount(request.getAmount())
+                .paymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : "CASH")
+                .paymentId(paymentId)
+                .status(status)
+                .meetingLink(request.getMeetingLink())
+                .notes(request.getNotes())
+                .build();
+
+        Booking saved = bookingRepository.save(booking);
+
+        activityLogRepository.save(UserActivityLog.builder()
+                .user(user)
+                .action("ADMIN_CREATED_BOOKING")
+                .metadataJson("Admin created " + saved.getPaymentMethod() + " booking #" + saved.getId() + " (" + saved.getServiceName() + ") for ₹" + saved.getAmount())
+                .build());
+
+        return mapToResponse(saved);
+    }
+
+    @Transactional
+    public BookingResponse adminUpdateBooking(Long id, AdminUpdateBookingRequest request) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + id));
+
+        if (request.getServiceName() != null && !request.getServiceName().isBlank()) {
+            booking.setServiceName(request.getServiceName());
+        }
+        if (request.getBookingDate() != null) {
+            booking.setBookingDate(request.getBookingDate());
+        }
+        if (request.getBookingTime() != null) {
+            booking.setBookingTime(request.getBookingTime());
+        }
+        if (request.getAmount() != null) {
+            booking.setAmount(request.getAmount());
+        }
+        if (request.getPaymentMethod() != null && !request.getPaymentMethod().isBlank()) {
+            booking.setPaymentMethod(request.getPaymentMethod());
+        }
+        if (request.getPaymentId() != null && !request.getPaymentId().isBlank()) {
+            booking.setPaymentId(request.getPaymentId());
+        }
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            try {
+                booking.setStatus(Booking.Status.valueOf(request.getStatus().toUpperCase()));
+            } catch (Exception ignored) {}
+        }
+        if (request.getMeetingLink() != null) {
+            booking.setMeetingLink(request.getMeetingLink());
+        }
+        if (request.getNotes() != null) {
+            booking.setNotes(request.getNotes());
+        }
+
+        // Also update client name/phone if changed
+        if (booking.getUser() != null) {
+            User user = booking.getUser();
+            boolean userChanged = false;
+            if (request.getClientName() != null && !request.getClientName().isBlank()) {
+                String[] parts = request.getClientName().trim().split(" ", 2);
+                user.setFirstName(parts[0]);
+                if (parts.length > 1) user.setLastName(parts[1]);
+                userChanged = true;
+            }
+            if (request.getClientPhone() != null && !request.getClientPhone().isBlank()) {
+                user.setPhone(request.getClientPhone());
+                userChanged = true;
+            }
+            if (userChanged) {
+                userRepository.save(user);
+            }
+        }
+
+        Booking saved = bookingRepository.save(booking);
+
+        if (saved.getUser() != null) {
+            activityLogRepository.save(UserActivityLog.builder()
+                    .user(saved.getUser())
+                    .action("ADMIN_UPDATED_BOOKING")
+                    .metadataJson("Admin updated booking #" + saved.getId() + " (" + saved.getServiceName() + ")")
+                    .build());
+        }
+
+        return mapToResponse(saved);
+    }
+
+    @Transactional
+    public void adminDeleteBooking(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + id));
+
+        bookingRepository.delete(booking);
+    }
+
     private BookingResponse mapToResponse(Booking booking) {
         BookingResponse res = new BookingResponse();
         res.setId(booking.getId());

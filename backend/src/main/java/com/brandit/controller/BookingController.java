@@ -60,4 +60,24 @@ public class BookingController {
                                                                @Valid @RequestBody ScheduleMeetRequest request) {
         return ResponseEntity.ok(bookingService.scheduleGoogleMeet(id, request));
     }
+
+    @PostMapping("/admin")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
+    public ResponseEntity<BookingResponse> adminCreateBooking(@Valid @RequestBody AdminCreateBookingRequest request) {
+        return ResponseEntity.ok(bookingService.adminCreateBooking(request));
+    }
+
+    @PutMapping("/admin/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
+    public ResponseEntity<BookingResponse> adminUpdateBooking(@PathVariable Long id,
+                                                              @Valid @RequestBody AdminUpdateBookingRequest request) {
+        return ResponseEntity.ok(bookingService.adminUpdateBooking(id, request));
+    }
+
+    @DeleteMapping("/admin/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
+    public ResponseEntity<Void> adminDeleteBooking(@PathVariable Long id) {
+        bookingService.adminDeleteBooking(id);
+        return ResponseEntity.noContent().build();
+    }
 }
