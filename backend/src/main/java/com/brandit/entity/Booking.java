@@ -58,7 +58,7 @@ public class Booking {
     private String paymentScreenshot;
 
     @Builder.Default
-    @Column(columnDefinition = "boolean default false")
+    @Column(name = "distributed")
     private Boolean distributed = false;
 
     @CreatedDate

@@ -58,7 +58,7 @@ public class User {
     private boolean emailVerified = false;
 
     @Builder.Default
-    @Column(columnDefinition = "boolean default false")
+    @Column(name = "revenue_distributed")
     private Boolean revenueDistributed = false;
 
     private String verificationToken;

@@ -2,11 +2,13 @@ package com.brandit.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(1)
 @RequiredArgsConstructor
 @Slf4j
 public class DatabaseMigrationConfig implements CommandLineRunner {
@@ -23,6 +25,8 @@ public class DatabaseMigrationConfig implements CommandLineRunner {
             jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS amount NUMERIC(19, 2);");
             jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS notes TEXT;");
             jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS meeting_link VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS distributed BOOLEAN DEFAULT FALSE;");
+            jdbcTemplate.execute("UPDATE bookings SET distributed = FALSE WHERE distributed IS NULL;");
             log.info("✅ Verified and added missing columns to PostgreSQL bookings table.");
         } catch (Exception e) {
             log.warn("Bookings column schema migration notice: {}", e.getMessage());
@@ -35,6 +39,8 @@ public class DatabaseMigrationConfig implements CommandLineRunner {
             jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS current_role VARCHAR(255);");
             jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS bio TEXT;");
             jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255);");
+            jdbcTemplate.execute("ALTER TABLE app_users ADD COLUMN IF NOT EXISTS revenue_distributed BOOLEAN DEFAULT FALSE;");
+            jdbcTemplate.execute("UPDATE app_users SET revenue_distributed = FALSE WHERE revenue_distributed IS NULL;");
             log.info("✅ Verified and added missing columns to PostgreSQL app_users table.");
         } catch (Exception e) {
             log.warn("AppUsers column schema migration notice: {}", e.getMessage());
