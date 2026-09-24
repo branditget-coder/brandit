@@ -36,7 +36,8 @@ public class DatabaseConfig {
                 int port = uri.getPort() == -1 ? 5432 : uri.getPort();
                 String dbName = uri.getPath(); // e.g. "/railway"
 
-                String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + dbName;
+                String query = uri.getQuery();
+                String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + dbName + (query != null && !query.isEmpty() ? "?" + query : "");
                 ds.setJdbcUrl(jdbcUrl);
                 ds.setDriverClassName("org.postgresql.Driver");
 

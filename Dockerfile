@@ -25,4 +25,4 @@ ENV PORT=8080
 ENV SPRING_PROFILES_ACTIVE=prod
 
 # Launch Spring Boot application
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -Dserver.port=${PORT} -jar app.jar"]

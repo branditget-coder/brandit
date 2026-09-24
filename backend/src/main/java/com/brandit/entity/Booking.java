@@ -57,13 +57,17 @@ public class Booking {
     @Column(columnDefinition = "text")
     private String paymentScreenshot;
 
-    @Column(nullable = false)
     @Builder.Default
+    @Column(columnDefinition = "boolean default false")
     private Boolean distributed = false;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public Boolean getDistributed() {
+        return distributed != null ? distributed : false;
+    }
 
     public enum Status { PENDING, CONFIRMED, COMPLETED, CANCELLED }
 }

@@ -58,7 +58,7 @@ public class User {
     private boolean emailVerified = false;
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(columnDefinition = "boolean default false")
     private Boolean revenueDistributed = false;
 
     private String verificationToken;
@@ -86,6 +86,10 @@ public class User {
 
     public enum Role { USER, ADMIN, TEAM }
     public enum AuthProvider { LOCAL, GOOGLE, LINKEDIN }
+
+    public Boolean getRevenueDistributed() {
+        return revenueDistributed != null ? revenueDistributed : false;
+    }
 
     public String getFullName() {
         return firstName + " " + lastName;
