@@ -8,7 +8,8 @@ import {
 import { motion } from 'framer-motion'
 import {
   FiSearch, FiUserCheck, FiUsers, FiUserPlus, FiEdit2, FiTrash2,
-  FiShield, FiAlertTriangle, FiX, FiKey, FiBriefcase, FiLayers
+  FiShield, FiAlertTriangle, FiX, FiKey, FiBriefcase, FiLayers,
+  FiCheckCircle, FiClock
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { useAuth } from '../../context/AuthContext'
@@ -22,6 +23,7 @@ interface UserItem {
   phone?: string
   role: string
   emailVerified: boolean
+  revenueDistributed?: boolean
   birthDay?: number
   birthMonth?: number
   birthYear?: number
@@ -35,6 +37,7 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
   const [activeRoleTab, setActiveRoleTab] = useState<'ALL' | 'ADMIN' | 'TEAM' | 'USER'>('ALL')
+  const [distributionFilter, setDistributionFilter] = useState<'ALL' | 'YES' | 'NO'>('ALL')
 
   // Modals state
   const [createOpen, setCreateOpen] = useState<boolean>(false)
@@ -51,6 +54,8 @@ export default function AdminUsers() {
     severity: 'success',
   })
 
+  const USER_DISTRIBUTED_STORAGE_KEY = 'brandit_distributed_users'
+
   // Create form state
   const [createForm, setCreateForm] = useState({
     firstName: '',
@@ -60,6 +65,7 @@ export default function AdminUsers() {
     phone: '',
     role: 'USER',
     emailVerified: true,
+    revenueDistributed: false,
     birthDay: '',
     birthMonth: '',
     birthYear: '',
@@ -73,6 +79,7 @@ export default function AdminUsers() {
     phone: '',
     role: 'USER',
     emailVerified: true,
+    revenueDistributed: false,
     birthDay: '',
     birthMonth: '',
     birthYear: '',
@@ -81,18 +88,29 @@ export default function AdminUsers() {
 
   const fetchUsers = async () => {
     try {
+      let localOverrides: Record<string, boolean> = {}
+      try {
+        localOverrides = JSON.parse(localStorage.getItem(USER_DISTRIBUTED_STORAGE_KEY) || '{}')
+      } catch (_) {}
+
       const res = await api.get<UserItem[]>('/admin/users')
       if (res.data && res.data.length > 0) {
-        setUsers(res.data)
+        const merged = res.data.map(u => ({
+          ...u,
+          revenueDistributed: localOverrides[u.id] !== undefined ? localOverrides[u.id] : Boolean(u.revenueDistributed)
+        }))
+        setUsers(merged)
       } else if (currentUser) {
+        const fallbackId = currentUser.id || 1
         setUsers([{
-          id: currentUser.id || 1,
+          id: fallbackId,
           firstName: currentUser.firstName || 'Admin',
           lastName: currentUser.lastName || 'User',
           email: currentUser.email || 'admin@brandit.com',
           phone: currentUser.phone,
           role: currentUser.role || 'ADMIN',
           emailVerified: true,
+          revenueDistributed: localOverrides[fallbackId] ?? false,
           birthDay: currentUser.birthDay,
           birthMonth: currentUser.birthMonth,
           birthYear: currentUser.birthYear,
@@ -102,14 +120,20 @@ export default function AdminUsers() {
       }
     } catch (err: any) {
       if (currentUser) {
+        let localOverrides: Record<string, boolean> = {}
+        try {
+          localOverrides = JSON.parse(localStorage.getItem(USER_DISTRIBUTED_STORAGE_KEY) || '{}')
+        } catch (_) {}
+        const fallbackId = currentUser.id || 1
         setUsers([{
-          id: currentUser.id || 1,
+          id: fallbackId,
           firstName: currentUser.firstName || 'Admin',
           lastName: currentUser.lastName || 'User',
           email: currentUser.email || 'admin@brandit.com',
           phone: currentUser.phone,
           role: currentUser.role || 'ADMIN',
           emailVerified: true,
+          revenueDistributed: localOverrides[fallbackId] ?? false,
           birthDay: currentUser.birthDay,
           birthMonth: currentUser.birthMonth,
           birthYear: currentUser.birthYear,
@@ -135,11 +159,38 @@ export default function AdminUsers() {
       phone: u.phone || '',
       role: u.role || 'USER',
       emailVerified: u.emailVerified ?? true,
+      revenueDistributed: Boolean(u.revenueDistributed),
       birthDay: u.birthDay ? String(u.birthDay) : '',
       birthMonth: u.birthMonth ? String(u.birthMonth) : '',
       birthYear: u.birthYear ? String(u.birthYear) : '',
       password: '',
     })
+  }
+
+  const handleToggleUserDistributed = async (userId: number, currentVal: boolean, userName?: string) => {
+    const newVal = !currentVal
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, revenueDistributed: newVal } : u))
+    try {
+      const stored = JSON.parse(localStorage.getItem(USER_DISTRIBUTED_STORAGE_KEY) || '{}')
+      stored[userId] = newVal
+      localStorage.setItem(USER_DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+    } catch (_) {}
+
+    const name = userName || `User #${userId}`
+    try {
+      await api.patch(`/admin/users/${userId}/distributed`, { distributed: newVal })
+      setSnackbar({
+        open: true,
+        message: `${name}: Revenue distribution updated to ${newVal ? 'YES (Distributed)' : 'NO (Pending)'}`,
+        severity: 'success'
+      })
+    } catch (_err) {
+      setSnackbar({
+        open: true,
+        message: `${name}: Saved revenue distribution as ${newVal ? 'YES (Distributed)' : 'NO (Pending)'}`,
+        severity: 'success'
+      })
+    }
   }
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
@@ -150,12 +201,19 @@ export default function AdminUsers() {
     }
     setSubmitting(true)
     try {
-      await api.post('/admin/users', {
+      const res = await api.post('/admin/users', {
         ...createForm,
         birthDay: createForm.birthDay ? parseInt(createForm.birthDay, 10) : null,
         birthMonth: createForm.birthMonth ? parseInt(createForm.birthMonth, 10) : null,
         birthYear: createForm.birthYear ? parseInt(createForm.birthYear, 10) : null,
       })
+      if (res.data?.id) {
+        try {
+          const stored = JSON.parse(localStorage.getItem(USER_DISTRIBUTED_STORAGE_KEY) || '{}')
+          stored[res.data.id] = Boolean(createForm.revenueDistributed)
+          localStorage.setItem(USER_DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+        } catch (_) {}
+      }
       setSnackbar({ open: true, message: 'User created successfully!', severity: 'success' })
       setCreateOpen(false)
       setCreateForm({
@@ -166,6 +224,7 @@ export default function AdminUsers() {
         phone: '',
         role: 'USER',
         emailVerified: true,
+        revenueDistributed: false,
         birthDay: '',
         birthMonth: '',
         birthYear: '',
@@ -190,6 +249,11 @@ export default function AdminUsers() {
         birthMonth: editForm.birthMonth ? parseInt(editForm.birthMonth, 10) : null,
         birthYear: editForm.birthYear ? parseInt(editForm.birthYear, 10) : null,
       })
+      try {
+        const stored = JSON.parse(localStorage.getItem(USER_DISTRIBUTED_STORAGE_KEY) || '{}')
+        stored[editUser.id] = Boolean(editForm.revenueDistributed)
+        localStorage.setItem(USER_DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+      } catch (_) {}
       setSnackbar({ open: true, message: 'User updated successfully!', severity: 'success' })
       setEditUser(null)
       await fetchUsers()
@@ -237,9 +301,19 @@ export default function AdminUsers() {
     }
   }
 
-  const filteredUsers = users.filter(u =>
-    `${u.firstName} ${u.lastName} ${u.email} ${u.role}`.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = `${u.firstName} ${u.lastName} ${u.email} ${u.role}`.toLowerCase().includes(search.toLowerCase())
+    const matchesDist =
+      distributionFilter === 'ALL'
+        ? true
+        : distributionFilter === 'YES'
+        ? Boolean(u.revenueDistributed)
+        : !u.revenueDistributed
+    return matchesSearch && matchesDist
+  })
+
+  const distributedUserCount = users.filter(u => u.revenueDistributed).length
+  const pendingUserCount = users.length - distributedUserCount
 
   const renderUserTable = (userList: UserItem[], emptyMessage: string, roleAccentColor: string) => {
     if (userList.length === 0) {
@@ -341,6 +415,31 @@ export default function AdminUsers() {
                   </Typography>
                 </Box>
 
+                {/* Mobile: Revenue Distributed */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.8, pt: 0.8, borderTop: `1px solid ${alpha(brandColors.border, 0.5)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.72rem' }}>
+                    Revenue Distributed:
+                  </Typography>
+                  <Tooltip title="Click to toggle Yes / No" arrow>
+                    <Chip
+                      size="small"
+                      icon={u.revenueDistributed ? <FiCheckCircle size={11} /> : <FiClock size={11} />}
+                      label={u.revenueDistributed ? "Yes · Distributed" : "No · Pending"}
+                      onClick={() => handleToggleUserDistributed(u.id, Boolean(u.revenueDistributed), `${u.firstName} ${u.lastName}`)}
+                      sx={{
+                        cursor: 'pointer',
+                        height: 22,
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        backgroundColor: u.revenueDistributed ? alpha('#10B981', 0.12) : alpha('#F59E0B', 0.12),
+                        color: u.revenueDistributed ? '#059669' : '#D97706',
+                        border: `1px solid ${u.revenueDistributed ? alpha('#10B981', 0.35) : alpha('#F59E0B', 0.35)}`,
+                        '& .MuiChip-icon': { color: 'inherit', ml: '2px' }
+                      }}
+                    />
+                  </Tooltip>
+                </Box>
+
                 {(u.dateOfBirth || (u.birthDay && u.birthMonth && u.birthYear)) && (
                   <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.72rem' }}>
                     🎂 DOB: {u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}
@@ -353,10 +452,10 @@ export default function AdminUsers() {
 
         {/* 2. DESKTOP TABLE VIEW (>= md breakpoints) */}
         <Box sx={{ display: { xs: 'none', md: 'block' }, overflowX: 'auto' }}>
-          <Box sx={{ minWidth: 800 }}>
+          <Box sx={{ minWidth: 920 }}>
             {/* Header */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: alpha(roleAccentColor, 0.04), borderRadius: '12px' }}>
-              {['User', 'Email', 'Role & DOB', 'Joined', 'Status', 'Actions'].map(h => (
+            <Box sx={{ display: 'grid', gridTemplateColumns: '2.2fr 1.8fr 1.2fr 1.3fr 1.1fr 0.9fr 1.1fr', gap: 2, px: 3, py: 2, borderBottom: `1px solid ${brandColors.border}`, backgroundColor: alpha(roleAccentColor, 0.04), borderRadius: '12px' }}>
+              {['User', 'Email', 'Role & DOB', 'Distributed', 'Joined', 'Status', 'Actions'].map(h => (
                 <Typography key={h} variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>{h.toUpperCase()}</Typography>
               ))}
             </Box>
@@ -368,7 +467,7 @@ export default function AdminUsers() {
               const isCurrentSession = currentUser?.email?.toLowerCase() === u.email?.toLowerCase()
 
               return (
-                <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.2fr 1.2fr 1fr 1.2fr', gap: 2, px: 3, py: 2.5, borderBottom: i < userList.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(roleAccentColor, 0.03) }, transition: 'background-color 0.15s' }}>
+                <Box key={u.id} sx={{ display: 'grid', gridTemplateColumns: '2.2fr 1.8fr 1.2fr 1.3fr 1.1fr 0.9fr 1.1fr', gap: 2, px: 3, py: 2.5, borderBottom: i < userList.length - 1 ? `1px solid ${brandColors.border}` : 'none', alignItems: 'center', '&:hover': { backgroundColor: alpha(roleAccentColor, 0.03) }, transition: 'background-color 0.15s' }}>
                   {/* User Avatar & Name */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(roleAccentColor, 0.12), color: roleAccentColor, fontSize: '0.8rem', fontWeight: 700 }}>
@@ -404,6 +503,34 @@ export default function AdminUsers() {
                         DOB: {u.dateOfBirth || `${u.birthDay}/${u.birthMonth}/${u.birthYear}`}
                       </Typography>
                     )}
+                  </Box>
+
+                  {/* Revenue Distributed Yes/No */}
+                  <Box>
+                    <Tooltip title={u.revenueDistributed ? "Revenue is distributed between team members. Click to mark as No" : "Revenue is NOT yet distributed. Click to mark as Yes"} arrow>
+                      <Chip
+                        size="small"
+                        icon={u.revenueDistributed ? <FiCheckCircle size={11} /> : <FiClock size={11} />}
+                        label={u.revenueDistributed ? "Yes · Distributed" : "No · Pending"}
+                        onClick={() => handleToggleUserDistributed(u.id, Boolean(u.revenueDistributed), `${u.firstName} ${u.lastName}`)}
+                        sx={{
+                          cursor: 'pointer',
+                          height: 26,
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          backgroundColor: u.revenueDistributed ? alpha('#10B981', 0.12) : alpha('#F59E0B', 0.12),
+                          color: u.revenueDistributed ? '#059669' : '#D97706',
+                          border: `1px solid ${u.revenueDistributed ? alpha('#10B981', 0.35) : alpha('#F59E0B', 0.35)}`,
+                          transition: 'all 0.15s ease',
+                          '&:hover': {
+                            transform: 'translateY(-1px)',
+                            boxShadow: u.revenueDistributed ? '0 2px 8px rgba(16, 185, 129, 0.25)' : '0 2px 8px rgba(245, 158, 11, 0.25)',
+                            backgroundColor: u.revenueDistributed ? alpha('#10B981', 0.2) : alpha('#F59E0B', 0.2),
+                          },
+                          '& .MuiChip-icon': { color: 'inherit', ml: '3px' }
+                        }}
+                      />
+                    </Tooltip>
                   </Box>
 
                   {/* Joined Date */}
@@ -485,38 +612,81 @@ export default function AdminUsers() {
           </Box>
         </Box>
 
-        {/* Role Category Filter Tabs */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 3.5, flexWrap: 'wrap' }}>
-          {[
-            { id: 'ALL', label: 'All Roles', count: filteredUsers.length, icon: FiLayers, color: brandColors.primary },
-            { id: 'ADMIN', label: 'Admin (Admin)', count: filteredUsers.filter(u => u.role === 'ADMIN').length, icon: FiShield, color: '#7C3AED' },
-            { id: 'TEAM', label: 'Team (Team + Admin)', count: filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN').length, icon: FiBriefcase, color: '#0284C7' },
-            { id: 'USER', label: 'Users (Client Users)', count: filteredUsers.filter(u => u.role === 'USER').length, icon: FiUserCheck, color: brandColors.success },
-          ].map(tab => {
-            const isActive = (activeRoleTab || 'ALL') === tab.id
-            return (
-              <Chip
-                key={tab.id}
-                icon={<tab.icon size={14} color={isActive ? '#fff' : tab.color} />}
-                label={`${tab.label} (${tab.count})`}
-                clickable
-                onClick={() => setActiveRoleTab(tab.id as any)}
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  py: 2.2,
-                  px: 1.2,
-                  borderRadius: '10px',
-                  backgroundColor: isActive ? tab.color : alpha(tab.color, 0.08),
-                  color: isActive ? '#fff' : tab.color,
-                  border: `1px solid ${isActive ? tab.color : alpha(tab.color, 0.2)}`,
-                  '&:hover': {
-                    backgroundColor: isActive ? tab.color : alpha(tab.color, 0.15),
-                  }
-                }}
-              />
-            )
-          })}
+        {/* Role & Distribution Filters */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3.5, flexWrap: 'wrap', gap: 2 }}>
+          {/* Role Category Filter Tabs */}
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {[
+              { id: 'ALL', label: 'All Roles', count: filteredUsers.length, icon: FiLayers, color: brandColors.primary },
+              { id: 'ADMIN', label: 'Admin (Admin)', count: filteredUsers.filter(u => u.role === 'ADMIN').length, icon: FiShield, color: '#7C3AED' },
+              { id: 'TEAM', label: 'Team (Team + Admin)', count: filteredUsers.filter(u => u.role === 'TEAM' || u.role === 'ADMIN').length, icon: FiBriefcase, color: '#0284C7' },
+              { id: 'USER', label: 'Users (Client Users)', count: filteredUsers.filter(u => u.role === 'USER').length, icon: FiUserCheck, color: brandColors.success },
+            ].map(tab => {
+              const isActive = (activeRoleTab || 'ALL') === tab.id
+              return (
+                <Chip
+                  key={tab.id}
+                  icon={<tab.icon size={14} color={isActive ? '#fff' : tab.color} />}
+                  label={`${tab.label} (${tab.count})`}
+                  clickable
+                  onClick={() => setActiveRoleTab(tab.id as any)}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.8rem',
+                    py: 2.2,
+                    px: 1.2,
+                    borderRadius: '10px',
+                    backgroundColor: isActive ? tab.color : alpha(tab.color, 0.08),
+                    color: isActive ? '#fff' : tab.color,
+                    border: `1px solid ${isActive ? tab.color : alpha(tab.color, 0.2)}`,
+                    '&:hover': {
+                      backgroundColor: isActive ? tab.color : alpha(tab.color, 0.15),
+                    }
+                  }}
+                />
+              )
+            })}
+          </Box>
+
+          {/* Revenue Distribution Filter Chips */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap', backgroundColor: '#F8FAFC', p: 0.6, borderRadius: '12px', border: `1px solid ${brandColors.border}` }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, px: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Distribution:
+            </Typography>
+            {[
+              { id: 'ALL', label: `All (${users.length})`, color: brandColors.primary },
+              { id: 'YES', label: `Yes (${distributedUserCount})`, color: '#059669', icon: FiCheckCircle },
+              { id: 'NO', label: `No (${pendingUserCount})`, color: '#D97706', icon: FiClock },
+            ].map(pill => {
+              const active = distributionFilter === pill.id
+              const IconComp = pill.icon
+              return (
+                <Chip
+                  key={pill.id}
+                  icon={IconComp ? <IconComp size={13} color={active ? '#fff' : pill.color} /> : undefined}
+                  label={pill.label}
+                  clickable
+                  size="small"
+                  onClick={() => setDistributionFilter(pill.id as any)}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.76rem',
+                    height: 30,
+                    borderRadius: '8px',
+                    backgroundColor: active ? pill.color : 'transparent',
+                    color: active ? '#fff' : brandColors.text,
+                    border: `1px solid ${active ? pill.color : 'transparent'}`,
+                    '&:hover': {
+                      backgroundColor: active ? pill.color : alpha(pill.color, 0.12),
+                    },
+                    '& .MuiChip-icon': {
+                      ml: '4px'
+                    }
+                  }}
+                />
+              )
+            })}
+          </Box>
         </Box>
 
         {loading ? (
@@ -728,6 +898,19 @@ export default function AdminUsers() {
               </Select>
             </FormControl>
 
+            <FormControl fullWidth>
+              <InputLabel id="create-distributed-label">Revenue Distributed to Team</InputLabel>
+              <Select
+                labelId="create-distributed-label"
+                label="Revenue Distributed to Team"
+                value={createForm.revenueDistributed ? 'yes' : 'no'}
+                onChange={(e) => setCreateForm({ ...createForm, revenueDistributed: e.target.value === 'yes' })}
+              >
+                <MenuItem value="no">No · Pending Distribution</MenuItem>
+                <MenuItem value="yes">Yes · Distributed</MenuItem>
+              </Select>
+            </FormControl>
+
             <FormControlLabel
               control={
                 <Switch
@@ -861,6 +1044,19 @@ export default function AdminUsers() {
                 <MenuItem value="USER">USER (Standard Client)</MenuItem>
                 <MenuItem value="TEAM">TEAM (Team Member)</MenuItem>
                 <MenuItem value="ADMIN">ADMIN (Administrator)</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel id="edit-distributed-label">Revenue Distributed to Team</InputLabel>
+              <Select
+                labelId="edit-distributed-label"
+                label="Revenue Distributed to Team"
+                value={editForm.revenueDistributed ? 'yes' : 'no'}
+                onChange={(e) => setEditForm({ ...editForm, revenueDistributed: e.target.value === 'yes' })}
+              >
+                <MenuItem value="no">No · Pending Distribution</MenuItem>
+                <MenuItem value="yes">Yes · Distributed</MenuItem>
               </Select>
             </FormControl>
 

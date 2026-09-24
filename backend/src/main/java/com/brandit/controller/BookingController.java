@@ -54,6 +54,13 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.updateBookingStatus(id, request));
     }
 
+    @PatchMapping("/{id}/distributed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
+    public ResponseEntity<BookingResponse> updateDistributedStatus(@PathVariable Long id,
+                                                                   @RequestBody UpdateDistributedRequest request) {
+        return ResponseEntity.ok(bookingService.updateDistributedStatus(id, request != null ? request.getDistributed() : false));
+    }
+
     @PostMapping("/{id}/schedule-meet")
     @PreAuthorize("hasAnyRole('ADMIN', 'TEAM')")
     public ResponseEntity<BookingResponse> scheduleGoogleMeet(@PathVariable Long id,

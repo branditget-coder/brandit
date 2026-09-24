@@ -160,6 +160,7 @@ public class CommonDtos {
         private String phone;
         private String role;
         private boolean emailVerified;
+        private Boolean revenueDistributed;
         private Integer birthDay;
         private Integer birthMonth;
         private Integer birthYear;
@@ -176,6 +177,7 @@ public class CommonDtos {
         private String phone;
         private String role; // USER, ADMIN, TEAM
         private boolean emailVerified = true;
+        private Boolean revenueDistributed = false;
         private Integer birthDay;
         private Integer birthMonth;
         private Integer birthYear;
@@ -189,10 +191,16 @@ public class CommonDtos {
         private String phone;
         private String role;
         private Boolean emailVerified;
+        private Boolean revenueDistributed;
         private Integer birthDay;
         private Integer birthMonth;
         private Integer birthYear;
         private String password;
+    }
+
+    @Data
+    public static class UpdateUserDistributedRequest {
+        private Boolean distributed;
     }
 
     @Data

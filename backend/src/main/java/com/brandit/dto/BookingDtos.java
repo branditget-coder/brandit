@@ -30,6 +30,7 @@ public class BookingDtos {
         private String clientEmail;
         private String clientPhone;
         private String paymentScreenshot;
+        private Boolean distributed;
     }
 
     @Data
@@ -59,6 +60,7 @@ public class BookingDtos {
         private String status = "CONFIRMED";
         private String meetingLink;
         private String notes;
+        private Boolean distributed = false;
     }
 
     @Data
@@ -75,6 +77,7 @@ public class BookingDtos {
         private String status;
         private String meetingLink;
         private String notes;
+        private Boolean distributed;
     }
 
     @Data
@@ -95,6 +98,12 @@ public class BookingDtos {
         private String clientEmail;
         private String clientPhone;
         private String consultantName;
+        private Boolean distributed;
+    }
+
+    @Data
+    public static class UpdateDistributedRequest {
+        private Boolean distributed;
     }
 
     @Data

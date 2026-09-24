@@ -84,6 +84,7 @@ public class AdminController {
             r.setPhone(u.getPhone());
             r.setRole(u.getRole() != null ? u.getRole().name() : "USER");
             r.setEmailVerified(u.isEmailVerified());
+            r.setRevenueDistributed(Boolean.TRUE.equals(u.getRevenueDistributed()));
             r.setBirthDay(u.getBirthDay());
             r.setBirthMonth(u.getBirthMonth());
             r.setBirthYear(u.getBirthYear());
@@ -127,6 +128,7 @@ public class AdminController {
                 .birthYear(request.getBirthYear())
                 .dateOfBirth(dob)
                 .provider(User.AuthProvider.LOCAL)
+                .revenueDistributed(Boolean.TRUE.equals(request.getRevenueDistributed()))
                 .build();
 
         User saved = userRepository.save(user);
@@ -141,6 +143,7 @@ public class AdminController {
         r.setPhone(saved.getPhone());
         r.setRole(saved.getRole().name());
         r.setEmailVerified(saved.isEmailVerified());
+        r.setRevenueDistributed(Boolean.TRUE.equals(saved.getRevenueDistributed()));
         r.setBirthDay(saved.getBirthDay());
         r.setBirthMonth(saved.getBirthMonth());
         r.setBirthYear(saved.getBirthYear());
@@ -188,6 +191,10 @@ public class AdminController {
             user.setEmailVerified(request.getEmailVerified());
         }
 
+        if (request.getRevenueDistributed() != null) {
+            user.setRevenueDistributed(request.getRevenueDistributed());
+        }
+
         User saved = userRepository.save(user);
 
         logActivity("ADMIN_UPDATE_USER", "Updated user details for " + saved.getEmail());
@@ -200,6 +207,7 @@ public class AdminController {
         r.setPhone(saved.getPhone());
         r.setRole(saved.getRole().name());
         r.setEmailVerified(saved.isEmailVerified());
+        r.setRevenueDistributed(Boolean.TRUE.equals(saved.getRevenueDistributed()));
         r.setBirthDay(saved.getBirthDay());
         r.setBirthMonth(saved.getBirthMonth());
         r.setBirthYear(saved.getBirthYear());
@@ -207,6 +215,16 @@ public class AdminController {
         r.setCreatedAt(saved.getCreatedAt() != null ? saved.getCreatedAt() : java.time.LocalDateTime.now());
 
         return ResponseEntity.ok(r);
+    }
+
+    @PatchMapping("/users/{id}/distributed")
+    public ResponseEntity<?> updateUserRevenueDistributed(@PathVariable Long id, @RequestBody UpdateUserDistributedRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+        user.setRevenueDistributed(request != null && Boolean.TRUE.equals(request.getDistributed()));
+        User saved = userRepository.save(user);
+        logActivity("ADMIN_UPDATE_USER_DISTRIBUTION", "Updated revenue distribution for " + saved.getEmail() + " to " + (saved.getRevenueDistributed() ? "YES" : "NO"));
+        return ResponseEntity.ok(Map.of("id", saved.getId(), "revenueDistributed", saved.getRevenueDistributed()));
     }
 
     @PostMapping("/users/{id}/password")

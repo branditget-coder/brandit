@@ -57,6 +57,10 @@ public class User {
     @Column(nullable = false)
     private boolean emailVerified = false;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean revenueDistributed = false;
+
     private String verificationToken;
 
     private String resetPasswordToken;

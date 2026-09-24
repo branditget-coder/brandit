@@ -56,6 +56,7 @@ public class BookingService {
                 .paymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : "MANUAL_GPAY_UPI")
                 .paymentScreenshot(request.getPaymentScreenshot())
                 .status(Booking.Status.CONFIRMED)
+                .distributed(Boolean.TRUE.equals(request.getDistributed()))
                 .build();
 
         Booking saved = bookingRepository.save(booking);
@@ -409,6 +410,7 @@ public class BookingService {
                 .status(status)
                 .meetingLink(request.getMeetingLink())
                 .notes(request.getNotes())
+                .distributed(Boolean.TRUE.equals(request.getDistributed()))
                 .build();
 
         Booking saved = bookingRepository.save(booking);
@@ -456,6 +458,9 @@ public class BookingService {
         if (request.getNotes() != null) {
             booking.setNotes(request.getNotes());
         }
+        if (request.getDistributed() != null) {
+            booking.setDistributed(request.getDistributed());
+        }
 
         // Also update client name/phone if changed
         if (booking.getUser() != null) {
@@ -490,6 +495,22 @@ public class BookingService {
     }
 
     @Transactional
+    public BookingResponse updateDistributedStatus(Long id, Boolean distributed) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + id));
+        booking.setDistributed(Boolean.TRUE.equals(distributed));
+        Booking saved = bookingRepository.save(booking);
+        if (saved.getUser() != null) {
+            activityLogRepository.save(UserActivityLog.builder()
+                    .user(saved.getUser())
+                    .action("BOOKING_DISTRIBUTION_UPDATED")
+                    .metadataJson("Booking #" + saved.getId() + " revenue distribution set to " + (saved.getDistributed() ? "YES" : "NO"))
+                    .build());
+        }
+        return mapToResponse(saved);
+    }
+
+    @Transactional
     public void adminDeleteBooking(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + id));
@@ -511,6 +532,7 @@ public class BookingService {
         res.setPaymentMethod(booking.getPaymentMethod());
         res.setPaymentScreenshot(booking.getPaymentScreenshot());
         res.setCreatedAt(booking.getCreatedAt());
+        res.setDistributed(Boolean.TRUE.equals(booking.getDistributed()));
         if (booking.getUser() != null) {
             res.setClientName(booking.getUser().getFullName());
             res.setClientEmail(booking.getUser().getEmail());

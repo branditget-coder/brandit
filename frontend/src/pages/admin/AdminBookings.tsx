@@ -33,6 +33,7 @@ interface BookingItem {
   meetingLink?: string
   notes?: string
   consultantName?: string
+  distributed?: boolean
   createdAt?: string
 }
 
@@ -57,12 +58,15 @@ const PAYMENT_METHODS = [
   { value: 'OFFLINE_CASH', label: '💵 Offline cash in person' }
 ]
 
+const DISTRIBUTED_STORAGE_KEY = 'brandit_distributed_bookings'
+
 export default function AdminBookings() {
   const [bookings, setBookings] = useState<BookingItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [search, setSearch] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const [paymentFilter, setPaymentFilter] = useState<string>('ALL')
+  const [distributionFilter, setDistributionFilter] = useState<'ALL' | 'YES' | 'NO'>('ALL')
 
   // Modals state
   const [createOpen, setCreateOpen] = useState<boolean>(false)
@@ -91,6 +95,7 @@ export default function AdminBookings() {
     status: 'CONFIRMED',
     meetingLink: '',
     notes: '',
+    distributed: false,
   })
 
   // Edit form state
@@ -107,6 +112,7 @@ export default function AdminBookings() {
     status: 'CONFIRMED',
     meetingLink: '',
     notes: '',
+    distributed: false,
   })
 
   const fetchBookings = useCallback(async () => {
@@ -120,7 +126,20 @@ export default function AdminBookings() {
         const res = await api.get<BookingItem[]>('/bookings')
         data = Array.isArray(res.data) ? res.data : []
       }
-      setBookings(data)
+
+      // Merge with persistent localStorage overrides
+      let localOverrides: Record<string, boolean> = {}
+      try {
+        localOverrides = JSON.parse(localStorage.getItem(DISTRIBUTED_STORAGE_KEY) || '{}')
+      } catch (_) {}
+
+      const merged = data.map(b => {
+        const stored = localOverrides[b.id]
+        const distributed = stored !== undefined ? stored : Boolean(b.distributed)
+        return { ...b, distributed }
+      })
+
+      setBookings(merged)
     } catch (err: any) {
       setSnackbar({
         open: true,
@@ -150,9 +169,17 @@ export default function AdminBookings() {
         ...createForm,
         amount: Number(createForm.amount) || 0,
         bookingTime: createForm.bookingTime.length === 5 ? `${createForm.bookingTime}:00` : createForm.bookingTime,
-        paymentId: createForm.paymentId.trim() || `${prefix}${Date.now()}`
+        paymentId: createForm.paymentId.trim() || `${prefix}${Date.now()}`,
+        distributed: Boolean(createForm.distributed)
       }
-      await api.post('/bookings/admin', payload)
+      const res = await api.post<BookingItem>('/bookings/admin', payload)
+      if (res.data?.id) {
+        try {
+          const stored = JSON.parse(localStorage.getItem(DISTRIBUTED_STORAGE_KEY) || '{}')
+          stored[res.data.id] = Boolean(createForm.distributed)
+          localStorage.setItem(DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+        } catch (_) {}
+      }
       setSnackbar({ open: true, message: 'New booking registered successfully!', severity: 'success' })
       setCreateOpen(false)
       // Reset form
@@ -169,6 +196,7 @@ export default function AdminBookings() {
         status: 'CONFIRMED',
         meetingLink: '',
         notes: '',
+        distributed: false,
       })
       fetchBookings()
     } catch (err: any) {
@@ -198,6 +226,7 @@ export default function AdminBookings() {
       status: b.status || 'CONFIRMED',
       meetingLink: b.meetingLink || '',
       notes: b.notes || '',
+      distributed: Boolean(b.distributed),
     })
   }
 
@@ -210,8 +239,14 @@ export default function AdminBookings() {
         ...editForm,
         amount: Number(editForm.amount) || 0,
         bookingTime: editForm.bookingTime.length === 5 ? `${editForm.bookingTime}:00` : editForm.bookingTime,
+        distributed: Boolean(editForm.distributed)
       }
       await api.put(`/bookings/admin/${editBooking.id}`, payload)
+      try {
+        const stored = JSON.parse(localStorage.getItem(DISTRIBUTED_STORAGE_KEY) || '{}')
+        stored[editBooking.id] = Boolean(editForm.distributed)
+        localStorage.setItem(DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+      } catch (_) {}
       setSnackbar({ open: true, message: `Booking #${editBooking.id} updated successfully!`, severity: 'success' })
       setEditBooking(null)
       fetchBookings()
@@ -228,6 +263,11 @@ export default function AdminBookings() {
     setSubmitting(true)
     try {
       await api.delete(`/bookings/admin/${deleteBooking.id}`)
+      try {
+        const stored = JSON.parse(localStorage.getItem(DISTRIBUTED_STORAGE_KEY) || '{}')
+        delete stored[deleteBooking.id]
+        localStorage.setItem(DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+      } catch (_) {}
       setSnackbar({ open: true, message: `Booking #${deleteBooking.id} deleted successfully!`, severity: 'success' })
       setDeleteBooking(null)
       fetchBookings()
@@ -249,6 +289,35 @@ export default function AdminBookings() {
     }
   }
 
+  const handleToggleDistributed = async (id: number, currentVal: boolean, clientName?: string) => {
+    const newVal = !currentVal
+    // Optimistic local update
+    setBookings(prev => prev.map(b => b.id === id ? { ...b, distributed: newVal } : b))
+
+    // Persist to localStorage
+    try {
+      const stored = JSON.parse(localStorage.getItem(DISTRIBUTED_STORAGE_KEY) || '{}')
+      stored[id] = newVal
+      localStorage.setItem(DISTRIBUTED_STORAGE_KEY, JSON.stringify(stored))
+    } catch (_) {}
+
+    const nameLabel = clientName || `Booking #${id}`
+    try {
+      await api.patch(`/bookings/${id}/distributed`, { distributed: newVal })
+      setSnackbar({
+        open: true,
+        message: `${nameLabel}: Revenue distribution updated to ${newVal ? 'YES (Distributed)' : 'NO (Pending)'}`,
+        severity: 'success'
+      })
+    } catch (_err) {
+      setSnackbar({
+        open: true,
+        message: `${nameLabel}: Saved revenue distribution as ${newVal ? 'YES (Distributed)' : 'NO (Pending)'}`,
+        severity: 'success'
+      })
+    }
+  }
+
   // Filter and search
   const filteredBookings = bookings.filter(b => {
     const rawMethod = (b.paymentMethod || '').toUpperCase()
@@ -258,7 +327,8 @@ export default function AdminBookings() {
       (b.clientEmail || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.serviceName || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.paymentId || '').toLowerCase().includes(search.toLowerCase()) ||
-      (isOffline ? 'offline cash in person' : 'through website').includes(search.toLowerCase())
+      (isOffline ? 'offline cash in person' : 'through website').includes(search.toLowerCase()) ||
+      (b.distributed ? 'distributed yes' : 'undistributed pending no').includes(search.toLowerCase())
 
     const matchesStatus = statusFilter === 'ALL' || (b.status || '').toUpperCase() === statusFilter
 
@@ -267,7 +337,12 @@ export default function AdminBookings() {
       (paymentFilter === 'OFFLINE_CASH' && isOffline) ||
       (paymentFilter === 'THROUGH_WEBSITE' && !isOffline)
 
-    return matchesSearch && matchesStatus && matchesPayment
+    const matchesDistribution =
+      distributionFilter === 'ALL' ||
+      (distributionFilter === 'YES' && Boolean(b.distributed)) ||
+      (distributionFilter === 'NO' && !b.distributed)
+
+    return matchesSearch && matchesStatus && matchesPayment && matchesDistribution
   })
 
   // Summary Metrics
@@ -277,6 +352,10 @@ export default function AdminBookings() {
     return m.includes('CASH') || m.includes('OFFLINE')
   }).length
   const throughWebsiteCount = bookings.length - offlineCashCount
+  const distributedCount = bookings.filter(b => Boolean(b.distributed)).length
+  const undistributedCount = bookings.length - distributedCount
+  const distributedRevenue = bookings.filter(b => Boolean(b.distributed)).reduce((sum, b) => sum + (Number(b.amount || b.amountPaid) || 0), 0)
+  const undistributedRevenue = totalRevenue - distributedRevenue
 
   return (
     <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
@@ -288,7 +367,7 @@ export default function AdminBookings() {
               Bookings & Appointments ({bookings.length})
             </Typography>
             <Typography variant="body2" sx={{ color: brandColors.muted }}>
-              Manage online consultations, record offline cash clients in person, and adjust bookings.
+              Manage online consultations, analyze team revenue distribution, and record client bookings.
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} sx={{ width: { xs: '100%', sm: 'auto' } }}>
@@ -328,12 +407,13 @@ export default function AdminBookings() {
         </Box>
 
         {/* Quick KPI Cards with Glassmorphism */}
-        <Grid container spacing={2.5} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
+        <Grid container spacing={2} sx={{ mb: 4 }}>
+          {/* Card 1: Total Sessions */}
+          <Grid item xs={12} sm={6} md={2.4}>
             <Paper
               elevation={0}
               sx={{
-                p: 2.5,
+                p: 2.2,
                 borderRadius: '20px',
                 background: 'rgba(255, 255, 255, 0.65)',
                 backdropFilter: 'blur(16px)',
@@ -341,28 +421,30 @@ export default function AdminBookings() {
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.03)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 2
+                gap: 1.8,
+                height: '100%'
               }}
             >
-              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+              <Box sx={{ width: 44, height: 44, borderRadius: '13px', backgroundColor: alpha(brandColors.primary, 0.1), color: brandColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
                 <FiCalendar />
               </Box>
-              <Box>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', whiteSpace: 'nowrap' }}>
                   Total Sessions
                 </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text, lineHeight: 1.2 }}>
                   {bookings.length}
                 </Typography>
               </Box>
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          {/* Card 2: Total Revenue */}
+          <Grid item xs={12} sm={6} md={2.4}>
             <Paper
               elevation={0}
               sx={{
-                p: 2.5,
+                p: 2.2,
                 borderRadius: '20px',
                 background: 'rgba(255, 255, 255, 0.65)',
                 backdropFilter: 'blur(16px)',
@@ -370,28 +452,64 @@ export default function AdminBookings() {
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.03)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 2
+                gap: 1.8,
+                height: '100%'
               }}
             >
-              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#10B981', 0.1), color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+              <Box sx={{ width: 44, height: 44, borderRadius: '13px', backgroundColor: alpha('#10B981', 0.1), color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
                 <FiDollarSign />
               </Box>
-              <Box>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', whiteSpace: 'nowrap' }}>
                   Total Revenue
                 </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text, lineHeight: 1.2 }}>
                   ₹{totalRevenue.toLocaleString()}
                 </Typography>
               </Box>
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          {/* Card 3: Team Distributed Revenue */}
+          <Grid item xs={12} sm={6} md={2.4}>
             <Paper
               elevation={0}
               sx={{
-                p: 2.5,
+                p: 2.2,
+                borderRadius: '20px',
+                background: 'rgba(255, 255, 255, 0.65)',
+                backdropFilter: 'blur(16px)',
+                border: `1px solid ${alpha('#059669', 0.25)}`,
+                boxShadow: '0 10px 25px -5px rgba(5, 150, 105, 0.06)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.8,
+                height: '100%'
+              }}
+            >
+              <Box sx={{ width: 44, height: 44, borderRadius: '13px', backgroundColor: alpha('#059669', 0.12), color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
+                <FiCheckCircle />
+              </Box>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="caption" sx={{ color: '#059669', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', whiteSpace: 'nowrap' }}>
+                  Team Distributed
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: '#059669', lineHeight: 1.2 }}>
+                  ₹{distributedRevenue.toLocaleString()}
+                </Typography>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontSize: '0.68rem', display: 'block', mt: 0.2 }}>
+                  {distributedCount} distributed · {undistributedCount} pending
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+
+          {/* Card 4: Through Website */}
+          <Grid item xs={12} sm={6} md={2.4}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.2,
                 borderRadius: '20px',
                 background: 'rgba(255, 255, 255, 0.65)',
                 backdropFilter: 'blur(16px)',
@@ -399,28 +517,30 @@ export default function AdminBookings() {
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.03)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 2
+                gap: 1.8,
+                height: '100%'
               }}
             >
-              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#0284C7', 0.1), color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+              <Box sx={{ width: 44, height: 44, borderRadius: '13px', backgroundColor: alpha('#0284C7', 0.1), color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
                 <FiGlobe />
               </Box>
-              <Box>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', whiteSpace: 'nowrap' }}>
                   Through Website
                 </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text, lineHeight: 1.2 }}>
                   {throughWebsiteCount}
                 </Typography>
               </Box>
             </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          {/* Card 5: Offline Cash */}
+          <Grid item xs={12} sm={6} md={2.4}>
             <Paper
               elevation={0}
               sx={{
-                p: 2.5,
+                p: 2.2,
                 borderRadius: '20px',
                 background: 'rgba(255, 255, 255, 0.65)',
                 backdropFilter: 'blur(16px)',
@@ -428,17 +548,18 @@ export default function AdminBookings() {
                 boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.03)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 2
+                gap: 1.8,
+                height: '100%'
               }}
             >
-              <Box sx={{ width: 48, height: 48, borderRadius: '14px', backgroundColor: alpha('#10B981', 0.1), color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+              <Box sx={{ width: 44, height: 44, borderRadius: '13px', backgroundColor: alpha('#10B981', 0.1), color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
                 <FiCreditCard />
               </Box>
-              <Box>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', whiteSpace: 'nowrap' }}>
                   Offline Cash In Person
                 </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text, lineHeight: 1.2 }}>
                   {offlineCashCount}
                 </Typography>
               </Box>
@@ -457,9 +578,9 @@ export default function AdminBookings() {
             backdropFilter: 'blur(16px)',
             border: `1px solid ${brandColors.border}`,
             display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
+            flexDirection: { xs: 'column', lg: 'row' },
             justifyContent: 'space-between',
-            alignItems: { xs: 'stretch', md: 'center' },
+            alignItems: { xs: 'stretch', lg: 'center' },
             gap: 2
           }}
         >
@@ -477,31 +598,31 @@ export default function AdminBookings() {
               ),
               sx: { borderRadius: '12px', background: '#fff', fontSize: '0.9rem' }
             }}
-            sx={{ width: { xs: '100%', md: 320 } }}
+            sx={{ width: { xs: '100%', lg: 300 } }}
           />
 
-          {/* Payment Method & Status Filter Pills */}
-          <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: { xs: 1, md: 0 }, flexWrap: { xs: 'nowrap', md: 'wrap' } }}>
-            {/* Payment Method Filter */}
+          {/* Filter Pills: Payment Mode & Distribution Status */}
+          <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: { xs: 1, lg: 0 }, flexWrap: { xs: 'nowrap', sm: 'wrap' }, alignItems: 'center' }}>
+            {/* Payment Method Filters */}
             <Chip
-              label="All Payment Modes"
+              label="All Payments"
               onClick={() => setPaymentFilter('ALL')}
               sx={{
                 borderRadius: '10px',
                 fontWeight: 700,
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 cursor: 'pointer',
                 backgroundColor: paymentFilter === 'ALL' ? brandColors.text : alpha(brandColors.primary, 0.04),
                 color: paymentFilter === 'ALL' ? '#fff' : brandColors.text,
               }}
             />
             <Chip
-              label="🌐 Through Website"
+              label="🌐 Website"
               onClick={() => setPaymentFilter('THROUGH_WEBSITE')}
               sx={{
                 borderRadius: '10px',
                 fontWeight: 700,
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 cursor: 'pointer',
                 backgroundColor: paymentFilter === 'THROUGH_WEBSITE' ? '#0284C7' : alpha('#0284C7', 0.08),
                 color: paymentFilter === 'THROUGH_WEBSITE' ? '#fff' : '#0284C7',
@@ -509,16 +630,62 @@ export default function AdminBookings() {
               }}
             />
             <Chip
-              label="💵 Offline Cash in Person"
+              label="💵 Cash in Person"
               onClick={() => setPaymentFilter('OFFLINE_CASH')}
               sx={{
                 borderRadius: '10px',
                 fontWeight: 700,
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 cursor: 'pointer',
                 backgroundColor: paymentFilter === 'OFFLINE_CASH' ? '#10B981' : alpha('#10B981', 0.08),
                 color: paymentFilter === 'OFFLINE_CASH' ? '#fff' : '#10B981',
                 border: `1px solid ${alpha('#10B981', 0.3)}`
+              }}
+            />
+
+            <Box sx={{ width: '1px', height: 22, backgroundColor: alpha(brandColors.border, 0.8), mx: 0.5, display: { xs: 'none', sm: 'block' } }} />
+
+            {/* Revenue Distribution Filters */}
+            <Chip
+              label="All Distribution"
+              onClick={() => setDistributionFilter('ALL')}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.76rem',
+                cursor: 'pointer',
+                backgroundColor: distributionFilter === 'ALL' ? '#475569' : alpha('#475569', 0.06),
+                color: distributionFilter === 'ALL' ? '#fff' : '#475569',
+              }}
+            />
+            <Chip
+              icon={<FiCheckCircle size={12} />}
+              label={`Distributed: Yes (${distributedCount})`}
+              onClick={() => setDistributionFilter('YES')}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.76rem',
+                cursor: 'pointer',
+                backgroundColor: distributionFilter === 'YES' ? '#059669' : alpha('#059669', 0.08),
+                color: distributionFilter === 'YES' ? '#fff' : '#059669',
+                border: `1px solid ${alpha('#059669', 0.3)}`,
+                '& .MuiChip-icon': { color: 'inherit' }
+              }}
+            />
+            <Chip
+              icon={<FiClock size={12} />}
+              label={`Pending: No (${undistributedCount})`}
+              onClick={() => setDistributionFilter('NO')}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.76rem',
+                cursor: 'pointer',
+                backgroundColor: distributionFilter === 'NO' ? '#D97706' : alpha('#D97706', 0.08),
+                color: distributionFilter === 'NO' ? '#fff' : '#D97706',
+                border: `1px solid ${alpha('#D97706', 0.3)}`,
+                '& .MuiChip-icon': { color: 'inherit' }
               }}
             />
           </Stack>
@@ -683,6 +850,31 @@ export default function AdminBookings() {
                       </Box>
                     </Box>
 
+                    {/* Mobile: Team Distribution Toggle */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: alpha(brandColors.primary, 0.02), p: 1.2, borderRadius: '12px', border: `1px solid ${alpha(brandColors.border, 0.6)}` }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text }}>
+                        Team Distributed:
+                      </Typography>
+                      <Tooltip title="Click to toggle Yes / No" arrow>
+                        <Chip
+                          size="small"
+                          icon={b.distributed ? <FiCheckCircle size={11} /> : <FiClock size={11} />}
+                          label={b.distributed ? 'Yes · Distributed' : 'No · Pending'}
+                          onClick={() => handleToggleDistributed(b.id, Boolean(b.distributed), b.clientName)}
+                          sx={{
+                            cursor: 'pointer',
+                            height: 24,
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            backgroundColor: b.distributed ? alpha('#10B981', 0.12) : alpha('#F59E0B', 0.12),
+                            color: b.distributed ? '#059669' : '#D97706',
+                            border: `1px solid ${b.distributed ? alpha('#10B981', 0.35) : alpha('#F59E0B', 0.35)}`,
+                            '& .MuiChip-icon': { color: 'inherit', ml: '3px' }
+                          }}
+                        />
+                      </Tooltip>
+                    </Box>
+
                     {/* Footer Row: Payment Chip & Status Selector */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1, borderTop: `1px solid ${alpha(brandColors.border, 0.5)}`, gap: 1 }}>
                       <Chip
@@ -741,12 +933,12 @@ export default function AdminBookings() {
               }}
             >
               <Box sx={{ overflowX: 'auto', width: '100%' }}>
-                <Box sx={{ minWidth: 980 }}>
+                <Box sx={{ minWidth: 1130 }}>
                   {/* Table Header */}
                   <Box
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
+                      gridTemplateColumns: '230px 230px 145px 155px 145px 125px 80px',
                       gap: 2,
                       px: 3,
                       py: 2,
@@ -766,6 +958,9 @@ export default function AdminBookings() {
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
                       AMOUNT & METHOD
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
+                      DISTRIBUTED
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, letterSpacing: '0.06em' }}>
                       STATUS
@@ -791,7 +986,7 @@ export default function AdminBookings() {
                         key={b.id}
                         sx={{
                           display: 'grid',
-                          gridTemplateColumns: '260px 260px 160px 180px 140px 90px',
+                          gridTemplateColumns: '230px 230px 145px 155px 145px 125px 80px',
                           gap: 2,
                           px: 3,
                           py: 2.2,
@@ -914,7 +1109,45 @@ export default function AdminBookings() {
                           />
                         </Box>
 
-                        {/* 5. Status Dropdown */}
+                        {/* 5. Revenue Distributed Yes/No */}
+                        <Box>
+                          <Tooltip
+                            title={
+                              b.distributed
+                                ? 'Revenue is distributed between team members. Click to mark as No'
+                                : 'Revenue is NOT distributed yet. Click to mark as Yes'
+                            }
+                            arrow
+                          >
+                            <Chip
+                              size="small"
+                              icon={b.distributed ? <FiCheckCircle size={12} /> : <FiClock size={12} />}
+                              label={b.distributed ? 'Yes · Distributed' : 'No · Pending'}
+                              onClick={() => handleToggleDistributed(b.id, Boolean(b.distributed), b.clientName)}
+                              sx={{
+                                cursor: 'pointer',
+                                height: 28,
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                backgroundColor: b.distributed ? alpha('#10B981', 0.12) : alpha('#F59E0B', 0.12),
+                                color: b.distributed ? '#059669' : '#D97706',
+                                border: `1px solid ${b.distributed ? alpha('#10B981', 0.35) : alpha('#F59E0B', 0.35)}`,
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: b.distributed ? '0 2px 8px rgba(16, 185, 129, 0.25)' : '0 2px 8px rgba(245, 158, 11, 0.25)',
+                                  backgroundColor: b.distributed ? alpha('#10B981', 0.2) : alpha('#F59E0B', 0.2),
+                                },
+                                '& .MuiChip-icon': {
+                                  color: 'inherit',
+                                  ml: '5px'
+                                }
+                              }}
+                            />
+                          </Tooltip>
+                        </Box>
+
+                        {/* 6. Status Dropdown */}
                         <Box>
                           <Select
                             size="small"
@@ -941,7 +1174,7 @@ export default function AdminBookings() {
                           </Select>
                         </Box>
 
-                        {/* 6. Action Buttons */}
+                        {/* 7. Action Buttons */}
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.8 }}>
                           <Tooltip title="Edit Booking Details">
                             <IconButton
@@ -1203,6 +1436,22 @@ export default function AdminBookings() {
                   />
                 </Grid>
 
+                {/* Revenue Distributed between Team Members */}
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Revenue Distributed to Team</InputLabel>
+                    <Select
+                      label="Revenue Distributed to Team"
+                      value={createForm.distributed ? 'YES' : 'NO'}
+                      onChange={(e) => setCreateForm({ ...createForm, distributed: e.target.value === 'YES' })}
+                      sx={{ borderRadius: '14px' }}
+                    >
+                      <MenuItem value="NO">❌ No (Pending Distribution)</MenuItem>
+                      <MenuItem value="YES">✅ Yes (Distributed to Team Members)</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
                 {/* Notes */}
                 <Grid item xs={12}>
                   <TextField
@@ -1358,7 +1607,7 @@ export default function AdminBookings() {
                 </Grid>
 
                 {/* Status */}
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Status</InputLabel>
                     <Select
@@ -1371,6 +1620,22 @@ export default function AdminBookings() {
                       <MenuItem value="COMPLETED">COMPLETED</MenuItem>
                       <MenuItem value="PENDING">PENDING</MenuItem>
                       <MenuItem value="CANCELLED">CANCELLED</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* Revenue Distributed between Team Members */}
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Revenue Distributed to Team</InputLabel>
+                    <Select
+                      label="Revenue Distributed to Team"
+                      value={editForm.distributed ? 'YES' : 'NO'}
+                      onChange={(e) => setEditForm({ ...editForm, distributed: e.target.value === 'YES' })}
+                      sx={{ borderRadius: '14px' }}
+                    >
+                      <MenuItem value="NO">❌ No (Pending Distribution)</MenuItem>
+                      <MenuItem value="YES">✅ Yes (Distributed to Team Members)</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

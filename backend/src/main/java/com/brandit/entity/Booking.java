@@ -57,6 +57,10 @@ public class Booking {
     @Column(columnDefinition = "text")
     private String paymentScreenshot;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean distributed = false;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
