@@ -56,9 +56,9 @@ export function TermsPage() {
             </Typography>
           </Section>
 
-          <Section title="5. Client Conduct & Intellectual Property">
+          <Section title="5. Intellectual Property & Digital Assets Ownership">
             <Typography variant="body1" sx={{ lineHeight: 1.8, color: brandColors.muted }}>
-              Clients agree to provide accurate background details for profile optimization. Upon full payment, all customized profile text, content calendars, and outreach scripts prepared specifically for the client belong to the client.
+              Clients agree to provide accurate background details for profile optimization. Any digital property, assets, templates, content calendars, outreach scripts, strategies, and materials created or utilized for profile optimization are considered to be BrandIt's exclusive digital property. BrandIt retains complete and absolute ownership over all such assets, which may be freely utilized, adapted, and deployed for any other client's profile optimization, internal operations, or team members.
             </Typography>
           </Section>
 
