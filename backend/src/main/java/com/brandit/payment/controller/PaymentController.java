@@ -19,11 +19,31 @@ public class PaymentController {
 
     private final StripeService stripeService;
 
+    private static final Map<String, BigDecimal> PLAN_PRICING_CATALOG = Map.of(
+            "STARTER", new BigDecimal(1499),
+            "GROWTH", new BigDecimal(2499),
+            "EXECUTIVE", new BigDecimal(4999),
+            "CONSULTING", new BigDecimal(1499)
+    );
+
+    private BigDecimal resolvePlanPrice(String planId, String planName, BigDecimal requestedAmount) {
+        String key = (planId != null ? planId : (planName != null ? planName : "")).toUpperCase().replaceAll("[^A-Z]", "");
+        for (Map.Entry<String, BigDecimal> entry : PLAN_PRICING_CATALOG.entrySet()) {
+            if (key.contains(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        if (requestedAmount != null && requestedAmount.compareTo(new BigDecimal(99)) >= 0) {
+            return requestedAmount;
+        }
+        return new BigDecimal(1499);
+    }
+
     @PostMapping("/create-session")
     public ResponseEntity<Map<String, String>> createCheckoutSession(@RequestBody StripeCheckoutRequest request,
                                                                    @RequestHeader(value = "Origin", required = false) String origin) {
         log.info("Creating Stripe Payment Gateway session for plan: {}", request.getPlanName());
-        BigDecimal amount = request.getAmount() != null ? request.getAmount() : new BigDecimal(129);
+        BigDecimal amount = resolvePlanPrice(request.getPlanId(), request.getPlanName(), request.getAmount());
         Map<String, String> response = stripeService.createCheckoutSession(
                 request.getPlanName() != null ? request.getPlanName() : "BrandIt Package",
                 amount,

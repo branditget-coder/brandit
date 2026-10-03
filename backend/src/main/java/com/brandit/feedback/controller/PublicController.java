@@ -11,6 +11,7 @@ import com.brandit.newsletter.repository.NewsletterRepository;
 import com.brandit.feedback.repository.TestimonialRepository;
 import com.brandit.user.repository.UserRepository;
 import com.brandit.notification.service.EmailService;
+import com.brandit.notification.service.provider.EmailTemplateBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
@@ -78,19 +81,10 @@ public class PublicController {
     public ResponseEntity<Map<String, Object>> healthCheck() {
         Map<String, Object> health = new HashMap<>();
         try (Connection conn = dataSource.getConnection()) {
-            String dbUrl = conn.getMetaData().getURL();
-            String dbType = dbUrl.contains("postgresql") ? "PostgreSQL" : dbUrl.contains("h2") ? "H2" : "Unknown";
-            health.put("database", dbType);
-            health.put("databaseUrl", dbUrl.replaceAll("password=[^&]*", "password=***"));
-            health.put("userCount", userRepository.count());
             health.put("status", "UP");
         } catch (Exception e) {
-            health.put("status", "DB_ERROR");
-            health.put("error", e.getMessage());
+            health.put("status", "DOWN");
         }
-        health.put("resendConfigured",
-                resendApiKey != null && !resendApiKey.isBlank() && resendApiKey.startsWith("re_"));
-        health.put("mailFrom", fromEmail);
         return ResponseEntity.ok(health);
     }
 
@@ -137,12 +131,41 @@ public class PublicController {
     }
 
     @GetMapping({"/public/bookings/{id}/payment-proof", "/bookings/public/{id}/payment-proof"})
-    public ResponseEntity<byte[]> getPaymentProofImage(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getPaymentProofImage(@PathVariable Long id,
+                                                       @RequestParam(required = false) String token,
+                                                       @AuthenticationPrincipal UserDetails userDetails) {
         Optional<Booking> bookingOpt = bookingRepository.findById(id);
         if (bookingOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        String screenshot = bookingOpt.get().getPaymentScreenshot();
+        Booking booking = bookingOpt.get();
+
+        // Access Control: Must provide cryptographic token from official notification email,
+        // OR be an authenticated Admin / Team member or booking owner.
+        boolean authorized = false;
+        if (token != null && !token.isBlank()) {
+            String expected = EmailTemplateBuilder.generateProofToken(id, booking.getPaymentId());
+            if (expected.equalsIgnoreCase(token.trim())) {
+                authorized = true;
+            }
+        }
+        if (!authorized && userDetails != null) {
+            String currentUserEmail = userDetails.getUsername();
+            boolean isStaff = userDetails.getAuthorities().stream().anyMatch(a ->
+                    a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_TEAM"));
+            boolean isOwner = booking.getUser() != null &&
+                    booking.getUser().getEmail() != null &&
+                    booking.getUser().getEmail().equalsIgnoreCase(currentUserEmail);
+            if (isStaff || isOwner) {
+                authorized = true;
+            }
+        }
+
+        if (!authorized) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String screenshot = booking.getPaymentScreenshot();
         if (screenshot == null || screenshot.isBlank()) {
             return ResponseEntity.notFound().build();
         }
@@ -150,7 +173,9 @@ public class PublicController {
     }
 
     @GetMapping({"/public/bookings/payment-proof-by-ref", "/bookings/public/payment-proof-by-ref"})
-    public ResponseEntity<byte[]> getPaymentProofImageByRef(@RequestParam String ref) {
+    public ResponseEntity<byte[]> getPaymentProofImageByRef(@RequestParam String ref,
+                                                            @RequestParam(required = false) String token,
+                                                            @AuthenticationPrincipal UserDetails userDetails) {
         if (ref == null || ref.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
@@ -158,7 +183,32 @@ public class PublicController {
         if (bookingOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        String screenshot = bookingOpt.get().getPaymentScreenshot();
+        Booking booking = bookingOpt.get();
+
+        boolean authorized = false;
+        if (token != null && !token.isBlank()) {
+            String expected = EmailTemplateBuilder.generateProofToken(booking.getId(), booking.getPaymentId());
+            if (expected.equalsIgnoreCase(token.trim())) {
+                authorized = true;
+            }
+        }
+        if (!authorized && userDetails != null) {
+            String currentUserEmail = userDetails.getUsername();
+            boolean isStaff = userDetails.getAuthorities().stream().anyMatch(a ->
+                    a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_TEAM"));
+            boolean isOwner = booking.getUser() != null &&
+                    booking.getUser().getEmail() != null &&
+                    booking.getUser().getEmail().equalsIgnoreCase(currentUserEmail);
+            if (isStaff || isOwner) {
+                authorized = true;
+            }
+        }
+
+        if (!authorized) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String screenshot = booking.getPaymentScreenshot();
         if (screenshot == null || screenshot.isBlank()) {
             return ResponseEntity.notFound().build();
         }
@@ -168,8 +218,21 @@ public class PublicController {
     private ResponseEntity<byte[]> buildImageResponse(String screenshotData) {
         try {
             if (screenshotData.startsWith("http://") || screenshotData.startsWith("https://")) {
+                URI uri = URI.create(screenshotData);
+                String host = uri.getHost() != null ? uri.getHost().toLowerCase() : "";
+                // Validate host against trusted cloud storage / platform domains to prevent open redirects
+                boolean isTrustedHost = host.endsWith("amazonaws.com") ||
+                        host.endsWith("railway.app") ||
+                        host.endsWith("vercel.app") ||
+                        host.endsWith("go-brandit.com");
+
+                if (!isTrustedHost) {
+                    log.warn("Blocked redirect to untrusted external host: {}", host);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+
                 return ResponseEntity.status(HttpStatus.FOUND)
-                        .location(URI.create(screenshotData))
+                        .location(uri)
                         .build();
             }
 

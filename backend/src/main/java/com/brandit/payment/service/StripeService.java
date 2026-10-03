@@ -18,15 +18,36 @@ public class StripeService {
     @Value("${stripe.api.key:sk_test_placeholder}")
     private String stripeApiKey;
 
+    @Value("${app.frontend.url:https://go-brandit.vercel.app}")
+    private String configuredFrontendUrl;
+
+    private String getValidatedDomain(String originUrl) {
+        if (originUrl != null && !originUrl.isBlank()) {
+            try {
+                java.net.URI uri = java.net.URI.create(originUrl.trim());
+                String host = uri.getHost() != null ? uri.getHost().toLowerCase() : "";
+                if (host.equals("localhost") || host.equals("127.0.0.1") ||
+                    host.equals("go-brandit.vercel.app") || host.equals("go-brandit.com") ||
+                    host.endsWith(".go-brandit.com")) {
+                    int port = uri.getPort();
+                    return uri.getScheme() + "://" + host + (port != -1 ? ":" + port : "");
+                }
+            } catch (Exception ignored) {}
+        }
+        return (configuredFrontendUrl != null && !configuredFrontendUrl.isBlank())
+                ? configuredFrontendUrl
+                : "https://go-brandit.vercel.app";
+    }
+
     public Map<String, String> createCheckoutSession(String planName, BigDecimal amountInRupees, String clientEmail, String originUrl) {
         Map<String, String> result = new HashMap<>();
+        String domain = getValidatedDomain(originUrl);
 
         try {
             if (stripeApiKey != null && stripeApiKey.startsWith("sk_")) {
                 Stripe.apiKey = stripeApiKey;
 
                 long amountInPaise = amountInRupees.multiply(new BigDecimal(100)).longValue();
-                String domain = (originUrl != null && !originUrl.isEmpty()) ? originUrl : "http://localhost:5173";
 
                 SessionCreateParams params = SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -64,7 +85,7 @@ public class StripeService {
 
         // Hosted Gateway Fallback Link
         String mockSessionId = "cs_test_" + System.currentTimeMillis();
-        result.put("url", (originUrl != null ? originUrl : "http://localhost:5173") + "/book?status=success&session_id=" + mockSessionId);
+        result.put("url", domain + "/book?status=success&session_id=" + mockSessionId);
         result.put("sessionId", mockSessionId);
         return result;
     }

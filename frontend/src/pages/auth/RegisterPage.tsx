@@ -101,7 +101,7 @@ export default function RegisterPage() {
     try {
       await sendOtp(email.trim(), firstName.trim())
       setOtpSent(true)
-      setInfoMsg(`📩 A 4-digit verification code has been sent to ${email.trim()}. Please enter the code below.`)
+      setInfoMsg(`📩 A verification code has been sent to ${email.trim()}. Please enter the code below.`)
       setResendTimer(30)
       const otpInput = document.getElementById('register-otp')
       otpInput?.focus()
@@ -126,7 +126,7 @@ export default function RegisterPage() {
       try {
         await sendOtp(email.trim(), firstName.trim())
         setOtpSent(true)
-        setInfoMsg(`📩 A 4-digit verification code has been sent to ${email.trim()}. Please enter the code below to complete registration.`)
+        setInfoMsg(`📩 A verification code has been sent to ${email.trim()}. Please enter the code below to complete registration.`)
         setResendTimer(30)
         const otpInput = document.getElementById('register-otp')
         otpInput?.focus()
@@ -139,7 +139,7 @@ export default function RegisterPage() {
     }
 
     if (cleanOtp.length < 4) {
-      setError('Please enter the complete 4-digit verification code.')
+      setError('Please enter the complete verification code.')
       return
     }
 
@@ -167,10 +167,10 @@ export default function RegisterPage() {
       const serverMsg = err.response?.data?.message || ''
       if (serverMsg.includes('verification code has been sent') || serverMsg.includes('code is required')) {
         setOtpSent(true)
-        setInfoMsg(`📩 A 4-digit verification code has been sent to ${email.trim()}. Please enter the code below.`)
+        setInfoMsg(`📩 A verification code has been sent to ${email.trim()}. Please enter the code below.`)
         if (resendTimer === 0) setResendTimer(30)
       } else {
-        setError(serverMsg || 'Registration failed. Please check your 4-digit verification code.')
+        setError(serverMsg || 'Registration failed. Please check your verification code.')
       }
     } finally {
       setLoading(false)
@@ -507,20 +507,20 @@ export default function RegisterPage() {
                     sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                   />
 
-                  {/* ── 4-DIGIT VERIFICATION OTP FIELD WITH RESEND BUTTON NEXT TO IT ── */}
+                  {/* ── VERIFICATION OTP FIELD WITH RESEND BUTTON NEXT TO IT ── */}
                   <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.primary, mb: 0.5, display: 'block' }}>
-                    4-Digit Verification Code (OTP) *
+                    Verification Code (OTP) *
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1.5, mb: 3, alignItems: 'stretch' }}>
                     <TextField
                       fullWidth
                       id="register-otp"
-                      placeholder="Enter 4-digit OTP code"
+                      placeholder="Enter verification code"
                       value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       variant="outlined"
                       size="medium"
-                      inputProps={{ maxLength: 4 }}
+                      inputProps={{ maxLength: 6 }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">

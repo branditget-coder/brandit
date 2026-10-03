@@ -72,21 +72,19 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/newsletter").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/bookings/public-slots").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/bookings/public/**").permitAll()
-                .requestMatchers("/api/payments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/public/live-visitors").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/public/bookings/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/bookings/public/**").permitAll()
+                .requestMatchers("/api/payments/create-session", "/api/payments/webhook").permitAll()
                 // Diagnostics & Health
                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
                 .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
-                // Protected Diagnostics / Admin Operations (Restricted from public scraping)
-                .requestMatchers(HttpMethod.GET, "/api/test-email").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/list-bookings").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/resend-booking-email").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/resend-latest-booking-email").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/send-manual-payment-email").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/record-client-payment").hasRole("ADMIN")
+                // Protected Diagnostics / Admin Operations (Restricted to ADMIN)
+                .requestMatchers("/api/test-email", "/api/list-bookings", "/api/resend-booking-email",
+                                 "/api/resend-latest-booking-email", "/api/send-manual-payment-email",
+                                 "/api/record-client-payment").hasRole("ADMIN")
                 // Admin only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Everything else requires auth
@@ -99,11 +97,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Use specific patterns (required when allowCredentials = true)
+        // Specific authorized origin patterns (prevent arbitrary multi-tenant *.vercel.app / *.up.railway.app cross-origin attacks)
         config.addAllowedOriginPattern("http://localhost:*");
         config.addAllowedOriginPattern("http://127.0.0.1:*");
-        config.addAllowedOriginPattern("https://*.vercel.app");
-        config.addAllowedOriginPattern("https://*.up.railway.app");
         config.addAllowedOriginPattern("https://go-brandit.vercel.app");
         config.addAllowedOriginPattern("https://*.go-brandit.com");
         config.addAllowedOriginPattern("https://go-brandit.com");

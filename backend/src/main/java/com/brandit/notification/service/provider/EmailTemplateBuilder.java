@@ -1,10 +1,16 @@
 package com.brandit.notification.service.provider;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 import java.time.Year;
 
 @Component
 public class EmailTemplateBuilder {
+
+    private String escape(String input) {
+        if (input == null) return "";
+        return HtmlUtils.htmlEscape(input.trim());
+    }
 
     private String cleanUrl(String rawUrl) {
         if (rawUrl == null || rawUrl.isBlank()) {
@@ -62,15 +68,32 @@ public class EmailTemplateBuilder {
                 "</html>";
     }
 
+    public static String generateProofToken(Long bookingId, String upiRef) {
+        try {
+            String raw = (bookingId != null ? bookingId.toString() : "0") + ":" + (upiRef != null ? upiRef.trim() : "brandit");
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(raw.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.substring(0, 16);
+        } catch (Exception e) {
+            return "proof_valid";
+        }
+    }
+
     public String buildWelcomeTemplate(String clientName, String toEmail, String role, String frontendUrl) {
         String portalLink = cleanUrl(frontendUrl) + "/login";
         return wrapHtmlTemplate("Welcome to BrandIt",
-                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome aboard, " + clientName + "! 🎉</h2>" +
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome aboard, " + escape(clientName) + "! 🎉</h2>" +
                 "<p>Thank you for creating your account with <strong>BrandIt</strong>. We are thrilled to partner with you on your career and personal branding journey.</p>" +
                 "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                 "  <p style='margin:0 0 8px 0; color:#0A66C2; font-weight:700;'>Account Details:</p>" +
-                "  <p style='margin:4px 0; word-break:break-all;'>📧 Registered Email: <strong>" + toEmail + "</strong></p>" +
-                "  <p style='margin:4px 0;'>🔒 Account Role: <strong>" + role + " Portal Access</strong></p>" +
+                "  <p style='margin:4px 0; word-break:break-all;'>📧 Registered Email: <strong>" + escape(toEmail) + "</strong></p>" +
+                "  <p style='margin:4px 0;'>🔒 Account Role: <strong>" + escape(role) + " Portal Access</strong></p>" +
                 "</div>" +
                 "<p>Through your portal, you can view booked consultation slots, access invoices, track personal branding milestones, and change password & security settings anytime.</p>" +
                 "<div style='text-align:center; margin-top:24px;'>" +
@@ -79,14 +102,14 @@ public class EmailTemplateBuilder {
     }
 
     public String buildRegistrationOtpTemplate(String firstName, String recipientEmail, String otp, String frontendUrl) {
-        String name = (firstName != null && !firstName.isBlank()) ? firstName.trim() : "Valued Member";
+        String name = (firstName != null && !firstName.isBlank()) ? escape(firstName.trim()) : "Valued Member";
         return wrapHtmlTemplate("Verify Your BrandIt Account",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome to BrandIt, " + name + "! 👋</h2>" +
-                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Thank you for starting your account registration. Please use the 4-digit verification code below to verify your email address and complete your registration:</p>" +
+                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Thank you for starting your account registration. Please use the 6-digit verification code below to verify your email address and complete your registration:</p>" +
 
                 "<div style='text-align:center; margin:28px 0; padding:24px; background-color:#F0F9FF; border:2px dashed #0A66C2; border-radius:16px; box-sizing:border-box;'>" +
-                "  <p style='margin:0 0 8px 0; color:#0369A1; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;'>Your 4-Digit Verification Code</p>" +
-                "  <div style='font-size:42px; font-weight:900; letter-spacing:16px; color:#0A66C2; font-family:monospace; padding-left:16px; margin:10px 0;'>" + otp + "</div>" +
+                "  <p style='margin:0 0 8px 0; color:#0369A1; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;'>Your 6-Digit Verification Code</p>" +
+                "  <div style='font-size:42px; font-weight:900; letter-spacing:12px; color:#0A66C2; font-family:monospace; padding-left:12px; margin:10px 0;'>" + escape(otp) + "</div>" +
                 "  <p style='margin:8px 0 0 0; color:#64748B; font-size:12px;'>⏱️ This code will expire in <strong>10 minutes</strong>. Do not share it with anyone.</p>" +
                 "</div>" +
 
@@ -97,10 +120,10 @@ public class EmailTemplateBuilder {
 
     public String buildBookingTemplate(String clientName, String serviceName, String bookingDate, String bookingTime, String price, String paymentId, String frontendUrl) {
         String dashboardLink = cleanUrl(frontendUrl) + "/dashboard";
-        String txnRef = (paymentId != null && !paymentId.isBlank()) ? paymentId : "CONFIRMED";
+        String txnRef = (paymentId != null && !paymentId.isBlank()) ? escape(paymentId) : "CONFIRMED";
 
         return wrapHtmlTemplate("Booking Confirmation",
-                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Booking Confirmed, " + clientName + "! ✅</h2>" +
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Booking Confirmed, " + escape(clientName) + "! ✅</h2>" +
                 "<p>Your consultation booking with BrandIt has been successfully processed. Here is your official booking summary:</p>" +
 
                 "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
@@ -108,17 +131,17 @@ public class EmailTemplateBuilder {
 
                 "  <div style='margin-bottom:12px;'>" +
                 "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Service Package</div>" +
-                "    <div style='font-size:15px; font-weight:700; color:#111827; margin-top:2px; word-break:break-word;'>" + serviceName + "</div>" +
+                "    <div style='font-size:15px; font-weight:700; color:#111827; margin-top:2px; word-break:break-word;'>" + escape(serviceName) + "</div>" +
                 "  </div>" +
 
                 "  <div style='margin-bottom:12px;'>" +
                 "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Amount Paid</div>" +
-                "    <div style='font-size:15px; font-weight:700; color:#16A34A; margin-top:2px;'>" + price + "</div>" +
+                "    <div style='font-size:15px; font-weight:700; color:#16A34A; margin-top:2px;'>" + escape(price) + "</div>" +
                 "  </div>" +
 
                 "  <div style='margin-bottom:12px;'>" +
                 "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Scheduled Slot</div>" +
-                "    <div style='font-size:15px; font-weight:700; color:#111827; margin-top:2px;'>" + bookingDate + " • " + bookingTime + " IST</div>" +
+                "    <div style='font-size:15px; font-weight:700; color:#111827; margin-top:2px;'>" + escape(bookingDate) + " • " + escape(bookingTime) + " IST</div>" +
                 "  </div>" +
 
                 "  <div>" +
@@ -142,10 +165,10 @@ public class EmailTemplateBuilder {
     }
 
     public String buildPasswordResetTemplate(String clientName, String toEmail, String resetToken, String frontendUrl) {
-        String resetLink = cleanUrl(frontendUrl) + "/reset-password?token=" + resetToken;
+        String resetLink = cleanUrl(frontendUrl) + "/reset-password?token=" + escape(resetToken);
         return wrapHtmlTemplate("Password Reset Request",
-                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Hello " + clientName + ",</h2>" +
-                "<p>We received a request to reset your password for your <strong>BrandIt</strong> account (" + toEmail + ").</p>" +
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Hello " + escape(clientName) + ",</h2>" +
+                "<p>We received a request to reset your password for your <strong>BrandIt</strong> account (" + escape(toEmail) + ").</p>" +
                 "<p>Click the button below to choose a new password. This link is valid for <strong>1 hour</strong>:</p>" +
                 "<div style='text-align:center; margin:28px 0;'>" +
                 "  <a href='" + resetLink + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#DC2626; color:#FFFFFF !important; text-decoration:none !important; padding:14px 28px; border-radius:10px; font-weight:700; font-size:15px; text-align:center; font-family:sans-serif;'>Reset Password &rarr;</a>" +
@@ -159,21 +182,21 @@ public class EmailTemplateBuilder {
         return wrapHtmlTemplate("New Inquiry Received",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>New Website Inquiry 📩</h2>" +
                 "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
-                "  <p style='margin:4px 0; word-break:break-all;'><strong>From:</strong> " + senderName + " (" + senderEmail + ")</p>" +
-                "  <p style='margin:4px 0;'><strong>Phone:</strong> " + (phone != null && !phone.isBlank() ? phone : "N/A") + "</p>" +
-                "  <p style='margin:4px 0;'><strong>Interested In:</strong> " + (serviceInterested != null && !serviceInterested.isBlank() ? serviceInterested : "General Inquiry") + "</p>" +
+                "  <p style='margin:4px 0; word-break:break-all;'><strong>From:</strong> " + escape(senderName) + " (" + escape(senderEmail) + ")</p>" +
+                "  <p style='margin:4px 0;'><strong>Phone:</strong> " + (phone != null && !phone.isBlank() ? escape(phone) : "N/A") + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Interested In:</strong> " + (serviceInterested != null && !serviceInterested.isBlank() ? escape(serviceInterested) : "General Inquiry") + "</p>" +
                 "</div>" +
                 "<h3 style='color:#111827; font-size:15px;'>Message Details:</h3>" +
                 "<div class='card' style='background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; box-sizing:border-box; word-break:break-word;'>" +
-                "  <p style='margin:0; white-space:pre-wrap; word-break:break-word;'>" + messageText + "</p>" +
+                "  <p style='margin:0; white-space:pre-wrap; word-break:break-word;'>" + escape(messageText) + "</p>" +
                 "</div>", frontendUrl);
     }
 
     public String buildContactUserReceiptTemplate(String senderName, String serviceInterested, String frontendUrl) {
         String baseUrl = cleanUrl(frontendUrl);
         return wrapHtmlTemplate("Inquiry Received — BrandIt",
-                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>We Received Your Inquiry, " + senderName + "! 📩</h2>" +
-                "<p>Thank you for reaching out to <strong>BrandIt Consulting</strong>. Our team has received your message regarding <strong>" + (serviceInterested != null && !serviceInterested.isBlank() ? serviceInterested : "Personal Branding Services") + "</strong>.</p>" +
+                "<h2 style='color:#111827; margin-top:0; font-size:20px;'>We Received Your Inquiry, " + escape(senderName) + "! 📩</h2>" +
+                "<p>Thank you for reaching out to <strong>BrandIt Consulting</strong>. Our team has received your message regarding <strong>" + (serviceInterested != null && !serviceInterested.isBlank() ? escape(serviceInterested) : "Personal Branding Services") + "</strong>.</p>" +
                 "<div class='card' style='background-color:#F0F9FF; border:1px solid #BAE6FD; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                 "  <p style='margin:0; color:#0369A1; font-weight:700;'>Next Steps:</p>" +
                 "  <p style='margin:6px 0 0 0;'>One of our branding consultants will review your request and contact you within <strong>24 hours</strong>.</p>" +
@@ -189,7 +212,7 @@ public class EmailTemplateBuilder {
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Welcome to BrandIt Career Insights! 🚀</h2>" +
                 "<p>You are now subscribed to receive <strong>BrandIt Weekly Career Insights</strong>. Expect proven personal branding tactics, executive resume frameworks, and LinkedIn algorithm strategies right in your inbox.</p>" +
                 "<div class='card' style='background-color:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:18px 20px; margin:20px 0; color:#166534; box-sizing:border-box; word-break:break-word;'>" +
-                "  <p style='margin:0; word-break:break-all;'><strong>Subscription Email:</strong> " + subscriberEmail + "</p>" +
+                "  <p style='margin:0; word-break:break-all;'><strong>Subscription Email:</strong> " + escape(subscriberEmail) + "</p>" +
                 "  <p style='margin:6px 0 0 0; font-size:13px;'>Frequency: Weekly curated career & branding insights</p>" +
                 "</div>" +
                 "<div style='text-align:center; margin-top:24px;'>" +
@@ -213,7 +236,8 @@ public class EmailTemplateBuilder {
         if (screenshotBase64 != null && (screenshotBase64.startsWith("http://") || screenshotBase64.startsWith("https://"))) {
             imageUrl = screenshotBase64;
         } else if (bookingId != null) {
-            imageUrl = baseUrl + "/api/public/bookings/" + bookingId + "/payment-proof";
+            String token = generateProofToken(bookingId, upiRef);
+            imageUrl = baseUrl + "/api/public/bookings/" + bookingId + "/payment-proof?token=" + token;
         } else if (upiRef != null && !upiRef.isBlank()) {
             try {
                 imageUrl = baseUrl + "/api/public/bookings/payment-proof-by-ref?ref=" + java.net.URLEncoder.encode(upiRef.trim(), java.nio.charset.StandardCharsets.UTF_8.name());
@@ -236,7 +260,7 @@ public class EmailTemplateBuilder {
                         "  </div>" +
                         "</div>";
         } else if (hasScreenshot) {
-            imageHtml = "<div style='margin-top:16px; padding:12px; background:#F1F5F9; border-radius:8px; text-align:center;'><p style='color:#0A66C2; font-weight:700; margin:0;'>✓ Payment Screenshot Uploaded by Client (Ref: " + upiRef + ")</p></div>";
+            imageHtml = "<div style='margin-top:16px; padding:12px; background:#F1F5F9; border-radius:8px; text-align:center;'><p style='color:#0A66C2; font-weight:700; margin:0;'>✓ Payment Screenshot Uploaded by Client (Ref: " + escape(upiRef) + ")</p></div>";
         } else {
             imageHtml = "<p style='color:#DC2626; font-weight:600; text-align:center;'>No screenshot image provided.</p>";
         }
@@ -247,17 +271,17 @@ public class EmailTemplateBuilder {
 
                 "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                 "  <h3 style='margin:0 0 12px 0; color:#0A66C2; font-size:16px; border-bottom:1px solid #E2E8F0; padding-bottom:8px;'>👤 Client Details</h3>" +
-                "  <p style='margin:4px 0;'><strong>Client Name:</strong> " + clientName + "</p>" +
-                "  <p style='margin:4px 0; word-break:break-all;'><strong>Client Email:</strong> " + clientEmail + "</p>" +
-                "  <p style='margin:4px 0;'><strong>Client Phone:</strong> " + (clientPhone != null ? clientPhone : "N/A") + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Client Name:</strong> " + escape(clientName) + "</p>" +
+                "  <p style='margin:4px 0; word-break:break-all;'><strong>Client Email:</strong> " + escape(clientEmail) + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Client Phone:</strong> " + (clientPhone != null ? escape(clientPhone) : "N/A") + "</p>" +
                 "</div>" +
 
                 "<div class='card' style='background-color:#FEF3C7; border:1px solid #FCD34D; border-radius:12px; padding:18px 20px; margin:20px 0; color:#92400E; box-sizing:border-box; word-break:break-word;'>" +
                 "  <h3 style='margin:0 0 12px 0; color:#92400E; font-size:16px; border-bottom:1px solid #FDE68A; padding-bottom:8px;'>📌 Payment & Booking Info</h3>" +
-                "  <p style='margin:4px 0;'><strong>Service Package:</strong> " + serviceName + "</p>" +
-                "  <p style='margin:4px 0;'><strong>Amount Paid:</strong> " + price + "</p>" +
-                "  <p style='margin:4px 0;'><strong>Scheduled Slot:</strong> " + bookingDate + " @ " + bookingTime + " IST</p>" +
-                "  <p style='margin:8px 0 0 0; font-size:16px;'><strong>Transaction Ref / UTR ID:</strong> <span style='font-family:monospace; background-color:#FFFFFF; padding:4px 10px; border-radius:6px; border:1px solid #D97706; font-weight:800; color:#B45309; word-break:break-all;'>" + upiRef + "</span></p>" +
+                "  <p style='margin:4px 0;'><strong>Service Package:</strong> " + escape(serviceName) + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Amount Paid:</strong> " + escape(price) + "</p>" +
+                "  <p style='margin:4px 0;'><strong>Scheduled Slot:</strong> " + escape(bookingDate) + " @ " + escape(bookingTime) + " IST</p>" +
+                "  <p style='margin:8px 0 0 0; font-size:16px;'><strong>Transaction Ref / UTR ID:</strong> <span style='font-family:monospace; background-color:#FFFFFF; padding:4px 10px; border-radius:6px; border:1px solid #D97706; font-weight:800; color:#B45309; word-break:break-all;'>" + escape(upiRef) + "</span></p>" +
                 "</div>" +
 
                 imageHtml, frontendUrl);
@@ -268,7 +292,7 @@ public class EmailTemplateBuilder {
         return wrapHtmlTemplate(subject,
                 "<div style='text-align:center; margin-bottom:16px;'>" +
                 "  <p style='margin:0; font-size:12px; font-weight:700; color:#0A66C2; text-transform:uppercase; letter-spacing:0.08em;'>✨ BrandIt Monday Spark • Weekly Digest</p>" +
-                "  <p style='margin:4px 0 0 0; color:#64748B; font-size:13px;'>A fresh, easy 60-second read curated for <strong>" + recipientEmail + "</strong></p>" +
+                "  <p style='margin:4px 0 0 0; color:#64748B; font-size:13px;'>A fresh, easy 60-second read curated for <strong>" + escape(recipientEmail) + "</strong></p>" +
                 "</div>" +
                 "<div class='card' style='background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:22px; margin:16px 0; box-sizing:border-box; word-break:break-word; font-size:15px; line-height:1.7; box-shadow:0 4px 16px rgba(0,0,0,0.03);'>" +
                 contentHtml +
@@ -286,20 +310,20 @@ public class EmailTemplateBuilder {
         String notesBlock = (customNotes != null && !customNotes.isBlank())
                 ? "<div class='card' style='background-color:#FFFBEB; border:1px solid #FCD34D; border-radius:12px; padding:16px 18px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                   "  <p style='margin:0 0 6px 0; color:#B45309; font-weight:700; font-size:13px; text-transform:uppercase;'>📝 Preparation & Notes from HR Team:</p>" +
-                  "  <p style='margin:0; color:#78350F; font-size:14px; white-space:pre-wrap;'>" + customNotes + "</p>" +
+                  "  <p style='margin:0; color:#78350F; font-size:14px; white-space:pre-wrap;'>" + escape(customNotes) + "</p>" +
                   "</div>"
                 : "";
 
         return wrapHtmlTemplate("Google Meet Consultation Invitation",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>📹 Your Google Meet Consultation is Scheduled!</h2>" +
-                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Hello <strong>" + clientName + "</strong>,</p>" +
-                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Your personal branding consultation has been scheduled with our Main Consultant, <strong>" + consultantName + "</strong>. Please find your meeting invitation details below:</p>" +
+                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Hello <strong>" + escape(clientName) + "</strong>,</p>" +
+                "<p style='color:#374151; font-size:15px; line-height:1.6;'>Your personal branding consultation has been scheduled with our Main Consultant, <strong>" + escape(consultantName) + "</strong>. Please find your meeting invitation details below:</p>" +
 
                 "<div class='card' style='background-color:#F0F9FF; border:1px solid #BAE6FD; border-radius:14px; padding:20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                 "  <h3 style='margin:0 0 14px 0; color:#0369A1; font-size:16px; border-bottom:1px solid #7DD3FC; padding-bottom:8px;'>📅 Meeting Details</h3>" +
-                "  <p style='margin:6px 0;'><strong>Service Package:</strong> " + serviceName + "</p>" +
-                "  <p style='margin:6px 0;'><strong>Consultant:</strong> " + consultantName + " (BrandIt Lead Consultant)</p>" +
-                "  <p style='margin:6px 0;'><strong>Date & Time:</strong> <span style='color:#0A66C2; font-weight:800;'>" + bookingDate + " at " + bookingTime + " IST</span></p>" +
+                "  <p style='margin:6px 0;'><strong>Service Package:</strong> " + escape(serviceName) + "</p>" +
+                "  <p style='margin:6px 0;'><strong>Consultant:</strong> " + escape(consultantName) + " (BrandIt Lead Consultant)</p>" +
+                "  <p style='margin:6px 0;'><strong>Date & Time:</strong> <span style='color:#0A66C2; font-weight:800;'>" + escape(bookingDate) + " at " + escape(bookingTime) + " IST</span></p>" +
                 "  <p style='margin:6px 0; word-break:break-all;'><strong>Google Meet Link:</strong> <a href='" + meetUrl + "' target='_blank' style='color:#0A66C2; font-weight:700;'>" + meetUrl + "</a></p>" +
                 "</div>" +
 

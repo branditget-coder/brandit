@@ -43,11 +43,18 @@ public class AuthService {
 
     private final Map<String, OtpData> registrationOtpStore = new java.util.concurrent.ConcurrentHashMap<>();
 
+    public String getStoredOtpForTesting(String email) {
+        OtpData data = registrationOtpStore.get(cleanEmail(email));
+        return data != null ? data.getCode() : null;
+    }
+
     @lombok.Data
     @lombok.AllArgsConstructor
     public static class OtpData {
         private String code;
         private LocalDateTime expiryTime;
+        private LocalDateTime requestedAt;
+        private int failedAttempts;
     }
 
     private String cleanEmail(String email) {
@@ -64,9 +71,17 @@ public class AuthService {
             throw new IllegalArgumentException("Email is already registered. Please sign in instead.");
         }
 
-        // Generate 4-digit numeric OTP
-        String otp = String.format("%04d", new java.security.SecureRandom().nextInt(10000));
-        registrationOtpStore.put(email, new OtpData(otp, LocalDateTime.now().plusMinutes(10)));
+        // Rate limiting: 60-second resend cooldown per email
+        OtpData existing = registrationOtpStore.get(email);
+        if (existing != null && existing.getRequestedAt() != null &&
+                existing.getRequestedAt().plusSeconds(60).isAfter(LocalDateTime.now())) {
+            long waitSecs = java.time.Duration.between(LocalDateTime.now(), existing.getRequestedAt().plusSeconds(60)).getSeconds();
+            throw new IllegalArgumentException("Please wait " + Math.max(1, waitSecs) + " seconds before requesting a new code.");
+        }
+
+        // Generate cryptographically secure 6-digit numeric OTP (1,000,000 combinations)
+        String otp = String.format("%06d", new java.security.SecureRandom().nextInt(1_000_000));
+        registrationOtpStore.put(email, new OtpData(otp, LocalDateTime.now().plusMinutes(10), LocalDateTime.now(), 0));
 
         EmailService.EmailDispatchResult result = emailService.sendRegistrationOtpEmail(email, request.getFirstName(), otp);
 
@@ -74,7 +89,7 @@ public class AuthService {
             org.slf4j.LoggerFactory.getLogger(AuthService.class).warn("⚠️ Registration OTP [{}] for {} could not be dispatched via remote mail API. Code cached for registration.", otp, email);
         }
 
-        return new com.brandit.common.dto.CommonDtos.MessageResponse("A 4-digit verification code has been sent to your registered email address (" + email + ").");
+        return new com.brandit.common.dto.CommonDtos.MessageResponse("A 6-digit verification code has been sent to your registered email address (" + email + ").");
     }
 
     @Transactional
@@ -84,14 +99,14 @@ public class AuthService {
             throw new IllegalArgumentException("Email is already registered. Please sign in instead.");
         }
 
-        // 4-Digit OTP Verification for first-time registering users
+        // 6-Digit OTP Verification for first-time registering users
         String userOtp = request.getOtp() != null ? request.getOtp().trim() : "";
         if (userOtp.isBlank()) {
             SendOtpRequest sendOtpReq = new SendOtpRequest();
             sendOtpReq.setEmail(email);
             sendOtpReq.setFirstName(request.getFirstName());
             sendRegistrationOtp(sendOtpReq);
-            throw new IllegalArgumentException("A 4-digit verification code has been sent to " + email + ". Please enter the code below to complete registration.");
+            throw new IllegalArgumentException("A 6-digit verification code has been sent to " + email + ". Please enter the code below to complete registration.");
         }
 
         OtpData otpData = registrationOtpStore.get(email);
@@ -100,7 +115,13 @@ public class AuthService {
         }
 
         if (!otpData.getCode().equalsIgnoreCase(userOtp)) {
-            throw new IllegalArgumentException("Incorrect 4-digit verification code. Please check your email and try again.");
+            otpData.setFailedAttempts(otpData.getFailedAttempts() + 1);
+            if (otpData.getFailedAttempts() >= 5) {
+                registrationOtpStore.remove(email);
+                throw new IllegalArgumentException("Too many incorrect attempts. This verification code has been invalidated for security. Please request a new code.");
+            }
+            int remaining = 5 - otpData.getFailedAttempts();
+            throw new IllegalArgumentException("Incorrect verification code. " + remaining + " attempt(s) remaining.");
         }
 
         // OTP verified successfully -> remove from temporary store
@@ -208,16 +229,61 @@ public class AuthService {
         return response;
     }
 
+    private String verifyGoogleIdToken(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
+        String cleanToken = token.startsWith("g_") ? token.substring(2) : token;
+        if (cleanToken.isBlank()) {
+            return null;
+        }
+        try {
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://oauth2.googleapis.com/tokeninfo?id_token=" + java.net.URLEncoder.encode(cleanToken.trim(), java.nio.charset.StandardCharsets.UTF_8)))
+                    .timeout(java.time.Duration.ofSeconds(5))
+                    .GET()
+                    .build();
+            java.net.http.HttpResponse<String> resp = client.send(req, java.net.http.HttpResponse.BodyHandlers.ofString());
+            if (resp.statusCode() == 200) {
+                com.fasterxml.jackson.databind.JsonNode root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(resp.body());
+                if (root.has("email") && root.has("email_verified") && "true".equalsIgnoreCase(root.get("email_verified").asText())) {
+                    return root.get("email").asText().toLowerCase().trim();
+                }
+            }
+        } catch (Exception e) {
+            org.slf4j.LoggerFactory.getLogger(AuthService.class).warn("Google token verification network call error: {}", e.getMessage());
+        }
+        return null;
+    }
+
     @Transactional
     public AuthResponse loginWithSocial(String rawEmail, String firstName, String lastName, User.AuthProvider provider, String providerId) {
-        String email = cleanEmail(rawEmail);
+        String resolvedEmail = cleanEmail(rawEmail);
+
+        if (provider == User.AuthProvider.GOOGLE) {
+            String verifiedGoogleEmail = verifyGoogleIdToken(providerId);
+            if (verifiedGoogleEmail != null) {
+                resolvedEmail = verifiedGoogleEmail;
+            } else {
+                final String checkEmail = resolvedEmail;
+                // Strict Security: Unverified tokens CANNOT access existing accounts or any Team/Admin accounts!
+                boolean accountExists = userRepository.existsByEmailIgnoreCase(checkEmail);
+                boolean isProtectedTeamEmail = ALLOWED_TEAM_EMAILS.stream().anyMatch(e -> e.equalsIgnoreCase(checkEmail));
+                if (accountExists || isProtectedTeamEmail) {
+                    throw new IllegalArgumentException("Google authentication failed: unverified token cannot access this account. Please sign in with your email and password.");
+                }
+            }
+        }
+
+        final String finalEmail = resolvedEmail;
         boolean[] isNewUser = {false};
-        User user = userRepository.findByEmailIgnoreCase(email).orElseGet(() -> {
+        User user = userRepository.findByEmailIgnoreCase(finalEmail).orElseGet(() -> {
             isNewUser[0] = true;
             User newUser = User.builder()
                     .firstName(firstName != null ? firstName : "User")
                     .lastName(lastName != null ? lastName : "")
-                    .email(email)
+                    .email(finalEmail)
                     .role(User.Role.USER)
                     .provider(provider)
                     .providerId(providerId)
@@ -227,13 +293,13 @@ public class AuthService {
         });
 
         // Auto-enroll new social login users in Weekly Career Insights (mandatory)
-        if (isNewUser[0] && !newsletterRepository.existsByEmail(email)) {
+        if (isNewUser[0] && !newsletterRepository.existsByEmail(finalEmail)) {
             Newsletter subscription = Newsletter.builder()
-                    .email(email)
+                    .email(finalEmail)
                     .active(true)
                     .build();
             newsletterRepository.save(subscription);
-            emailService.sendWelcomeEmail(email, user.getFullName(), user.getRole().name());
+            emailService.sendWelcomeEmail(finalEmail, user.getFullName(), user.getRole().name());
         }
 
         activityLogRepository.save(UserActivityLog.builder()

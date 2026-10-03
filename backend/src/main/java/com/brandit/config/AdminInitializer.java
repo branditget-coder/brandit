@@ -5,6 +5,7 @@ import com.brandit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,25 @@ public class AdminInitializer implements CommandLineRunner {
             new TeamMemberSeed("Yash", "Jain", "yashjainnn13@gmail.com", "+919024469496", User.Role.TEAM, "Finance & Accounting Lead")
     );
 
+    @Value("${app.admin.initial-password:}")
+    private String configuredInitialPassword;
+
+    private String getInitialPasswordForAccount(String email) {
+        if (configuredInitialPassword != null && !configuredInitialPassword.isBlank()) {
+            return configuredInitialPassword.trim();
+        }
+        // Generate secure 16-character alphanumeric initial password if none configured
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 16; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        String generated = sb.toString();
+        log.warn("⚠️ [SECURITY] No ADMIN_INITIAL_PASSWORD configured. Generated secure initial password for {}: {}", email, generated);
+        return generated;
+    }
+
     @Override
     public void run(String... args) {
         try {
@@ -65,12 +85,13 @@ public class AdminInitializer implements CommandLineRunner {
                     },
                     () -> {
                         log.info("Creating official Team Account for {} ({}) with role {}...", seed.email, seed.firstName, seed.role);
+                        String initialPassword = getInitialPasswordForAccount(seed.email);
                         User teamMember = User.builder()
                                 .firstName(seed.firstName)
                                 .lastName(seed.lastName)
                                 .email(seed.email)
                                 .phone(seed.phone)
-                                .password(passwordEncoder.encode("brandit@team2026"))
+                                .password(passwordEncoder.encode(initialPassword))
                                 .role(seed.role)
                                 .provider(User.AuthProvider.LOCAL)
                                 .emailVerified(true)

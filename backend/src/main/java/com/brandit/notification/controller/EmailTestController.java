@@ -8,6 +8,9 @@ import com.brandit.notification.service.EmailService.EmailDispatchResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -61,7 +64,7 @@ public class EmailTestController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping({"/api/resend-booking-email", "/api/resend-latest-booking-email"})
+    @RequestMapping(value = {"/api/resend-booking-email", "/api/resend-latest-booking-email"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> resendBookingEmail(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String customEmail) {
@@ -71,7 +74,7 @@ public class EmailTestController {
         return ResponseEntity.ok(bookingService.resendBookingEmailsById(id, customEmail));
     }
 
-    @GetMapping("/api/send-manual-payment-email")
+    @RequestMapping(value = "/api/send-manual-payment-email", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> sendManualPaymentEmail(
             @RequestParam(defaultValue = "Valued Client") String clientName,
             @RequestParam(defaultValue = "client@brandit.com") String clientEmail,
@@ -87,7 +90,7 @@ public class EmailTestController {
         return ResponseEntity.ok("Successfully dispatched manual booking confirmation & payment verification emails for " + clientName + " (" + clientEmail + ")");
     }
 
-    @GetMapping({"/api/record-client-payment", "/api/admin/bookings/record-payment"})
+    @RequestMapping(value = {"/api/record-client-payment", "/api/admin/bookings/record-payment"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<com.brandit.booking.dto.BookingDtos.BookingResponse> recordClientPayment(
             @RequestParam(defaultValue = "Ujwal Tripathi") String clientName,
             @RequestParam(defaultValue = "ujwal.tripathi@gmail.com") String clientEmail,

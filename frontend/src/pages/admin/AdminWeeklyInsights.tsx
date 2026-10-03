@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import api from '../../services/api'
+import { sanitizeHtml } from '../../utils/sanitize'
 
 import { SubscriberItem, BroadcastResult, WeeklyEdition } from '../../types'
 
@@ -747,7 +748,7 @@ export default function AdminWeeklyInsights() {
               </Box>
 
               <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-                <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }} />
               </Paper>
 
               {/* Consultation Callout */}
