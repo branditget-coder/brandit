@@ -1,0 +1,97 @@
+package com.brandit.user.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+@Entity
+@Table(name = "app_users")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    private String password;
+
+    private String phone;
+
+    private String linkedinUrl;
+
+    private String currentRole;
+
+    private String bio;
+
+    @Builder.Default
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
+    @Builder.Default
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    private String providerId;
+
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
+    @Builder.Default
+    @Column(name = "revenue_distributed")
+    private Boolean revenueDistributed = false;
+
+    private String verificationToken;
+
+    private String resetPasswordToken;
+
+    private LocalDateTime resetPasswordTokenExpiry;
+
+    private String avatarUrl;
+
+    private Integer birthDay;
+
+    private Integer birthMonth;
+
+    private Integer birthYear;
+
+    private java.time.LocalDate dateOfBirth;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    public enum Role { USER, ADMIN, TEAM }
+    public enum AuthProvider { LOCAL, GOOGLE, LINKEDIN }
+
+    public Boolean getRevenueDistributed() {
+        return revenueDistributed != null ? revenueDistributed : false;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+}

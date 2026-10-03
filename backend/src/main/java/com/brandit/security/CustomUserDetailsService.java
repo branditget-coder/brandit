@@ -1,7 +1,7 @@
 package com.brandit.security;
 
-import com.brandit.entity.User;
-import com.brandit.repository.UserRepository;
+import com.brandit.user.entity.User;
+import com.brandit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

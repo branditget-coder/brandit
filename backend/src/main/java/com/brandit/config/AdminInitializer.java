@@ -1,7 +1,7 @@
 package com.brandit.config;
 
-import com.brandit.entity.User;
-import com.brandit.repository.UserRepository;
+import com.brandit.user.entity.User;
+import com.brandit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
