@@ -33,7 +33,7 @@ const row1Testimonials: TestimonialItem[] = [
     avatarBg: '#0A66C2',
     metric: '1,200+ Connections & 3x Reach',
     quote:
-      "Before our internship placements started, my LinkedIn was basically dead with barely 200 connections. Raghav helped me fix my headline, clean up my about section, and showed me how to cold message alumni properly. Within two weeks my connection requests actually started getting accepted and my profile reach literally tripled. Really helped me stand out in college.",
+      "Before our internship placements started, my LinkedIn was basically dead with barely 200 connections. Brandit helped me fix my headline, clean up my about section, and showed me how to cold message alumni properly. Within two weeks my connection requests actually started getting accepted and my profile reach literally tripled. Really helped me stand out in college.",
     rating: 5,
   },
   {
@@ -55,7 +55,7 @@ const row1Testimonials: TestimonialItem[] = [
     avatarBg: '#059669',
     metric: '50% Cold DM Reply Rate',
     quote:
-      "I used to send cold messages to recruiters and alumni on LinkedIn and was constantly left on seen. Raghav gave me simple, crisp cold messaging templates and tweaked my summary so people instantly understood what roles I was targeting. Started getting genuine replies from senior alumni within days.",
+      "I used to send cold messages to recruiters and alumni on LinkedIn and was constantly left on seen. Brandit gave me simple, crisp cold messaging templates and tweaked my summary so people instantly understood what roles I was targeting. Started getting genuine replies from senior alumni within days.",
     rating: 5,
   },
   {
@@ -103,7 +103,7 @@ const row2Testimonials: TestimonialItem[] = [
     avatarBg: '#0F766E',
     metric: 'Alumni Referrals & Connection Growth',
     quote:
-      "My biggest struggle was how to explain my pre-MBA work experience without making it sound boring. Raghav sat down with me, cut out all the extra clutter, and made the bullet points sharp and impact-driven. Got noticed by alumni in top supply chain firms when I reached out for referral guidance.",
+      "My biggest struggle was how to explain my pre-MBA work experience without making it sound boring. Brandit sat down with me, cut out all the extra clutter, and made the bullet points sharp and impact-driven. Got noticed by alumni in top supply chain firms when I reached out for referral guidance.",
     rating: 5,
   },
   {

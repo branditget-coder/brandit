@@ -10,6 +10,7 @@ import LandingPage from './pages/landing/LandingPage'
 import AboutPage from './pages/about/AboutPage'
 import ServicesPage from './pages/services/ServicesPage'
 import PricingPage from './pages/pricing/PricingPage'
+import TestimonialsPage from './pages/testimonials/TestimonialsPage'
 import ContactPage from './pages/contact/ContactPage'
 import BookPage from './pages/book/BookPage'
 import BlogPage from './pages/blog/BlogPage'
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/blogs" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/book" element={<BookPage />} />

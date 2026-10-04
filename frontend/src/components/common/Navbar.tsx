@@ -12,6 +12,7 @@ import BrandLogo from './BrandLogo'
 const navLinks = [
   { label: 'Services', href: '/services' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Testimonials', href: '/testimonials' },
   { label: 'Blogs & Guides', href: '/blogs' },
   { label: 'About & Team', href: '/about' },
   { label: 'Contact', href: '/contact' },
@@ -76,11 +77,11 @@ export default function Navbar() {
                         sx={{
                           color: active ? brandColors.primary : '#0F172A',
                           fontWeight: active ? 750 : 600,
-                          fontSize: '0.975rem',
+                          fontSize: { md: '0.91rem', lg: '0.96rem' },
                           letterSpacing: '-0.01em',
                           fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
-                          px: 2.2,
-                          py: 0.9,
+                          px: { md: 1.5, lg: 2 },
+                          py: 0.85,
                           borderRadius: '100px',
                           backgroundColor: active ? alpha(brandColors.primary, 0.09) : 'transparent',
                           border: active ? `1px solid ${alpha(brandColors.primary, 0.2)}` : '1px solid transparent',
