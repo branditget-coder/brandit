@@ -304,6 +304,18 @@ const theme = createTheme({
         },
       },
     },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'transparent',
+          backgroundImage: 'none',
+          boxShadow: 'none',
+          border: 'none',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
+        },
+      },
+    },
     MuiPaper: {
       styleOverrides: {
         root: {

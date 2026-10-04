@@ -30,16 +30,25 @@ export default function Navbar() {
       <AppBar
         position="fixed"
         elevation={0}
+        color="transparent"
         sx={{
-          backgroundColor: 'transparent',
+          backgroundColor: 'transparent !important',
+          backgroundImage: 'none !important',
+          boxShadow: 'none !important',
+          border: 'none !important',
+          outline: 'none !important',
+          backdropFilter: 'none !important',
+          WebkitBackdropFilter: 'none !important',
           top: { xs: 0, sm: 14 },
           px: { xs: 0, sm: 2, md: 3 },
+          pointerEvents: 'none',
           transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 0 } }}>
+        <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 0 }, pointerEvents: 'none' }}>
           <Box
             sx={{
+              pointerEvents: 'auto',
               mx: { xs: 0, sm: 'auto' },
               px: { xs: 2.5, sm: 3, md: 3.5 },
               py: { xs: 1, sm: 1.1 },
