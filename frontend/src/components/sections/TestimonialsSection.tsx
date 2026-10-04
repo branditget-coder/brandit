@@ -430,10 +430,6 @@ export default function TestimonialsSection() {
                 </Typography>
               </Box>
             </Stack>
-
-            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: brandColors.muted, fontStyle: 'italic' }}>
-              💡 Hover on any card to pause scrolling
-            </Typography>
           </motion.div>
         </Box>
       </Container>

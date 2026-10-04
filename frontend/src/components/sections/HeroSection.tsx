@@ -1,10 +1,12 @@
+import { useState } from 'react'
 import { Box, Container, Typography, Button, Stack, Grid, alpha } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiArrowRight,
   FiCheckCircle,
   FiTrendingUp,
+  FiTrendingDown,
   FiTarget,
   FiUsers,
   FiArrowUpRight,
@@ -13,6 +15,9 @@ import {
   FiMessageSquare,
   FiHeart,
   FiRepeat,
+  FiAlertTriangle,
+  FiCheck,
+  FiX,
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
@@ -69,6 +74,9 @@ const highlights = [
 ]
 
 export default function HeroSection() {
+  const [teardownMode, setTeardownMode] = useState<'after' | 'before'>('after')
+  const [replied, setReplied] = useState(false)
+
   return (
     <Box
       sx={{
@@ -484,267 +492,562 @@ export default function HeroSection() {
             </motion.div>
           </Grid>
 
-          {/* Right Column: Mobile-Responsive Creator Growth Card Showcase */}
+          {/* Right Column: Interactive Before vs After Profile Teardown */}
           <Grid item xs={12} md={6}>
             <Box
               sx={{
                 position: 'relative',
-                pt: { xs: 1.5, sm: 2.5, md: 5 },
-                pb: { xs: 2, sm: 2.5, md: 0 },
+                pt: { xs: 1, sm: 1.5, md: 2 },
+                pb: { xs: 1.5, sm: 2, md: 0 },
                 px: { xs: 0.5, sm: 1 },
-                maxWidth: '100%',
+                maxWidth: { xs: '100%', md: 470 },
+                mx: 'auto',
               }}
             >
-              {/* Main Dashboard Card */}
+              {/* Interactive Teardown Card */}
               <motion.div
-                initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                initial={{ opacity: 0, y: 20, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.65, delay: 0.25, ease: 'easeOut' }}
+                transition={{ duration: 0.55, delay: 0.2, ease: 'easeOut' }}
               >
                 <Box
                   sx={{
-                    background: 'linear-gradient(165deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.94) 100%)',
-                    backdropFilter: 'blur(16px)',
-                    borderRadius: { xs: '18px', sm: '24px' },
-                    p: { xs: 2, sm: 2.75, md: 3.25 },
-                    border: '1.5px solid rgba(255, 255, 255, 0.9)',
-                    boxShadow: `0 20px 50px -12px ${alpha(brandColors.primary, 0.16)}, 0 4px 16px -2px rgba(15, 23, 42, 0.05)`,
+                    background: 'linear-gradient(165deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.96) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: { xs: '18px', sm: '22px' },
+                    p: { xs: 1.5, sm: 2, md: 2.25 },
+                    border: '1.5px solid rgba(255, 255, 255, 0.95)',
+                    boxShadow: teardownMode === 'after'
+                      ? `0 18px 45px -10px ${alpha(brandColors.primary, 0.16)}, 0 4px 16px -2px rgba(15, 23, 42, 0.05)`
+                      : '0 16px 40px -10px rgba(239, 68, 68, 0.1), 0 4px 14px -2px rgba(15, 23, 42, 0.04)',
                     position: 'relative',
+                    transition: 'box-shadow 0.35s ease, border-color 0.35s ease',
                   }}
                 >
-                  {/* Card Header: Creator Profile */}
-                  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: { xs: 2, sm: 2.75 } }}>
-                    <Stack direction="row" spacing={{ xs: 1.25, sm: 1.75 }} alignItems="center">
+                  {/* Top Interactive Switcher Bar */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'stretch', sm: 'center' },
+                      justifyContent: 'space-between',
+                      gap: 1,
+                      mb: { xs: 1.25, sm: 1.5 },
+                      pb: 1,
+                      borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                       <Box
                         sx={{
-                          position: 'relative',
-                          width: { xs: 40, sm: 46 },
-                          height: { xs: 40, sm: 46 },
+                          width: 7,
+                          height: 7,
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #0A66C2 0%, #3B82F6 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#FFFFFF',
-                          fontWeight: 800,
-                          fontSize: { xs: '0.95rem', sm: '1.05rem' },
-                          boxShadow: '0 4px 12px rgba(10, 102, 194, 0.25)',
-                          flexShrink: 0,
+                          backgroundColor: teardownMode === 'after' ? '#10B981' : '#EF4444',
+                          boxShadow: teardownMode === 'after' ? '0 0 6px #10B981' : '0 0 6px #EF4444',
                         }}
-                      >
-                        AS
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            right: 0,
-                            width: 10,
-                            height: 10,
-                            borderRadius: '50%',
-                            backgroundColor: '#22C55E',
-                            border: '2px solid #FFFFFF',
-                          }}
-                        />
-                      </Box>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Stack direction="row" alignItems="center" spacing={0.5}>
-                          <Typography noWrap sx={{ fontWeight: 800, fontSize: { xs: '0.88rem', sm: '0.96rem' }, color: brandColors.text }}>
-                            Arjun Sharma
-                          </Typography>
-                          <FiAward size={14} color="#0A66C2" />
-                        </Stack>
-                        <Typography noWrap sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.muted, fontWeight: 500 }}>
-                          Founder • LinkedIn Top Voice
-                        </Typography>
-                      </Box>
-                    </Stack>
+                      />
+                      <Typography sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, fontWeight: 750, color: brandColors.text, letterSpacing: '-0.01em' }}>
+                        Live Teardown Simulator
+                      </Typography>
+                    </Box>
 
+                    {/* Mode Toggle Switch */}
                     <Box
                       sx={{
-                        px: { xs: 1, sm: 1.25 },
-                        py: 0.4,
+                        display: 'inline-flex',
+                        p: 0.35,
                         borderRadius: '100px',
-                        backgroundColor: '#EFF6FF',
-                        border: '1px solid #BFDBFE',
-                        color: brandColors.primary,
-                        fontSize: { xs: '0.66rem', sm: '0.72rem' },
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        flexShrink: 0,
+                        backgroundColor: '#F1F5F9',
+                        border: '1px solid #E2E8F0',
+                        alignSelf: { xs: 'center', sm: 'auto' },
                       }}
                     >
-                      <FiZap size={12} />
-                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Engine Active</Box>
-                      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Active</Box>
-                    </Box>
-                  </Stack>
-
-                  {/* 3-Column Grounded Growth Metrics (Realistic Percentages) */}
-                  <Grid container spacing={{ xs: 1, sm: 1.5 }} sx={{ mb: { xs: 2, sm: 2.5 } }}>
-                    <Grid item xs={4}>
-                      <Box
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          setTeardownMode('before')
+                          setReplied(false)
+                        }}
                         sx={{
-                          p: { xs: 1, sm: 1.35 },
-                          borderRadius: '12px',
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid rgba(226, 232, 240, 0.8)',
-                          boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
-                          textAlign: 'center',
+                          px: { xs: 1.2, sm: 1.5 },
+                          py: 0.35,
+                          borderRadius: '100px',
+                          fontSize: { xs: '0.66rem', sm: '0.7rem' },
+                          fontWeight: 750,
+                          minWidth: 'auto',
+                          textTransform: 'none',
+                          backgroundColor: teardownMode === 'before' ? '#EF4444' : 'transparent',
+                          color: teardownMode === 'before' ? '#FFFFFF' : '#64748B',
+                          boxShadow: teardownMode === 'before' ? '0 2px 8px rgba(239, 68, 68, 0.3)' : 'none',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            backgroundColor: teardownMode === 'before' ? '#DC2626' : 'rgba(0,0,0,0.04)',
+                          },
                         }}
                       >
-                        <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.7rem' }, color: brandColors.muted, fontWeight: 600, mb: 0.2 }}>
-                          Reach
-                        </Typography>
-                        <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.15rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
-                          +45%
-                        </Typography>
-                        <Typography sx={{ fontSize: { xs: '0.62rem', sm: '0.68rem' }, color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25, mt: 0.2 }}>
-                          <FiTrendingUp size={10} /> MoM
-                        </Typography>
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={4}>
-                      <Box
+                        ❌ Before BrandIt
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={() => setTeardownMode('after')}
                         sx={{
-                          p: { xs: 1, sm: 1.35 },
-                          borderRadius: '12px',
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid rgba(226, 232, 240, 0.8)',
-                          boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
-                          textAlign: 'center',
+                          px: { xs: 1.2, sm: 1.5 },
+                          py: 0.35,
+                          borderRadius: '100px',
+                          fontSize: { xs: '0.66rem', sm: '0.7rem' },
+                          fontWeight: 750,
+                          minWidth: 'auto',
+                          textTransform: 'none',
+                          backgroundColor: teardownMode === 'after' ? '#0A66C2' : 'transparent',
+                          color: teardownMode === 'after' ? '#FFFFFF' : '#64748B',
+                          boxShadow: teardownMode === 'after' ? '0 2px 8px rgba(10, 102, 194, 0.3)' : 'none',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            backgroundColor: teardownMode === 'after' ? '#084e96' : 'rgba(0,0,0,0.04)',
+                          },
                         }}
                       >
-                        <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.7rem' }, color: brandColors.muted, fontWeight: 600, mb: 0.2 }}>
-                          Profile Views
-                        </Typography>
-                        <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.15rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
-                          +58%
-                        </Typography>
-                        <Typography sx={{ fontSize: { xs: '0.62rem', sm: '0.68rem' }, color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25, mt: 0.2 }}>
-                          <FiTrendingUp size={10} /> MoM
-                        </Typography>
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={4}>
-                      <Box
-                        sx={{
-                          p: { xs: 1, sm: 1.35 },
-                          borderRadius: '12px',
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid rgba(226, 232, 240, 0.8)',
-                          boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)',
-                          textAlign: 'center',
-                        }}
-                      >
-                        <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.7rem' }, color: brandColors.muted, fontWeight: 600, mb: 0.2 }}>
-                          Inbounds
-                        </Typography>
-                        <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.15rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
-                          +35%
-                        </Typography>
-                        <Typography sx={{ fontSize: { xs: '0.62rem', sm: '0.68rem' }, color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25, mt: 0.2 }}>
-                          <FiTrendingUp size={10} /> MoM
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-
-                  {/* Growth Curve Chart Graphic */}
-                  <Box
-                    sx={{
-                      p: { xs: 1.5, sm: 1.75 },
-                      borderRadius: '14px',
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid rgba(226, 232, 240, 0.8)',
-                      mb: { xs: 1.75, sm: 2.25 },
-                      position: 'relative',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                      <Typography sx={{ fontSize: { xs: '0.72rem', sm: '0.76rem' }, fontWeight: 700, color: brandColors.text }}>
-                        Monthly Engagement Trend
-                      </Typography>
-                      <Typography sx={{ fontSize: { xs: '0.66rem', sm: '0.7rem' }, color: brandColors.primary, fontWeight: 700 }}>
-                        +45% Consistent Growth
-                      </Typography>
-                    </Stack>
-
-                    {/* SVG Sparkline Curve */}
-                    <Box sx={{ width: '100%', height: { xs: 44, sm: 54 } }}>
-                      <svg viewBox="0 0 320 54" width="100%" height="100%" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#0A66C2" stopOpacity="0.25" />
-                            <stop offset="100%" stopColor="#0A66C2" stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-                        <path
-                          d="M0,46 Q40,42 80,38 T160,28 T240,16 T320,6 L320,54 L0,54 Z"
-                          fill="url(#growthGradient)"
-                        />
-                        <path
-                          d="M0,46 Q40,42 80,38 T160,28 T240,16 T320,6"
-                          fill="none"
-                          stroke="#0A66C2"
-                          strokeWidth="2.75"
-                          strokeLinecap="round"
-                        />
-                        <circle cx="318" cy="6" r="3.5" fill="#0A66C2" />
-                        <circle cx="318" cy="6" r="7" fill="#0A66C2" fillOpacity="0.22" />
-                      </svg>
+                        ✨ With BrandIt AI
+                      </Button>
                     </Box>
                   </Box>
 
-                  {/* Strategy Post Preview Snippet */}
-                  <Box
-                    sx={{
-                      p: { xs: 1.35, sm: 1.6 },
-                      borderRadius: '12px',
-                      backgroundColor: '#F8FAFC',
-                      border: '1px dashed rgba(203, 213, 225, 0.8)',
-                    }}
-                  >
-                    <Typography sx={{ fontSize: { xs: '0.72rem', sm: '0.74rem' }, color: brandColors.text, fontWeight: 500, lineHeight: 1.45, mb: 0.8 }}>
-                      &ldquo;Optimized my LinkedIn profile and started posting weekly strategy content with BrandIt. Organic inbound inquiries grew by 45%.&rdquo;
-                    </Typography>
-                    <Stack direction="row" spacing={{ xs: 1.5, sm: 2 }} sx={{ fontSize: '0.68rem', color: brandColors.muted, fontWeight: 600 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4, color: '#E11D48' }}>
-                        <FiHeart size={11} /> 48
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                        <FiMessageSquare size={11} /> 14 comments
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                        <FiRepeat size={11} /> 6 reposts
-                      </Box>
-                    </Stack>
-                  </Box>
+                  {/* Animated Profile Card Content */}
+                  <AnimatePresence mode="wait">
+                    {teardownMode === 'before' ? (
+                      <motion.div
+                        key="before-view"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        {/* Profile Header (Before State: Bland & Ignored) */}
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+                          <Stack direction="row" spacing={1.25} alignItems="center">
+                            <Box
+                              sx={{
+                                width: { xs: 36, sm: 40 },
+                                height: { xs: 36, sm: 40 },
+                                borderRadius: '50%',
+                                backgroundColor: '#94A3B8',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#FFFFFF',
+                                fontWeight: 800,
+                                fontSize: '0.85rem',
+                                flexShrink: 0,
+                                position: 'relative',
+                              }}
+                            >
+                              RD
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: 0,
+                                  right: 0,
+                                  width: 9,
+                                  height: 9,
+                                  borderRadius: '50%',
+                                  backgroundColor: '#94A3B8',
+                                  border: '2px solid #FFFFFF',
+                                }}
+                              />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography noWrap sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, color: brandColors.text }}>
+                                Raghav Dhir
+                              </Typography>
+                              <Typography noWrap sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, color: '#94A3B8', fontWeight: 500 }}>
+                                College Student • Looking for Internships
+                              </Typography>
+                            </Box>
+                          </Stack>
+
+                          <Box
+                            sx={{
+                              px: 1,
+                              py: 0.35,
+                              borderRadius: '100px',
+                              backgroundColor: '#FEF2F2',
+                              border: '1px solid #FECACA',
+                              color: '#DC2626',
+                              fontSize: { xs: '0.62rem', sm: '0.66rem' },
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.35,
+                              flexShrink: 0,
+                            }}
+                          >
+                            <FiAlertTriangle size={11} />
+                            <span>Profile Ignored</span>
+                          </Box>
+                        </Stack>
+
+                        {/* Weak Headline Box */}
+                        <Box
+                          sx={{
+                            p: 1,
+                            borderRadius: '9px',
+                            backgroundColor: '#F8FAFC',
+                            border: '1px dashed #CBD5E1',
+                            mb: 1.25,
+                          }}
+                        >
+                          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', mb: 0.2 }}>
+                            Current Bland Headline:
+                          </Typography>
+                          <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: '#64748B', fontStyle: 'italic', lineHeight: 1.35 }}>
+                            &ldquo;MBA Student looking for internships | Open to work | Actively applying&rdquo;
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.65rem', color: '#DC2626', fontWeight: 600, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.35 }}>
+                            <FiX size={11} /> 0 keywords • Missed by campus recruiters
+                          </Typography>
+                        </Box>
+
+                        {/* 3 Low Metric Stats */}
+                        <Grid container spacing={1} sx={{ mb: 1.25 }}>
+                          <Grid item xs={4}>
+                            <Box sx={{ p: 0.85, borderRadius: '10px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                              <Typography sx={{ fontSize: '0.64rem', color: brandColors.muted, fontWeight: 600 }}>Weekly Views</Typography>
+                              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.05rem' }, fontWeight: 800, color: '#64748B', letterSpacing: '-0.02em' }}>
+                                18
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', color: '#DC2626', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.2 }}>
+                                <FiTrendingDown size={10} /> -24%
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={4}>
+                            <Box sx={{ p: 0.85, borderRadius: '10px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                              <Typography sx={{ fontSize: '0.64rem', color: brandColors.muted, fontWeight: 600 }}>Recruiter DMs</Typography>
+                              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.05rem' }, fontWeight: 800, color: '#64748B', letterSpacing: '-0.02em' }}>
+                                0
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', color: '#94A3B8', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.2 }}>
+                                No calls
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={4}>
+                            <Box sx={{ p: 0.85, borderRadius: '10px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                              <Typography sx={{ fontSize: '0.64rem', color: brandColors.muted, fontWeight: 600 }}>Campus Rank</Typography>
+                              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.05rem' }, fontWeight: 800, color: '#64748B', letterSpacing: '-0.02em' }}>
+                                Bottom 80%
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', color: '#DC2626', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.2 }}>
+                                Hard to Find
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+
+                        {/* Profile Strength Bar */}
+                        <Box sx={{ p: 1.1, borderRadius: '10px', backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', mb: 1.25 }}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.4 }}>
+                            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#92400E' }}>
+                              Profile Strength
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: '#B45309' }}>
+                              38 / 100 (Needs Work)
+                            </Typography>
+                          </Stack>
+                          <Box sx={{ height: 5, borderRadius: '4px', backgroundColor: '#FDE68A', overflow: 'hidden' }}>
+                            <Box sx={{ width: '38%', height: '100%', backgroundColor: '#F59E0B', borderRadius: '4px' }} />
+                          </Box>
+                        </Box>
+
+                        {/* Teardown Warning Insights */}
+                        <Box sx={{ p: 1.1, borderRadius: '10px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA' }}>
+                          <Stack spacing={0.4}>
+                            <Typography sx={{ fontSize: '0.68rem', color: '#991B1B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <FiAlertTriangle size={12} color="#DC2626" /> No skills or college achievements highlighted
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.68rem', color: '#991B1B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <FiAlertTriangle size={12} color="#DC2626" /> Passed over by 18 recruiters this week
+                            </Typography>
+                          </Stack>
+                        </Box>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="after-view"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        {/* Profile Header (After State: Standout Student) */}
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+                          <Stack direction="row" spacing={1.25} alignItems="center">
+                            <Box
+                              sx={{
+                                width: { xs: 36, sm: 40 },
+                                height: { xs: 36, sm: 40 },
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#FFFFFF',
+                                fontWeight: 800,
+                                fontSize: '0.85rem',
+                                flexShrink: 0,
+                                position: 'relative',
+                                boxShadow: '0 3px 10px rgba(10, 102, 194, 0.25)',
+                              }}
+                            >
+                              RD
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: 0,
+                                  right: 0,
+                                  width: 9,
+                                  height: 9,
+                                  borderRadius: '50%',
+                                  backgroundColor: '#10B981',
+                                  border: '2px solid #FFFFFF',
+                                  boxShadow: '0 0 5px #10B981',
+                                }}
+                              />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Stack direction="row" alignItems="center" spacing={0.5}>
+                                <Typography noWrap sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, color: brandColors.text }}>
+                                  Raghav Dhir
+                                </Typography>
+                                <FiAward size={13} color="#0A66C2" />
+                              </Stack>
+                              <Typography noWrap sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, color: brandColors.primary, fontWeight: 700 }}>
+                                College Student • Internship & Placement Ready 🎯
+                              </Typography>
+                            </Box>
+                          </Stack>
+
+                          <Box
+                            sx={{
+                              px: 1,
+                              py: 0.35,
+                              borderRadius: '100px',
+                              backgroundColor: '#EFF6FF',
+                              border: '1px solid #BFDBFE',
+                              color: brandColors.primary,
+                              fontSize: { xs: '0.62rem', sm: '0.66rem' },
+                              fontWeight: 750,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.35,
+                              flexShrink: 0,
+                            }}
+                          >
+                            <FiZap size={11} />
+                            <span>Ready to Get Hired</span>
+                          </Box>
+                        </Stack>
+
+                        {/* High-Converting Headline Box */}
+                        <Box
+                          sx={{
+                            p: 1,
+                            borderRadius: '9px',
+                            backgroundColor: '#F0F9FF',
+                            border: '1px solid #BAE6FD',
+                            mb: 1.25,
+                          }}
+                        >
+                          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: brandColors.primary, textTransform: 'uppercase', mb: 0.2 }}>
+                            Catchy Optimized Headline:
+                          </Typography>
+                          <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.text, fontWeight: 600, lineHeight: 1.35 }}>
+                            &ldquo;MBA Candidate | Strategy & Ops Enthusiast | Standout Projects & Problem Solver 🚀&rdquo;
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.65rem', color: '#16A34A', fontWeight: 700, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.35 }}>
+                            <FiCheck size={11} /> Ready for Campus Placements & Summer Internships
+                          </Typography>
+                        </Box>
+
+                        {/* 3 High Growth Metric Stats */}
+                        <Grid container spacing={1} sx={{ mb: 1.25 }}>
+                          <Grid item xs={4}>
+                            <Box sx={{ p: 0.85, borderRadius: '10px', backgroundColor: '#FFFFFF', border: '1px solid rgba(226, 232, 240, 0.9)', textAlign: 'center', boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)' }}>
+                              <Typography sx={{ fontSize: '0.64rem', color: brandColors.muted, fontWeight: 600 }}>Weekly Views</Typography>
+                              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.05rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
+                                2,450+
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.2 }}>
+                                <FiTrendingUp size={10} /> +320% this mo
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={4}>
+                            <Box sx={{ p: 0.85, borderRadius: '10px', backgroundColor: '#FFFFFF', border: '1px solid rgba(226, 232, 240, 0.9)', textAlign: 'center', boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)' }}>
+                              <Typography sx={{ fontSize: '0.64rem', color: brandColors.muted, fontWeight: 600 }}>Recruiter DMs</Typography>
+                              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.05rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
+                                8 new
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.3 }}>
+                                ✨ Direct Calls
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={4}>
+                            <Box sx={{ p: 0.85, borderRadius: '10px', backgroundColor: '#FFFFFF', border: '1px solid rgba(226, 232, 240, 0.9)', textAlign: 'center', boxShadow: '0 2px 6px rgba(15, 23, 42, 0.02)' }}>
+                              <Typography sx={{ fontSize: '0.64rem', color: brandColors.muted, fontWeight: 600 }}>Campus Rank</Typography>
+                              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1.05rem' }, fontWeight: 800, color: brandColors.text, letterSpacing: '-0.02em' }}>
+                                Top 5%
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', color: '#16A34A', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.2 }}>
+                                ⚡ Standout
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+
+                        {/* Profile Strength Bar */}
+                        <Box sx={{ p: 1.1, borderRadius: '10px', backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', mb: 1.25 }}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.4 }}>
+                            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#065F46' }}>
+                              Profile Strength
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: '#047857' }}>
+                              98 / 100 (Placement Ready)
+                            </Typography>
+                          </Stack>
+                          <Box sx={{ height: 5, borderRadius: '4px', backgroundColor: '#A7F3D0', overflow: 'hidden' }}>
+                            <Box sx={{ width: '98%', height: '100%', background: 'linear-gradient(90deg, #10B981, #059669)', borderRadius: '4px' }} />
+                          </Box>
+                        </Box>
+
+                        {/* Interactive Recruiter InMail Message Box */}
+                        <Box
+                          sx={{
+                            p: 1.15,
+                            borderRadius: '10px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #BFDBFE',
+                            boxShadow: '0 3px 10px rgba(10, 102, 194, 0.06)',
+                            position: 'relative',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.6 }}>
+                            <Stack direction="row" spacing={0.85} alignItems="center">
+                              <Box
+                                sx={{
+                                  width: 22,
+                                  height: 22,
+                                  borderRadius: '50%',
+                                  backgroundColor: '#1E293B',
+                                  color: '#FFFFFF',
+                                  fontSize: '0.58rem',
+                                  fontWeight: 800,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                PR
+                              </Box>
+                              <Box>
+                                <Typography sx={{ fontSize: '0.68rem', fontWeight: 750, color: brandColors.text, lineHeight: 1.1 }}>
+                                  Pooja Roy • Campus Hiring Lead
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.6rem', color: brandColors.muted }}>
+                                  Top Tech & Consulting • Today at 2:15 PM
+                                </Typography>
+                              </Box>
+                            </Stack>
+                            <Box
+                              sx={{
+                                px: 0.7,
+                                py: 0.15,
+                                borderRadius: '4px',
+                                backgroundColor: '#EFF6FF',
+                                color: brandColors.primary,
+                                fontSize: '0.58rem',
+                                fontWeight: 750,
+                              }}
+                            >
+                              New InMail
+                            </Box>
+                          </Stack>
+
+                          <Typography sx={{ fontSize: '0.68rem', color: brandColors.text, lineHeight: 1.4, mb: 1 }}>
+                            {replied
+                              ? '“Thanks Pooja! I’d love to connect. Thursday afternoon works great for me. Excited to discuss the internship role!”'
+                              : '“Hey Raghav, saw your profile and college projects—super impressive work! We’re hiring for our summer internship cohort. Free for a quick chat this week?”'}
+                          </Typography>
+
+                          {/* Interactive Action Buttons */}
+                          <Stack direction="row" spacing={0.8} alignItems="center">
+                            <Button
+                              size="small"
+                              variant="contained"
+                              onClick={() => setReplied(!replied)}
+                              sx={{
+                                py: 0.35,
+                                px: 1.1,
+                                fontSize: '0.64rem',
+                                fontWeight: 750,
+                                textTransform: 'none',
+                                borderRadius: '7px',
+                                backgroundColor: replied ? '#16A34A' : brandColors.primary,
+                                '&:hover': {
+                                  backgroundColor: replied ? '#15803D' : '#084e96',
+                                },
+                              }}
+                            >
+                              {replied ? '✓ Reply Sent!' : '⚡ Quick AI Reply'}
+                            </Button>
+                            <Button
+                              component={RouterLink}
+                              to="/book?plan=branding-network"
+                              size="small"
+                              sx={{
+                                py: 0.35,
+                                px: 1.1,
+                                fontSize: '0.64rem',
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                color: brandColors.text,
+                                backgroundColor: '#F1F5F9',
+                                borderRadius: '7px',
+                                '&:hover': { backgroundColor: '#E2E8F0' },
+                              }}
+                            >
+                              View Internship Details
+                            </Button>
+                          </Stack>
+                        </Box>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </Box>
               </motion.div>
 
-              {/* Floating Notification Pills (Cleanly Responsive) */}
-              {/* Floating Pill 1: Top Right */}
+              {/* Floating Dynamic Badges */}
+              {/* Top Right Floating Pill */}
               <motion.div
+                key={`badge-top-${teardownMode}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{
                   opacity: 1,
                   scale: 1,
-                  y: [0, -5, 0],
+                  y: [0, -4, 0],
                 }}
                 transition={{
-                  opacity: { duration: 0.5, delay: 0.4 },
-                  scale: { duration: 0.5, delay: 0.4 },
+                  opacity: { duration: 0.35 },
+                  scale: { duration: 0.35 },
                   y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' },
                 }}
                 style={{
                   position: 'absolute',
-                  top: '-10px',
-                  right: '4px',
+                  top: '-8px',
+                  right: '6px',
                   zIndex: 2,
                 }}
               >
@@ -752,40 +1055,43 @@ export default function HeroSection() {
                   sx={{
                     display: { xs: 'none', sm: 'flex' },
                     alignItems: 'center',
-                    gap: 0.75,
-                    px: 1.75,
-                    py: 0.75,
+                    gap: 0.6,
+                    px: 1.4,
+                    py: 0.55,
                     borderRadius: '100px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
                     backdropFilter: 'blur(12px)',
-                    border: '1px solid #FED7AA',
-                    boxShadow: '0 8px 20px rgba(245, 158, 11, 0.12)',
-                    color: '#9A3412',
-                    fontSize: '0.74rem',
+                    border: teardownMode === 'after' ? '1px solid #BFDBFE' : '1px solid #FECACA',
+                    boxShadow: teardownMode === 'after'
+                      ? '0 6px 20px rgba(10, 102, 194, 0.14)'
+                      : '0 6px 20px rgba(239, 68, 68, 0.1)',
+                    color: teardownMode === 'after' ? '#0A66C2' : '#DC2626',
+                    fontSize: '0.7rem',
                     fontWeight: 750,
                   }}
                 >
-                  🔥 +35% Profile Visibility
+                  {teardownMode === 'after' ? '🔥 8 Recruiter Messages This Week' : '😴 0 Recruiter Messages'}
                 </Box>
               </motion.div>
 
-              {/* Floating Pill 2: Bottom Left */}
+              {/* Bottom Left Floating Pill */}
               <motion.div
+                key={`badge-bot-${teardownMode}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{
                   opacity: 1,
                   scale: 1,
-                  y: [0, 5, 0],
+                  y: [0, 4, 0],
                 }}
                 transition={{
-                  opacity: { duration: 0.5, delay: 0.55 },
-                  scale: { duration: 0.5, delay: 0.55 },
-                  y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
+                  opacity: { duration: 0.35 },
+                  scale: { duration: 0.35 },
+                  y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
                 }}
                 style={{
                   position: 'absolute',
-                  bottom: '-8px',
-                  left: '4px',
+                  bottom: '-6px',
+                  left: '6px',
                   zIndex: 2,
                 }}
               >
@@ -793,20 +1099,22 @@ export default function HeroSection() {
                   sx={{
                     display: { xs: 'none', sm: 'flex' },
                     alignItems: 'center',
-                    gap: 0.75,
-                    px: 1.75,
-                    py: 0.75,
+                    gap: 0.6,
+                    px: 1.4,
+                    py: 0.55,
                     borderRadius: '100px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
                     backdropFilter: 'blur(12px)',
-                    border: '1px solid #BBF7D0',
-                    boxShadow: '0 8px 20px rgba(34, 197, 94, 0.12)',
-                    color: '#166534',
-                    fontSize: '0.74rem',
+                    border: teardownMode === 'after' ? '1px solid #BBF7D0' : '1px solid #FED7AA',
+                    boxShadow: teardownMode === 'after'
+                      ? '0 6px 20px rgba(34, 197, 94, 0.12)'
+                      : '0 6px 20px rgba(245, 158, 11, 0.1)',
+                    color: teardownMode === 'after' ? '#166534' : '#B45309',
+                    fontSize: '0.7rem',
                     fontWeight: 750,
                   }}
                 >
-                  🤝 Inbound Inquiries Active
+                  {teardownMode === 'after' ? '🎯 98/100 Placement Ready' : '📉 Profile Score: 38/100'}
                 </Box>
               </motion.div>
 
@@ -816,19 +1124,19 @@ export default function HeroSection() {
                   display: { xs: 'flex', sm: 'none' },
                   alignItems: 'center',
                   justifyContent: 'space-around',
-                  mt: 1.5,
-                  p: 1.2,
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  border: '1px solid rgba(226, 232, 240, 0.8)',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+                  mt: 1.25,
+                  p: 1,
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid rgba(226, 232, 240, 0.9)',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
                 }}
               >
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: brandColors.primary }}>
-                  🔥 +35% Profile Visibility
+                <Typography sx={{ fontSize: '0.68rem', fontWeight: 750, color: teardownMode === 'after' ? brandColors.primary : '#DC2626' }}>
+                  {teardownMode === 'after' ? '🔥 8 Messages / Wk' : '😴 0 Messages'}
                 </Typography>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#166534' }}>
-                  🤝 Active Inbounds
+                <Typography sx={{ fontSize: '0.68rem', fontWeight: 750, color: teardownMode === 'after' ? '#166534' : '#B45309' }}>
+                  {teardownMode === 'after' ? '⚡ Score: 98/100' : '⚠️ Score: 38/100'}
                 </Typography>
               </Box>
             </Box>
