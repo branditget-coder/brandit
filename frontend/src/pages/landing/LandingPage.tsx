@@ -3,6 +3,7 @@ import HeroSection from '../../components/sections/HeroSection'
 import TrustedBySection from '../../components/sections/TrustedBySection'
 import PricingSection from '../../components/sections/PricingSection'
 import WhyBrandItSection from '../../components/sections/WhyBrandItSection'
+import TestimonialsSection from '../../components/sections/TestimonialsSection'
 import TeamSection from '../../components/sections/TeamSection'
 import FAQSection from '../../components/sections/FAQSection'
 import CTABannerSection from '../../components/sections/CTABannerSection'
@@ -20,6 +21,7 @@ export default function LandingPage() {
       <TrustedBySection />
       <PricingSection />
       <WhyBrandItSection />
+      <TestimonialsSection />
       <TeamSection />
       <FAQSection />
       <CTABannerSection />
