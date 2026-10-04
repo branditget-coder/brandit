@@ -7,9 +7,6 @@ import {
   FiCheckCircle,
   FiTrendingUp,
   FiTrendingDown,
-  FiTarget,
-  FiUsers,
-  FiArrowUpRight,
   FiZap,
   FiAward,
   FiMessageSquare,
@@ -21,50 +18,6 @@ import {
 } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
-const featurePillars = [
-  {
-    icon: <FiTrendingUp size={18} />,
-    title: 'Profile Setup & Advice',
-    desc: 'Complete structural overhaul & growth blueprint',
-    tag: 'One-Time',
-    badge: '⚡ 48-hr Turnaround',
-    price: '₹129',
-    unit: 'setup',
-    color: '#0A66C2',
-    bgColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
-    to: '/book?plan=setup-advice',
-    featured: false,
-  },
-  {
-    icon: <FiTarget size={18} />,
-    title: 'Personal Branding',
-    desc: '8 strategy-backed posts & custom content monthly',
-    tag: 'Monthly',
-    badge: '📈 Steady Reach Growth',
-    price: '₹349',
-    unit: '/mo',
-    color: '#0D9488',
-    bgColor: '#F0FDFA',
-    borderColor: '#99F6E4',
-    to: '/book?plan=branding-basic',
-    featured: false,
-  },
-  {
-    icon: <FiUsers size={18} />,
-    title: 'Outreach Engine',
-    desc: '8 posts/mo + cold messaging & follow-ups',
-    tag: 'Best Value',
-    badge: '🎯 Direct Inbounds',
-    price: '₹499',
-    unit: '/mo',
-    color: '#7C3AED',
-    bgColor: '#F5F3FF',
-    borderColor: '#DDD6FE',
-    to: '/book?plan=branding-network',
-    featured: true,
-  },
-]
 
 const highlights = [
   '₹129 One-Time Setup',
@@ -114,7 +67,7 @@ export default function HeroSection() {
       }}
     >
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={{ xs: 4, sm: 5, md: 6 }} alignItems={{ xs: 'center', md: 'flex-start' }}>
+        <Grid container spacing={{ xs: 4, sm: 5, md: 6 }} alignItems="center">
           {/* Left Column: Copy & Actions */}
           <Grid item xs={12} md={6}>
             {/* Pill Badge */}
@@ -306,189 +259,6 @@ export default function HeroSection() {
                   View Pricing Breakdown
                 </Button>
               </Stack>
-            </motion.div>
-
-            {/* Core Feature Pillars */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              <Grid container spacing={{ xs: 1.5, sm: 2 }} sx={{ mt: { xs: 3, sm: 4 } }}>
-                {featurePillars.map((p) => (
-                  <Grid item xs={12} sm={4} key={p.title}>
-                    <motion.div
-                      whileHover={{ y: -4 }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
-                      style={{ height: '100%' }}
-                    >
-                      <Box
-                        component={RouterLink}
-                        to={p.to}
-                        sx={{
-                          textDecoration: 'none',
-                          p: { xs: 1.75, sm: 2 },
-                          borderRadius: '16px',
-                          border: p.featured
-                            ? `1.5px solid ${p.color}`
-                            : '1px solid rgba(226, 232, 240, 0.9)',
-                          background: p.featured
-                            ? 'linear-gradient(180deg, #FFFFFF 0%, #F0FDFA 100%)'
-                            : 'linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%)',
-                          boxShadow: p.featured
-                            ? `0 6px 20px -2px ${alpha(p.color, 0.16)}, 0 2px 6px rgba(15, 23, 42, 0.04)`
-                            : '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          position: 'relative',
-                          overflow: 'hidden',
-                          transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            borderColor: p.color,
-                            boxShadow: `0 12px 24px -4px ${alpha(p.color, 0.2)}, 0 2px 8px -1px rgba(15, 23, 42, 0.04)`,
-                            background: '#FFFFFF',
-                            '& .arrow-icon': {
-                              transform: 'translate(2px, -2px)',
-                              color: p.color,
-                            },
-                          },
-                        }}
-                      >
-                        {/* Top Row: Icon Badge + Category Tag */}
-                        <Box sx={{ mb: 1.25 }}>
-                          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-                            <Box
-                              sx={{
-                                width: 34,
-                                height: 34,
-                                borderRadius: '9px',
-                                backgroundColor: p.bgColor,
-                                color: p.color,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: `1px solid ${p.borderColor}`,
-                                flexShrink: 0,
-                              }}
-                            >
-                              {p.icon}
-                            </Box>
-                            <Box
-                              sx={{
-                                px: 0.9,
-                                py: 0.3,
-                                borderRadius: '6px',
-                                backgroundColor: p.featured ? p.color : alpha(p.color, 0.08),
-                                color: p.featured ? '#FFFFFF' : p.color,
-                                fontSize: '0.64rem',
-                                fontWeight: 750,
-                                letterSpacing: '0.03em',
-                                textTransform: 'uppercase',
-                              }}
-                            >
-                              {p.tag}
-                            </Box>
-                          </Stack>
-
-                          {/* Title */}
-                          <Typography
-                            variant="subtitle2"
-                            sx={{
-                              fontWeight: 750,
-                              fontSize: { xs: '0.86rem', sm: '0.88rem' },
-                              color: brandColors.text,
-                              mb: 0.4,
-                              lineHeight: 1.3,
-                            }}
-                          >
-                            {p.title}
-                          </Typography>
-
-                          {/* Description */}
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: brandColors.muted,
-                              lineHeight: 1.4,
-                              display: 'block',
-                              fontSize: { xs: '0.74rem', sm: '0.76rem' },
-                              mb: 0.9,
-                            }}
-                          >
-                            {p.desc}
-                          </Typography>
-
-                          {/* Micro benefit badge */}
-                          <Box
-                            sx={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              px: 0.8,
-                              py: 0.2,
-                              borderRadius: '4px',
-                              backgroundColor: alpha(p.color, 0.06),
-                              color: p.color,
-                              fontSize: '0.66rem',
-                              fontWeight: 600,
-                            }}
-                          >
-                            {p.badge}
-                          </Box>
-                        </Box>
-
-                        {/* Bottom Row: Price & Action */}
-                        <Box
-                          sx={{
-                            pt: 1,
-                            mt: 0.75,
-                            borderTop: '1px dashed rgba(226, 232, 240, 0.9)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Stack direction="row" alignItems="baseline" spacing={0.5}>
-                            <Typography
-                              sx={{
-                                fontWeight: 800,
-                                fontSize: '0.95rem',
-                                color: brandColors.text,
-                                letterSpacing: '-0.02em',
-                              }}
-                            >
-                              {p.price}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: '0.68rem',
-                                color: brandColors.muted,
-                                fontWeight: 500,
-                              }}
-                            >
-                              {p.unit}
-                            </Typography>
-                          </Stack>
-
-                          <Box
-                            className="arrow-icon"
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: brandColors.muted,
-                              transition: 'all 0.2s ease',
-                            }}
-                          >
-                            <FiArrowUpRight size={15} />
-                          </Box>
-                        </Box>
-                      </Box>
-                    </motion.div>
-                  </Grid>
-                ))}
-              </Grid>
             </motion.div>
           </Grid>
 
