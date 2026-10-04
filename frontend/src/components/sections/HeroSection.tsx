@@ -608,7 +608,7 @@ export default function HeroSection() {
                           },
                         }}
                       >
-                        ✨ With BrandIt AI
+                        ✨ With BrandIt
                       </Button>
                     </Box>
                   </Box>
@@ -624,87 +624,76 @@ export default function HeroSection() {
                         transition={{ duration: 0.22 }}
                       >
                         {/* Profile Header (Before State: Bland & Ignored) */}
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
-                          <Stack direction="row" spacing={1.25} alignItems="center">
-                            <Box
-                              sx={{
-                                width: { xs: 36, sm: 40 },
-                                height: { xs: 36, sm: 40 },
-                                borderRadius: '50%',
-                                backgroundColor: '#94A3B8',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#FFFFFF',
-                                fontWeight: 800,
-                                fontSize: '0.85rem',
-                                flexShrink: 0,
-                                position: 'relative',
-                              }}
-                            >
-                              RD
-                              <Box
-                                sx={{
-                                  position: 'absolute',
-                                  bottom: 0,
-                                  right: 0,
-                                  width: 9,
-                                  height: 9,
-                                  borderRadius: '50%',
-                                  backgroundColor: '#94A3B8',
-                                  border: '2px solid #FFFFFF',
-                                }}
-                              />
-                            </Box>
-                            <Box sx={{ minWidth: 0 }}>
-                              <Typography noWrap sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, color: brandColors.text }}>
-                                Raghav Dhir
-                              </Typography>
-                              <Typography noWrap sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, color: '#94A3B8', fontWeight: 500 }}>
-                                College Student • Looking for Internships
-                              </Typography>
-                            </Box>
-                          </Stack>
-
+                        <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1.25 }}>
                           <Box
                             sx={{
-                              px: 1,
-                              py: 0.35,
-                              borderRadius: '100px',
-                              backgroundColor: '#FEF2F2',
-                              border: '1px solid #FECACA',
-                              color: '#DC2626',
-                              fontSize: { xs: '0.62rem', sm: '0.66rem' },
-                              fontWeight: 700,
+                              width: { xs: 36, sm: 40 },
+                              height: { xs: 36, sm: 40 },
+                              borderRadius: '50%',
+                              backgroundColor: '#94A3B8',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 0.35,
+                              justifyContent: 'center',
+                              color: '#FFFFFF',
+                              fontWeight: 800,
+                              fontSize: '0.85rem',
                               flexShrink: 0,
+                              position: 'relative',
                             }}
                           >
-                            <FiAlertTriangle size={11} />
-                            <span>Profile Ignored</span>
+                            RD
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                right: 0,
+                                width: 9,
+                                height: 9,
+                                borderRadius: '50%',
+                                backgroundColor: '#94A3B8',
+                                border: '2px solid #FFFFFF',
+                              }}
+                            />
+                          </Box>
+                          <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Stack direction="row" alignItems="center" spacing={0.75} flexWrap="wrap">
+                              <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.86rem', sm: '0.92rem' }, color: brandColors.text }}>
+                                Raghav Dhir
+                              </Typography>
+                              <Box
+                                sx={{
+                                  px: 0.85,
+                                  py: 0.15,
+                                  borderRadius: '100px',
+                                  backgroundColor: '#FEF2F2',
+                                  border: '1px solid #FECACA',
+                                  color: '#DC2626',
+                                  fontSize: '0.6rem',
+                                  fontWeight: 700,
+                                }}
+                              >
+                                Needs Update
+                              </Box>
+                            </Stack>
+                            <Typography noWrap sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, color: '#94A3B8', fontWeight: 500, mt: 0.2 }}>
+                              College Student • Actively Seeking Internships
+                            </Typography>
                           </Box>
                         </Stack>
 
                         {/* Weak Headline Box */}
                         <Box
                           sx={{
-                            p: 1,
+                            px: 1.25,
+                            py: 0.85,
                             borderRadius: '9px',
                             backgroundColor: '#F8FAFC',
                             border: '1px dashed #CBD5E1',
                             mb: 1.25,
                           }}
                         >
-                          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', mb: 0.2 }}>
-                            Current Bland Headline:
-                          </Typography>
-                          <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: '#64748B', fontStyle: 'italic', lineHeight: 1.35 }}>
+                          <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: '#64748B', fontStyle: 'italic', lineHeight: 1.4 }}>
                             &ldquo;MBA Student looking for internships | Open to work | Actively applying&rdquo;
-                          </Typography>
-                          <Typography sx={{ fontSize: '0.65rem', color: '#DC2626', fontWeight: 600, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.35 }}>
-                            <FiX size={11} /> 0 keywords • Missed by campus recruiters
                           </Typography>
                         </Box>
 
@@ -780,93 +769,83 @@ export default function HeroSection() {
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.22 }}
                       >
-                        {/* Profile Header (After State: Standout Student) */}
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
-                          <Stack direction="row" spacing={1.25} alignItems="center">
-                            <Box
-                              sx={{
-                                width: { xs: 36, sm: 40 },
-                                height: { xs: 36, sm: 40 },
-                                borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#FFFFFF',
-                                fontWeight: 800,
-                                fontSize: '0.85rem',
-                                flexShrink: 0,
-                                position: 'relative',
-                                boxShadow: '0 3px 10px rgba(10, 102, 194, 0.25)',
-                              }}
-                            >
-                              RD
-                              <Box
-                                sx={{
-                                  position: 'absolute',
-                                  bottom: 0,
-                                  right: 0,
-                                  width: 9,
-                                  height: 9,
-                                  borderRadius: '50%',
-                                  backgroundColor: '#10B981',
-                                  border: '2px solid #FFFFFF',
-                                  boxShadow: '0 0 5px #10B981',
-                                }}
-                              />
-                            </Box>
-                            <Box sx={{ minWidth: 0 }}>
-                              <Stack direction="row" alignItems="center" spacing={0.5}>
-                                <Typography noWrap sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, color: brandColors.text }}>
-                                  Raghav Dhir
-                                </Typography>
-                                <FiAward size={13} color="#0A66C2" />
-                              </Stack>
-                              <Typography noWrap sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, color: brandColors.primary, fontWeight: 700 }}>
-                                College Student • Internship & Placement Ready 🎯
-                              </Typography>
-                            </Box>
-                          </Stack>
-
+                        {/* Profile Header (After State: Clean & Decluttered) */}
+                        <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1.25 }}>
                           <Box
                             sx={{
-                              px: 1,
-                              py: 0.35,
-                              borderRadius: '100px',
-                              backgroundColor: '#EFF6FF',
-                              border: '1px solid #BFDBFE',
-                              color: brandColors.primary,
-                              fontSize: { xs: '0.62rem', sm: '0.66rem' },
-                              fontWeight: 750,
+                              width: { xs: 36, sm: 40 },
+                              height: { xs: 36, sm: 40 },
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 0.35,
+                              justifyContent: 'center',
+                              color: '#FFFFFF',
+                              fontWeight: 800,
+                              fontSize: '0.85rem',
                               flexShrink: 0,
+                              position: 'relative',
+                              boxShadow: '0 3px 10px rgba(10, 102, 194, 0.25)',
                             }}
                           >
-                            <FiZap size={11} />
-                            <span>Ready to Get Hired</span>
+                            RD
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                right: 0,
+                                width: 9,
+                                height: 9,
+                                borderRadius: '50%',
+                                backgroundColor: '#10B981',
+                                border: '2px solid #FFFFFF',
+                                boxShadow: '0 0 5px #10B981',
+                              }}
+                            />
+                          </Box>
+                          <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Stack direction="row" alignItems="center" spacing={0.75} flexWrap="wrap">
+                              <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.86rem', sm: '0.92rem' }, color: brandColors.text }}>
+                                Raghav Dhir
+                              </Typography>
+                              <Box
+                                sx={{
+                                  px: 0.85,
+                                  py: 0.15,
+                                  borderRadius: '100px',
+                                  backgroundColor: '#ECFDF5',
+                                  border: '1px solid #A7F3D0',
+                                  color: '#065F46',
+                                  fontSize: '0.6rem',
+                                  fontWeight: 750,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.35,
+                                }}
+                              >
+                                <Box component="span" sx={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: '#10B981' }} />
+                                Open to Work
+                              </Box>
+                            </Stack>
+                            <Typography noWrap sx={{ fontSize: { xs: '0.68rem', sm: '0.72rem' }, color: brandColors.primary, fontWeight: 700, mt: 0.2 }}>
+                              MBA Candidate &apos;26 • Placement & Internship Ready 🎯
+                            </Typography>
                           </Box>
                         </Stack>
 
-                        {/* High-Converting Headline Box */}
+                        {/* Clean High-Converting Headline Box */}
                         <Box
                           sx={{
-                            p: 1,
+                            px: 1.25,
+                            py: 0.85,
                             borderRadius: '9px',
                             backgroundColor: '#F0F9FF',
                             border: '1px solid #BAE6FD',
                             mb: 1.25,
                           }}
                         >
-                          <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: brandColors.primary, textTransform: 'uppercase', mb: 0.2 }}>
-                            Catchy Optimized Headline:
-                          </Typography>
-                          <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.text, fontWeight: 600, lineHeight: 1.35 }}>
-                            &ldquo;MBA Candidate | Strategy & Ops Enthusiast | Standout Projects & Problem Solver 🚀&rdquo;
-                          </Typography>
-                          <Typography sx={{ fontSize: '0.65rem', color: '#16A34A', fontWeight: 700, mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.35 }}>
-                            <FiCheck size={11} /> Ready for Campus Placements & Summer Internships
+                          <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.74rem' }, color: brandColors.text, fontWeight: 600, lineHeight: 1.4 }}>
+                            &ldquo;Strategy & Ops Enthusiast | Standout Projects & Problem Solver 🚀&rdquo;
                           </Typography>
                         </Box>
 
