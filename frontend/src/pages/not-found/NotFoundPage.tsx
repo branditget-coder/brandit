@@ -195,7 +195,7 @@ export default function NotFoundPage() {
                   <Box
                     component="img"
                     src={detectiveDogImg}
-                    alt="Detective Golden Retriever Puppy Investigating 404 Error"
+                    alt="Curious Golden Retriever Puppy looking directly into your eyes about the missing 404 page"
                     sx={{
                       width: '100%',
                       height: '100%',
@@ -226,7 +226,7 @@ export default function NotFoundPage() {
                       boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
                     }}
                   >
-                    <span>🕵️‍♂️ Detective Barnaby</span>
+                    <span>🐶 Barnaby is looking for your page!</span>
                   </Box>
                 </Box>
               </motion.div>
