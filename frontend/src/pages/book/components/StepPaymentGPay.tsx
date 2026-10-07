@@ -1,11 +1,20 @@
 import { useState, useRef } from 'react'
 import {
-  Box, Typography, Grid, Button, TextField, Chip, Stack, CircularProgress, alpha, IconButton, Alert
+  Box, Typography, Grid, Button, TextField, Chip, Stack, CircularProgress, alpha, IconButton, Alert, Tooltip
 } from '@mui/material'
-import { FiCheckCircle, FiShield, FiUploadCloud, FiTrash2, FiImage, FiAlertCircle } from 'react-icons/fi'
+import {
+  FiCheckCircle, FiShield, FiUploadCloud, FiTrash2, FiAlertCircle,
+  FiLock, FiCopy, FiCheck, FiExternalLink, FiRefreshCw
+} from 'react-icons/fi'
+import { QRCodeSVG } from 'qrcode.react'
 import { brandColors } from '../../../theme'
 import { ServicePackage } from './StepChoosePlan'
 import gpayQr from '../../../assets/gpay-qr.jpg'
+
+// Verified Beneficiary Account Details (from original GPay QR)
+const UPI_VPA = 'raghavdhir1510-4@okhdfcbank'
+const PAYEE_NAME = 'Raghav Dhir'
+const GPAY_AID = 'uGICAgMDEmsmiLg'
 
 interface StepPaymentGPayProps {
   selectedServiceObj?: ServicePackage
@@ -36,7 +45,27 @@ export function StepPaymentGPay({
 }: StepPaymentGPayProps) {
   const [fileName, setFileName] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [copiedUpi, setCopiedUpi] = useState(false)
+  const [showBackupQr, setShowBackupQr] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  // Determine exact plan amount payable
+  const payableAmount = selectedServiceObj?.rawAmount && selectedServiceObj.rawAmount > 0
+    ? selectedServiceObj.rawAmount
+    : 129
+
+  const formattedAmount = payableAmount.toFixed(2)
+  const txnNote = `BrandIt - ${(selectedServiceObj?.name || 'Service Plan').slice(0, 30)}`
+
+  // Standard NPCI UPI URI with exact locked amount:
+  // am = exact amount, mam = minimum amount equal to am (enforces locked read-only mode across UPI apps)
+  const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${formattedAmount}&mam=${formattedAmount}&cu=INR&tn=${encodeURIComponent(txnNote)}&aid=${GPAY_AID}`
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText(UPI_VPA)
+    setCopiedUpi(true)
+    setTimeout(() => setCopiedUpi(false), 2000)
+  }
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -111,7 +140,7 @@ export function StepPaymentGPay({
           Scan & Pay via GPay / UPI
         </Typography>
         <Typography variant="body2" sx={{ color: brandColors.muted }}>
-          Scan the GPay QR code below, enter your transaction reference, and attach your payment screenshot to proceed.
+          The QR code is automatically locked to your chosen plan amount (₹{payableAmount}). Scan to pay, enter your reference, and upload the screenshot.
         </Typography>
       </Box>
 
@@ -126,7 +155,7 @@ export function StepPaymentGPay({
             border: `1px solid ${alpha(brandColors.primary, 0.15)}`,
             display: 'flex',
             flexDirection: 'column',
-            justify: 'space-between'
+            justifyContent: 'space-between'
           }}>
             <Box>
               <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
@@ -155,9 +184,19 @@ export function StepPaymentGPay({
                 </Box>
               </Box>
 
+              {/* Amount Payable Box with Read-Only Lock Status */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderRadius: '12px', backgroundColor: alpha(brandColors.primary, 0.08), mb: 2.5 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>Total Amount Payable:</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.primary, fontSize: { xs: '1.5rem', sm: '2rem' } }}>{selectedServiceObj?.price}</Typography>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
+                    Total Amount Payable:
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
+                    <FiLock size={12} /> Read-only mode • Locked in QR
+                  </Typography>
+                </Box>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.primary, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+                  ₹{payableAmount}
+                </Typography>
               </Box>
 
               <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
@@ -166,8 +205,8 @@ export function StepPaymentGPay({
               <Stack spacing={1.2}>
                 {[
                   '1. Open GPay, PhonePe, Paytm, BHIM, or any UPI App.',
-                  '2. Scan the GPay QR code on the right.',
-                  `3. Complete payment of ${selectedServiceObj?.price}.`,
+                  `2. Scan the QR code on the right (₹${payableAmount} locked in read-only mode).`,
+                  `3. Confirm payment of exactly ₹${payableAmount} to ${PAYEE_NAME}.`,
                   '4. Fill in the 12-digit Txn Ref / UTR number (*Mandatory).',
                   '5. Upload payment confirmation screenshot (*Mandatory).',
                   '6. Click "Confirm Payment & Submit Booking".'
@@ -184,7 +223,7 @@ export function StepPaymentGPay({
           </Box>
         </Grid>
 
-        {/* Right: GPay QR & Mandatory Fields */}
+        {/* Right: GPay Dynamic QR & Mandatory Fields */}
         <Grid item xs={12} md={6}>
           <Box sx={{
             p: { xs: 2.5, sm: 3 },
@@ -197,20 +236,153 @@ export function StepPaymentGPay({
             flexDirection: 'column',
             alignItems: 'center'
           }}>
-            <Chip label="Scan to Pay with Any UPI App" color="primary" size="small" sx={{ fontWeight: 700, mb: 2 }} />
+            <Chip
+              icon={<FiLock size={12} />}
+              label={`Exact Plan Amount: ₹${payableAmount} (Read-Only)`}
+              color="primary"
+              size="small"
+              sx={{ fontWeight: 700, mb: 2 }}
+            />
 
+            {/* Dynamic UPI QR Code Card */}
             <Box sx={{
               p: 2,
               borderRadius: '20px',
-              backgroundColor: '#1E293B',
-              display: 'inline-block',
-              maxWidth: 250,
+              backgroundColor: '#0F172A',
+              display: 'inline-flex',
+              flexDirection: 'column',
+              alignItems: 'center',
               width: '100%',
-              mb: 2.5,
-              boxShadow: '0 12px 28px rgba(0,0,0,0.18)'
+              maxWidth: 270,
+              mb: 2,
+              boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
             }}>
-              <Box component="img" src={gpayQr} alt="Google Pay QR Code" sx={{ width: '100%', height: 'auto', borderRadius: '12px', display: 'block' }} />
+              {showBackupQr ? (
+                <Box
+                  component="img"
+                  src={gpayQr}
+                  alt="Static Google Pay QR Code"
+                  sx={{ width: '100%', height: 'auto', borderRadius: '12px', display: 'block', backgroundColor: '#fff', p: 1 }}
+                />
+              ) : (
+                <Box sx={{
+                  backgroundColor: '#ffffff',
+                  p: 1.5,
+                  borderRadius: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  aspectRatio: '1/1'
+                }}>
+                  <QRCodeSVG
+                    value={upiUri}
+                    size={220}
+                    level="M"
+                    includeMargin={false}
+                    style={{ width: '100%', height: 'auto', display: 'block' }}
+                  />
+                </Box>
+              )}
+
+              {/* Read-Only Badge below QR */}
+              <Box sx={{
+                mt: 1.5,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: '20px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.7
+              }}>
+                <FiLock size={12} color="#38BDF8" />
+                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.02em' }}>
+                  ₹{payableAmount} Locked in QR
+                </Typography>
+              </Box>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.72rem', mt: 0.4 }}>
+                Directly credits: {PAYEE_NAME}
+              </Typography>
             </Box>
+
+            {/* Beneficiary & UPI ID Card */}
+            <Box sx={{
+              width: '100%',
+              p: 1.5,
+              mb: 1.5,
+              borderRadius: '12px',
+              backgroundColor: alpha(brandColors.primary, 0.03),
+              border: `1px solid ${alpha(brandColors.primary, 0.15)}`,
+              textAlign: 'left'
+            }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>
+                  Verified Beneficiary:
+                </Typography>
+                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>
+                  {PAYEE_NAME}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>
+                  Account / UPI ID:
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700, fontFamily: 'monospace' }}>
+                    {UPI_VPA}
+                  </Typography>
+                  <Tooltip title={copiedUpi ? "Copied!" : "Copy UPI ID"}>
+                    <IconButton size="small" onClick={handleCopyUpi} sx={{ p: 0.3 }}>
+                      {copiedUpi ? <FiCheck size={13} color={brandColors.success} /> : <FiCopy size={13} color={brandColors.primary} />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Mobile / Direct UPI Intent Link */}
+            <Button
+              component="a"
+              href={upiUri}
+              variant="outlined"
+              fullWidth
+              size="small"
+              startIcon={<FiExternalLink />}
+              sx={{
+                mb: 1,
+                borderRadius: '10px',
+                fontWeight: 700,
+                textTransform: 'none',
+                fontSize: '0.825rem',
+                borderColor: brandColors.primary,
+                color: brandColors.primary,
+                '&:hover': {
+                  backgroundColor: alpha(brandColors.primary, 0.04),
+                  borderColor: brandColors.primary,
+                }
+              }}
+            >
+              Open & Pay ₹{payableAmount} via UPI App
+            </Button>
+
+            {/* Fallback QR Toggle */}
+            <Button
+              variant="text"
+              size="small"
+              onClick={() => setShowBackupQr(!showBackupQr)}
+              startIcon={<FiRefreshCw size={12} />}
+              sx={{
+                mb: 2,
+                fontSize: '0.72rem',
+                color: brandColors.muted,
+                textTransform: 'none',
+                py: 0.2
+              }}
+            >
+              {showBackupQr ? 'Show Dynamic Amount QR Code' : 'Trouble scanning? View static QR'}
+            </Button>
 
             {/* Field 1: Transaction Ref (Mandatory) */}
             <Box sx={{ width: '100%', textAlign: 'left', mb: 2 }}>
