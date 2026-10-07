@@ -172,7 +172,7 @@ export default function PricingSection() {
                 >
                   {plan.popular && (
                     <Chip
-                      label="Best Value"
+                      label="Best Seller"
                       icon={<FiZap size={12} />}
                       size="small"
                       sx={{
