@@ -9,7 +9,7 @@ import SEO from '../../components/common/SEO'
 const services = [
   'Profile Setup + Account building advice (₹129)',
   'Profile setup + Personal Branding (8 posts/mo - ₹349)',
-  'Profile setup + personal branding + building network (₹499/mo)',
+  'Profile setup + personal branding + building network (₹499/mo) — ★ Best Seller',
   'LinkedIn Consulting (₹249/mo)',
   'Other Query'
 ]

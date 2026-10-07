@@ -1,6 +1,6 @@
 import { Box, Container, Typography, Grid, Button, Chip, alpha } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiArrowRight, FiLinkedin, FiFeather, FiUsers, FiCompass } from 'react-icons/fi'
+import { FiArrowRight, FiLinkedin, FiFeather, FiUsers, FiCompass, FiStar } from 'react-icons/fi'
 import { Link as RouterLink } from 'react-router-dom'
 import { brandColors } from '../../theme'
 import SEO from '../../components/common/SEO'
@@ -68,13 +68,63 @@ export default function ServicesPage() {
             {services.map((s, i) => (
               <Grid item xs={12} md={6} key={s.id} id={s.id}>
                 <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}>
-                  <Box sx={{ p: 4, borderRadius: '24px', border: `1px solid ${brandColors.border}`, backgroundColor: '#fff', height: '100%', display: 'flex', flexDirection: 'column', transition: 'box-shadow 0.25s', '&:hover': { boxShadow: '0 12px 40px rgba(0,0,0,0.08)' } }}>
+                  <Box
+                    sx={{
+                      p: 4,
+                      borderRadius: '24px',
+                      border: s.id === 'branding-network'
+                        ? '2px solid rgba(124, 58, 237, 0.5)'
+                        : `1px solid ${brandColors.border}`,
+                      backgroundColor: s.id === 'branding-network' ? '#FAF5FF' : '#fff',
+                      boxShadow: s.id === 'branding-network' ? '0 16px 45px rgba(124, 58, 237, 0.12)' : 'none',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      transition: 'all 0.25s ease',
+                      '&:hover': {
+                        boxShadow: s.id === 'branding-network' ? '0 20px 50px rgba(124, 58, 237, 0.22)' : '0 12px 40px rgba(0,0,0,0.08)',
+                        transform: 'translateY(-3px)',
+                      }
+                    }}
+                  >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                       <Box sx={{ width: 52, height: 52, borderRadius: '14px', backgroundColor: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <s.icon size={24} color={s.iconColor} />
                       </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Chip label={`${s.price} ${s.period}`} size="medium" sx={{ backgroundColor: alpha(s.iconColor, 0.08), color: s.iconColor, fontWeight: 700, fontSize: '0.9rem' }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        {s.id === 'branding-network' && (
+                          <Box
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              px: 1.3,
+                              py: 0.4,
+                              borderRadius: '100px',
+                              background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                              color: '#fff',
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              letterSpacing: '0.04em',
+                              boxShadow: '0 2px 10px rgba(124, 58, 237, 0.35)',
+                            }}
+                          >
+                            <FiStar size={11} fill="#FDE047" color="#FDE047" />
+                            <span>BEST SELLER</span>
+                          </Box>
+                        )}
+                        <Chip
+                          label={`${s.price} ${s.period}`}
+                          size="medium"
+                          sx={{
+                            backgroundColor: s.id === 'branding-network' ? 'rgba(124, 58, 237, 0.12)' : alpha(s.iconColor, 0.08),
+                            color: s.id === 'branding-network' ? '#7C3AED' : s.iconColor,
+                            fontWeight: 800,
+                            fontSize: '0.9rem',
+                            border: s.id === 'branding-network' ? '1px solid rgba(124, 58, 237, 0.3)' : 'none',
+                          }}
+                        />
                       </Box>
                     </Box>
                     <Typography variant="h5" sx={{ mb: 1.5, color: brandColors.text, fontWeight: 700 }}>{s.title}</Typography>
@@ -89,7 +139,27 @@ export default function ServicesPage() {
                       ))}
                     </Box>
                     <Box sx={{ mt: 3.5 }}>
-                      <Button component={RouterLink} to={`/book?plan=${s.id}`} variant="contained" size="large" fullWidth endIcon={<FiArrowRight />}>
+                      <Button
+                        component={RouterLink}
+                        to={`/book?plan=${s.id}`}
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        endIcon={<FiArrowRight />}
+                        sx={{
+                          ...(s.id === 'branding-network' ? {
+                            background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                            boxShadow: '0 8px 24px rgba(124, 58, 237, 0.35)',
+                            fontWeight: 800,
+                            '&:hover': {
+                              background: 'linear-gradient(135deg, #6D28D9 0%, #1D4ED8 100%)',
+                              boxShadow: '0 10px 28px rgba(124, 58, 237, 0.5)',
+                            }
+                          } : {
+                            backgroundColor: brandColors.primary,
+                          })
+                        }}
+                      >
                         Select Package
                       </Button>
                     </Box>

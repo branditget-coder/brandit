@@ -63,7 +63,7 @@ export function StepConfirmation({
               </Typography>
               {[
                 { label: 'BOOKING REFERENCE', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
-                { label: 'SERVICE PACKAGE', value: selectedServiceObj?.name },
+                { label: 'SERVICE PACKAGE', value: selectedServiceObj?.id === 'branding-network' ? `${selectedServiceObj?.name} (★ Best Seller)` : selectedServiceObj?.name },
                 { label: 'AMOUNT PAYABLE', value: selectedServiceObj?.price },
                 { label: 'PAYMENT METHOD', value: 'GPay QR Code (Manual Verification)' },
                 { label: 'PAYMENT REF / UTR', value: upiRef || bookingResult?.paymentId || 'Direct GPay Scan' },

@@ -8,7 +8,7 @@ const footerLinks = {
   Services: [
     { label: 'Profile Setup & Advice (₹129)', href: '/services#setup-advice' },
     { label: 'Profile Setup + Branding (₹349/mo)', href: '/services#branding-basic' },
-    { label: 'Branding + Network Growth (₹499/mo)', href: '/services#branding-network' },
+    { label: 'Branding + Network Growth (₹499/mo) ★ Best Seller', href: '/services#branding-network' },
     { label: 'LinkedIn Consulting (₹249/mo)', href: '/services#linkedin-consulting' },
   ],
   Company: [

@@ -1,6 +1,6 @@
 import { Box, Container, Grid, Typography, Button, Stack, alpha } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiLinkedin, FiFeather, FiUsers, FiCompass, FiArrowRight, FiCheck } from 'react-icons/fi'
+import { FiLinkedin, FiFeather, FiUsers, FiCompass, FiArrowRight, FiCheck, FiStar } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import { Link as RouterLink } from 'react-router-dom'
 
@@ -105,16 +105,24 @@ export default function ServicesSection() {
                   sx={{
                     p: { xs: 3, sm: 4 },
                     borderRadius: '20px',
-                    border: `1px solid ${brandColors.border}`,
-                    backgroundColor: '#fff',
+                    border: service.id === 'branding-network'
+                      ? '2px solid rgba(124, 58, 237, 0.45)'
+                      : `1px solid ${brandColors.border}`,
+                    backgroundColor: service.id === 'branding-network'
+                      ? '#FAF5FF'
+                      : '#fff',
+                    boxShadow: service.id === 'branding-network'
+                      ? '0 12px 36px rgba(124, 58, 237, 0.1)'
+                      : 'none',
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     transition: 'all 0.25s ease',
+                    position: 'relative',
                     '&:hover': {
-                      boxShadow: `0 14px 36px -4px ${alpha(service.iconColor, 0.12)}, 0 4px 12px rgba(15, 23, 42, 0.04)`,
-                      borderColor: alpha(service.iconColor, 0.4),
+                      boxShadow: `0 16px 40px -4px ${alpha(service.iconColor, 0.2)}, 0 4px 12px rgba(15, 23, 42, 0.04)`,
+                      borderColor: service.id === 'branding-network' ? '#7C3AED' : alpha(service.iconColor, 0.4),
                       transform: 'translateY(-3px)',
                     },
                   }}
@@ -138,18 +146,24 @@ export default function ServicesSection() {
                       </Box>
                       <Box
                         sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.6,
                           px: 1.5,
                           py: 0.5,
                           borderRadius: '100px',
-                          backgroundColor: service.color,
-                          border: `1px solid ${alpha(service.iconColor, 0.25)}`,
-                          color: service.iconColor,
+                          backgroundColor: service.id === 'branding-network' ? 'transparent' : service.color,
+                          background: service.id === 'branding-network' ? 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)' : undefined,
+                          border: service.id === 'branding-network' ? 'none' : `1px solid ${alpha(service.iconColor, 0.25)}`,
+                          color: service.id === 'branding-network' ? '#fff' : service.iconColor,
                           fontSize: '0.72rem',
-                          fontWeight: 750,
+                          fontWeight: 800,
                           letterSpacing: '0.02em',
+                          boxShadow: service.id === 'branding-network' ? '0 4px 12px rgba(124, 58, 237, 0.35)' : 'none',
                         }}
                       >
-                        {service.badge}
+                        {service.id === 'branding-network' && <FiStar size={12} fill="#FDE047" color="#FDE047" />}
+                        {service.id === 'branding-network' ? 'Best Seller' : service.badge}
                       </Box>
                     </Box>
 
@@ -180,22 +194,36 @@ export default function ServicesSection() {
                   <Button
                     component={RouterLink}
                     to={`/book?plan=${service.id}`}
-                    variant="outlined"
+                    variant={service.id === 'branding-network' ? 'contained' : 'outlined'}
                     size="medium"
                     endIcon={<FiArrowRight />}
                     sx={{
-                      borderColor: brandColors.border,
-                      color: brandColors.text,
-                      fontWeight: 600,
-                      alignSelf: 'flex-start',
-                      borderRadius: '10px',
-                      px: 2.5,
-                      py: 1,
-                      '&:hover': {
-                        borderColor: service.iconColor,
-                        color: service.iconColor,
-                        backgroundColor: alpha(service.iconColor, 0.04),
-                      },
+                      ...(service.id === 'branding-network' ? {
+                        background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                        color: '#fff',
+                        fontWeight: 750,
+                        borderRadius: '10px',
+                        px: 3,
+                        py: 1,
+                        boxShadow: '0 6px 18px rgba(124, 58, 237, 0.3)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #6D28D9 0%, #1D4ED8 100%)',
+                          boxShadow: '0 8px 24px rgba(124, 58, 237, 0.45)',
+                        }
+                      } : {
+                        borderColor: brandColors.border,
+                        color: brandColors.text,
+                        fontWeight: 600,
+                        alignSelf: 'flex-start',
+                        borderRadius: '10px',
+                        px: 2.5,
+                        py: 1,
+                        '&:hover': {
+                          borderColor: service.iconColor,
+                          color: service.iconColor,
+                          backgroundColor: alpha(service.iconColor, 0.04),
+                        },
+                      })
                     }}
                   >
                     Select Program

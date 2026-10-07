@@ -4,7 +4,7 @@ import {
   TextField, InputAdornment, alpha, Paper
 } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiCheck, FiArrowRight, FiZap, FiInfo, FiSliders, FiRefreshCw } from 'react-icons/fi'
+import { FiCheck, FiArrowRight, FiZap, FiInfo, FiSliders, FiRefreshCw, FiStar } from 'react-icons/fi'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { brandColors } from '../../theme'
 
@@ -171,22 +171,32 @@ export default function PricingSection() {
                   }}
                 >
                   {plan.popular && (
-                    <Chip
-                      label="Best Seller"
-                      icon={<FiZap size={12} />}
-                      size="small"
+                    <Box
                       sx={{
                         position: 'absolute',
-                        top: -13,
+                        top: -14,
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        backgroundColor: brandColors.primary,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.6,
+                        px: 1.8,
+                        py: 0.45,
+                        borderRadius: '20px',
+                        background: 'linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)',
+                        boxShadow: '0 8px 20px -2px rgba(124, 58, 237, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
                         color: '#fff',
-                        fontWeight: 700,
+                        fontWeight: 800,
                         fontSize: '0.75rem',
-                        px: 1,
+                        letterSpacing: '0.04em',
+                        whiteSpace: 'nowrap',
+                        zIndex: 2,
                       }}
-                    />
+                    >
+                      <FiStar size={12} fill="#FDE047" color="#FDE047" />
+                      <span>Best Seller✨</span>
+                    </Box>
                   )}
 
                   <Box sx={{ mb: 2.5 }}>

@@ -4,7 +4,7 @@ import {
 } from '@mui/material'
 import {
   FiCheckCircle, FiShield, FiUploadCloud, FiTrash2,
-  FiLock, FiCopy, FiCheck, FiExternalLink, FiRefreshCw
+  FiLock, FiCopy, FiCheck, FiExternalLink, FiRefreshCw, FiStar
 } from 'react-icons/fi'
 import { QRCodeSVG } from 'qrcode.react'
 import { brandColors } from '../../../theme'
@@ -175,9 +175,31 @@ export function StepPaymentGPay({
                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, display: 'block', fontSize: '0.72rem' }}>
                   CHOSEN PLAN
                 </Typography>
-                <Typography noWrap variant="subtitle2" sx={{ fontWeight: 800, color: brandColors.text, fontSize: '0.875rem' }}>
-                  {selectedServiceObj?.name}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
+                  <Typography noWrap variant="subtitle2" sx={{ fontWeight: 800, color: brandColors.text, fontSize: '0.875rem' }}>
+                    {selectedServiceObj?.name}
+                  </Typography>
+                  {(selectedServiceObj?.id === 'branding-network' || payableAmount === 499) && (
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.4,
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: '100px',
+                        background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                        color: '#fff',
+                        fontSize: '0.64rem',
+                        fontWeight: 800,
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      <FiStar size={10} fill="#FDE047" color="#FDE047" />
+                      <span>BEST SELLER</span>
+                    </Box>
+                  )}
+                </Box>
               </Box>
               <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
                 <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, display: 'block', fontSize: '0.72rem' }}>
@@ -200,7 +222,12 @@ export function StepPaymentGPay({
               width: '100%',
               maxWidth: 260,
               mb: 2,
-              boxShadow: '0 12px 28px rgba(15, 23, 42, 0.18)'
+              boxShadow: (selectedServiceObj?.id === 'branding-network' || payableAmount === 499)
+                ? '0 12px 32px rgba(124, 58, 237, 0.35)'
+                : '0 12px 28px rgba(15, 23, 42, 0.18)',
+              border: (selectedServiceObj?.id === 'branding-network' || payableAmount === 499)
+                ? '1.5px solid rgba(124, 58, 237, 0.4)'
+                : '1px solid rgba(255, 255, 255, 0.08)'
             }}>
               {showBackupQr ? (
                 <Box
@@ -236,14 +263,25 @@ export function StepPaymentGPay({
                 px: 1.5,
                 py: 0.4,
                 borderRadius: '16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                backgroundColor: (selectedServiceObj?.id === 'branding-network' || payableAmount === 499)
+                  ? 'rgba(124, 58, 237, 0.3)'
+                  : 'rgba(255, 255, 255, 0.12)',
+                border: (selectedServiceObj?.id === 'branding-network' || payableAmount === 499)
+                  ? '1px solid rgba(253, 224, 71, 0.4)'
+                  : 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 0.6
               }}>
-                <FiLock size={12} color="#38BDF8" />
+                {(selectedServiceObj?.id === 'branding-network' || payableAmount === 499) ? (
+                  <FiStar size={12} fill="#FDE047" color="#FDE047" />
+                ) : (
+                  <FiLock size={12} color="#38BDF8" />
+                )}
                 <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.8rem' }}>
-                  ₹{payableAmount} (Read-only)
+                  {(selectedServiceObj?.id === 'branding-network' || payableAmount === 499)
+                    ? `₹${payableAmount} (Best Seller • Read-only)`
+                    : `₹${payableAmount} (Read-only)`}
                 </Typography>
               </Box>
             </Box>
