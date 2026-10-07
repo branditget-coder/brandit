@@ -313,7 +313,7 @@ export default function BookPage() {
     }
     if (activeStep === 1) return !!selected.date && !!selected.time && !isSlotBooked(selected.date, selected.time)
     if (activeStep === 2) return !!selected.name && !!selected.email && selected.email.includes('@') && !!selected.phone
-    if (activeStep === 3) return !!selected.upiRef && selected.upiRef.trim() !== '' && !!selected.paymentScreenshot
+    if (activeStep === 3) return !!selected.paymentScreenshot
     return true
   }
 

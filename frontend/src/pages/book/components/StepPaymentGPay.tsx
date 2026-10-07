@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react'
 import {
-  Box, Typography, Grid, Button, TextField, Chip, Stack, CircularProgress, alpha, IconButton, Alert, Tooltip
+  Box, Typography, Grid, Button, TextField, Chip, CircularProgress, alpha, IconButton, Alert, Tooltip
 } from '@mui/material'
 import {
-  FiCheckCircle, FiShield, FiUploadCloud, FiTrash2, FiAlertCircle,
+  FiCheckCircle, FiShield, FiUploadCloud, FiTrash2,
   FiLock, FiCopy, FiCheck, FiExternalLink, FiRefreshCw
 } from 'react-icons/fi'
 import { QRCodeSVG } from 'qrcode.react'
@@ -11,7 +11,7 @@ import { brandColors } from '../../../theme'
 import { ServicePackage } from './StepChoosePlan'
 import gpayQr from '../../../assets/gpay-qr.jpg'
 
-// Verified Beneficiary Account Details (from original GPay QR)
+// Verified Payee Details
 const UPI_VPA = 'raghavdhir1510-4@okhdfcbank'
 const PAYEE_NAME = 'Raghav Dhir'
 const GPAY_AID = 'uGICAgMDEmsmiLg'
@@ -49,7 +49,7 @@ export function StepPaymentGPay({
   const [showBackupQr, setShowBackupQr] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  // Determine exact plan amount payable
+  // Plan amount payable
   const payableAmount = selectedServiceObj?.rawAmount && selectedServiceObj.rawAmount > 0
     ? selectedServiceObj.rawAmount
     : 129
@@ -57,8 +57,7 @@ export function StepPaymentGPay({
   const formattedAmount = payableAmount.toFixed(2)
   const txnNote = `BrandIt - ${(selectedServiceObj?.name || 'Service Plan').slice(0, 30)}`
 
-  // Standard NPCI UPI URI with exact locked amount:
-  // am = exact amount, mam = minimum amount equal to am (enforces locked read-only mode across UPI apps)
+  // Standard NPCI UPI URI: mam = am locks amount in read-only mode in UPI apps
   const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${formattedAmount}&mam=${formattedAmount}&cu=INR&tn=${encodeURIComponent(txnNote)}&aid=${GPAY_AID}`
 
   const handleCopyUpi = () => {
@@ -69,7 +68,7 @@ export function StepPaymentGPay({
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      setUploadError('Please select a valid image file (PNG, JPG, JPEG, WebP).')
+      setUploadError('Please upload an image (PNG, JPG, JPEG, WebP).')
       return
     }
 
@@ -129,122 +128,68 @@ export function StepPaymentGPay({
     }
   }
 
-  const isUpiValid = upiRef.trim().length > 0
-  const isScreenshotValid = Boolean(paymentScreenshot)
-  const canSubmit = isUpiValid && isScreenshotValid
+  // Only mandatory requirement is payment screenshot
+  const canSubmit = Boolean(paymentScreenshot)
 
   return (
     <Box>
+      {/* Concise Header */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 700, mb: 0.5, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          Scan & Pay via GPay / UPI
+        <Typography variant="h5" sx={{ color: brandColors.text, fontWeight: 800, mb: 0.5, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+          Complete Payment
         </Typography>
         <Typography variant="body2" sx={{ color: brandColors.muted }}>
-          The QR code is automatically locked to your chosen plan amount (₹{payableAmount}). Scan to pay, enter your reference, and upload the screenshot.
+          Scan the QR code below to pay <strong>₹{payableAmount}</strong>, then upload your payment screenshot.
         </Typography>
       </Box>
 
       <Grid container spacing={3} alignItems="stretch">
-        {/* Left: Summary & Instructions */}
+        {/* Left Column: QR Code & Payee Details */}
         <Grid item xs={12} md={6}>
           <Box sx={{
             p: { xs: 2.5, sm: 3 },
             height: '100%',
             borderRadius: '20px',
-            backgroundColor: alpha(brandColors.primary, 0.03),
-            border: `1px solid ${alpha(brandColors.primary, 0.15)}`,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-          }}>
-            <Box>
-              <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
-                ORDER SUMMARY
-              </Typography>
-
-              <Typography variant="h6" sx={{ fontWeight: 800, color: brandColors.text, mb: 0.5 }}>
-                {selectedServiceObj?.name}
-              </Typography>
-              <Typography variant="body2" sx={{ color: brandColors.muted, mb: 2 }}>
-                Duration: {selectedServiceObj?.duration}
-              </Typography>
-
-              <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: '#fff', border: `1px solid ${brandColors.border}`, mb: 2.5 }}>
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', mb: 1, gap: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Scheduled Slot:</Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{selectedDate} @ {selectedTime} IST</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', mb: 1, gap: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Client Name:</Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>{clientName}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', gap: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>Client Email:</Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700, wordBreak: 'break-all' }}>{clientEmail}</Typography>
-                </Box>
-              </Box>
-
-              {/* Amount Payable Box with Read-Only Lock Status */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderRadius: '12px', backgroundColor: alpha(brandColors.primary, 0.08), mb: 2.5 }}>
-                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
-                    Total Amount Payable:
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
-                    <FiLock size={12} /> Read-only mode • Locked in QR
-                  </Typography>
-                </Box>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: brandColors.primary, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-                  ₹{payableAmount}
-                </Typography>
-              </Box>
-
-              <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.05em', display: 'block', mb: 1.5 }}>
-                MANDATORY VERIFICATION STEPS
-              </Typography>
-              <Stack spacing={1.2}>
-                {[
-                  '1. Open GPay, PhonePe, Paytm, BHIM, or any UPI App.',
-                  `2. Scan the QR code on the right (₹${payableAmount} locked in read-only mode).`,
-                  `3. Confirm payment of exactly ₹${payableAmount} to ${PAYEE_NAME}.`,
-                  '4. Fill in the 12-digit Txn Ref / UTR number (*Mandatory).',
-                  '5. Upload payment confirmation screenshot (*Mandatory).',
-                  '6. Click "Confirm Payment & Submit Booking".'
-                ].map((stepText, idx) => (
-                  <Box key={idx} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                    <FiCheckCircle color={brandColors.success} size={15} style={{ marginTop: 2, flexShrink: 0 }} />
-                    <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 500, lineHeight: 1.4 }}>
-                      {stepText}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
-          </Box>
-        </Grid>
-
-        {/* Right: GPay Dynamic QR & Mandatory Fields */}
-        <Grid item xs={12} md={6}>
-          <Box sx={{
-            p: { xs: 2.5, sm: 3 },
-            borderRadius: '20px',
             border: `1px solid ${brandColors.border}`,
             backgroundColor: '#fff',
             boxShadow: '0 8px 30px rgba(0,0,0,0.04)',
-            textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            textAlign: 'center',
+            justifyContent: 'space-between'
           }}>
-            <Chip
-              icon={<FiLock size={12} />}
-              label={`Exact Plan Amount: ₹${payableAmount} (Read-Only)`}
-              color="primary"
-              size="small"
-              sx={{ fontWeight: 700, mb: 2 }}
-            />
+            {/* Plan & Amount Summary Bar */}
+            <Box sx={{
+              width: '100%',
+              p: 1.5,
+              borderRadius: '14px',
+              backgroundColor: alpha(brandColors.primary, 0.05),
+              border: `1px solid ${alpha(brandColors.primary, 0.12)}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2.5
+            }}>
+              <Box sx={{ textAlign: 'left', overflow: 'hidden', mr: 1 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, display: 'block', fontSize: '0.72rem' }}>
+                  CHOSEN PLAN
+                </Typography>
+                <Typography noWrap variant="subtitle2" sx={{ fontWeight: 800, color: brandColors.text, fontSize: '0.875rem' }}>
+                  {selectedServiceObj?.name}
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, display: 'block', fontSize: '0.72rem' }}>
+                  AMOUNT
+                </Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: brandColors.primary }}>
+                  ₹{payableAmount}
+                </Typography>
+              </Box>
+            </Box>
 
-            {/* Dynamic UPI QR Code Card */}
+            {/* QR Code Container */}
             <Box sx={{
               p: 2,
               borderRadius: '20px',
@@ -253,10 +198,9 @@ export function StepPaymentGPay({
               flexDirection: 'column',
               alignItems: 'center',
               width: '100%',
-              maxWidth: 270,
+              maxWidth: 260,
               mb: 2,
-              boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
-              border: '1px solid rgba(255, 255, 255, 0.08)'
+              boxShadow: '0 12px 28px rgba(15, 23, 42, 0.18)'
             }}>
               {showBackupQr ? (
                 <Box
@@ -269,7 +213,7 @@ export function StepPaymentGPay({
                 <Box sx={{
                   backgroundColor: '#ffffff',
                   p: 1.5,
-                  borderRadius: '14px',
+                  borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -278,7 +222,7 @@ export function StepPaymentGPay({
                 }}>
                   <QRCodeSVG
                     value={upiUri}
-                    size={220}
+                    size={210}
                     level="M"
                     includeMargin={false}
                     style={{ width: '100%', height: 'auto', display: 'block' }}
@@ -286,63 +230,54 @@ export function StepPaymentGPay({
                 </Box>
               )}
 
-              {/* Read-Only Badge below QR */}
+              {/* Amount Locked Badge */}
               <Box sx={{
                 mt: 1.5,
                 px: 1.5,
-                py: 0.5,
-                borderRadius: '20px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                py: 0.4,
+                borderRadius: '16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 0.7
+                gap: 0.6
               }}>
                 <FiLock size={12} color="#38BDF8" />
-                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.02em' }}>
-                  ₹{payableAmount} Locked in QR
+                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.8rem' }}>
+                  ₹{payableAmount} (Read-only)
                 </Typography>
               </Box>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.72rem', mt: 0.4 }}>
-                Directly credits: {PAYEE_NAME}
-              </Typography>
             </Box>
 
-            {/* Beneficiary & UPI ID Card */}
+            {/* Beneficiary Details Pill */}
             <Box sx={{
               width: '100%',
-              p: 1.5,
-              mb: 1.5,
+              px: 2,
+              py: 1.2,
               borderRadius: '12px',
-              backgroundColor: alpha(brandColors.primary, 0.03),
-              border: `1px solid ${alpha(brandColors.primary, 0.15)}`,
-              textAlign: 'left'
+              backgroundColor: '#F8FAFC',
+              border: `1px solid ${brandColors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 1,
+              mb: 1.5
             }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>
-                  Verified Beneficiary:
+              <Box sx={{ textAlign: 'left', overflow: 'hidden' }}>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600, display: 'block', fontSize: '0.7rem' }}>
+                  BENEFICIARY: {PAYEE_NAME}
                 </Typography>
-                <Typography variant="caption" sx={{ color: brandColors.text, fontWeight: 700 }}>
-                  {PAYEE_NAME}
+                <Typography noWrap variant="caption" sx={{ color: brandColors.text, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.78rem' }}>
+                  {UPI_VPA}
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 600 }}>
-                  Account / UPI ID:
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: brandColors.primary, fontWeight: 700, fontFamily: 'monospace' }}>
-                    {UPI_VPA}
-                  </Typography>
-                  <Tooltip title={copiedUpi ? "Copied!" : "Copy UPI ID"}>
-                    <IconButton size="small" onClick={handleCopyUpi} sx={{ p: 0.3 }}>
-                      {copiedUpi ? <FiCheck size={13} color={brandColors.success} /> : <FiCopy size={13} color={brandColors.primary} />}
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </Box>
+              <Tooltip title={copiedUpi ? "Copied!" : "Copy UPI ID"}>
+                <IconButton size="small" onClick={handleCopyUpi} sx={{ p: 0.5, flexShrink: 0 }}>
+                  {copiedUpi ? <FiCheck size={14} color={brandColors.success} /> : <FiCopy size={14} color={brandColors.primary} />}
+                </IconButton>
+              </Tooltip>
             </Box>
 
-            {/* Mobile / Direct UPI Intent Link */}
+            {/* Mobile / Direct Pay Link */}
             <Button
               component="a"
               href={upiUri}
@@ -351,168 +286,199 @@ export function StepPaymentGPay({
               size="small"
               startIcon={<FiExternalLink />}
               sx={{
-                mb: 1,
                 borderRadius: '10px',
                 fontWeight: 700,
                 textTransform: 'none',
                 fontSize: '0.825rem',
                 borderColor: brandColors.primary,
                 color: brandColors.primary,
+                py: 0.8,
                 '&:hover': {
                   backgroundColor: alpha(brandColors.primary, 0.04),
                   borderColor: brandColors.primary,
                 }
               }}
             >
-              Open & Pay ₹{payableAmount} via UPI App
+              Open in UPI App (Pay ₹{payableAmount})
             </Button>
 
-            {/* Fallback QR Toggle */}
+            {/* Static QR Toggle */}
             <Button
               variant="text"
               size="small"
               onClick={() => setShowBackupQr(!showBackupQr)}
-              startIcon={<FiRefreshCw size={12} />}
+              startIcon={<FiRefreshCw size={11} />}
               sx={{
-                mb: 2,
+                mt: 1,
                 fontSize: '0.72rem',
                 color: brandColors.muted,
                 textTransform: 'none',
-                py: 0.2
+                py: 0
               }}
             >
-              {showBackupQr ? 'Show Dynamic Amount QR Code' : 'Trouble scanning? View static QR'}
+              {showBackupQr ? 'Show dynamic QR' : 'Trouble scanning? View static QR'}
             </Button>
+          </Box>
+        </Grid>
 
-            {/* Field 1: Transaction Ref (Mandatory) */}
-            <Box sx={{ width: '100%', textAlign: 'left', mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.8 }}>
-                Transaction Ref / UTR ID <span style={{ color: '#DC2626' }}>*</span>
-              </Typography>
-              <TextField
-                placeholder="e.g. 420192837465 or UPI Txn Ref"
-                fullWidth
-                value={upiRef}
-                onChange={e => onChangeUpiRef(e.target.value)}
-                error={upiRef.length > 0 && !isUpiValid}
-                helperText={!isUpiValid ? "Mandatory: Enter 12-digit UTR/Txn Ref from GPay/UPI app" : "Verified reference format"}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-              />
-            </Box>
-
-            {/* Field 2: Payment Screenshot Upload (Mandatory) */}
-            <Box sx={{ width: '100%', textAlign: 'left', mb: 2.5 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, mb: 0.8 }}>
-                Payment Screenshot <span style={{ color: '#DC2626' }}>*</span>
-              </Typography>
-
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-                id="payment-screenshot-upload"
-              />
-
-              {paymentScreenshot ? (
-                <Box sx={{
-                  p: 2,
-                  borderRadius: '14px',
-                  border: `2px solid ${brandColors.success}`,
-                  backgroundColor: alpha(brandColors.success, 0.05),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 1.5
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
-                    <Box component="img" src={paymentScreenshot} alt="Preview" sx={{ width: 44, height: 44, borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
-                    <Box sx={{ overflow: 'hidden' }}>
-                      <Typography noWrap variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.85rem' }}>
-                        {fileName || 'Screenshot Uploaded'}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: brandColors.success, fontWeight: 600, display: 'block' }}>
-                        ✓ Ready for verification
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <IconButton onClick={handleRemoveScreenshot} color="error" size="small" title="Remove image">
-                    <FiTrash2 size={18} />
-                  </IconButton>
+        {/* Right Column: Screenshot Upload & Confirmation */}
+        <Grid item xs={12} md={6}>
+          <Box sx={{
+            p: { xs: 2.5, sm: 3 },
+            height: '100%',
+            borderRadius: '20px',
+            border: `1px solid ${brandColors.border}`,
+            backgroundColor: '#fff',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <Box>
+              {/* Mandatory Screenshot Section */}
+              <Box sx={{ mb: 2.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: brandColors.text }}>
+                    Payment Screenshot <span style={{ color: '#DC2626' }}>*</span>
+                  </Typography>
+                  <Chip label="Mandatory" size="small" color="primary" sx={{ height: 20, fontSize: '0.68rem', fontWeight: 700 }} />
                 </Box>
-              ) : (
-                <Box
-                  component="label"
-                  htmlFor="payment-screenshot-upload"
-                  sx={{
-                    p: 2.5,
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  id="payment-screenshot-upload"
+                />
+
+                {paymentScreenshot ? (
+                  <Box sx={{
+                    p: 2,
                     borderRadius: '14px',
-                    border: `2px dashed ${alpha(brandColors.primary, 0.4)}`,
-                    backgroundColor: alpha(brandColors.primary, 0.02),
-                    cursor: 'pointer',
+                    border: `2px solid ${brandColors.success}`,
+                    backgroundColor: alpha(brandColors.success, 0.04),
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 1,
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      backgroundColor: alpha(brandColors.primary, 0.06),
-                      borderColor: brandColors.primary
+                    justifyContent: 'space-between',
+                    gap: 1.5
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
+                      <Box component="img" src={paymentScreenshot} alt="Screenshot" sx={{ width: 48, height: 48, borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
+                      <Box sx={{ overflow: 'hidden' }}>
+                        <Typography noWrap variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.85rem' }}>
+                          {fileName || 'Screenshot Uploaded'}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: brandColors.success, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.2 }}>
+                          <FiCheck size={12} /> Ready for verification
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <IconButton onClick={handleRemoveScreenshot} color="error" size="small" title="Remove screenshot">
+                      <FiTrash2 size={18} />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <Box
+                    component="label"
+                    htmlFor="payment-screenshot-upload"
+                    sx={{
+                      p: 3,
+                      borderRadius: '14px',
+                      border: `2px dashed ${alpha(brandColors.primary, 0.35)}`,
+                      backgroundColor: alpha(brandColors.primary, 0.02),
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 1,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        backgroundColor: alpha(brandColors.primary, 0.05),
+                        borderColor: brandColors.primary
+                      }
+                    }}
+                  >
+                    <FiUploadCloud size={30} color={brandColors.primary} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.primary, textAlign: 'center' }}>
+                      Upload Payment Screenshot
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: brandColors.muted, textAlign: 'center' }}>
+                      Click or drag screenshot here (PNG, JPG, WebP)
+                    </Typography>
+                  </Box>
+                )}
+
+                {uploadError && (
+                  <Typography variant="caption" sx={{ color: '#DC2626', mt: 0.8, display: 'block', fontWeight: 600 }}>
+                    {uploadError}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Optional Transaction Ref (No longer mandatory) */}
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.text }}>
+                    Transaction Ref / UTR
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 500 }}>
+                    Optional
+                  </Typography>
+                </Box>
+                <TextField
+                  placeholder="e.g. 12-digit UTR from GPay / PhonePe"
+                  fullWidth
+                  size="small"
+                  value={upiRef}
+                  onChange={e => onChangeUpiRef(e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      fontSize: '0.875rem'
                     }
                   }}
-                >
-                  <FiUploadCloud size={28} color={brandColors.primary} />
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: brandColors.primary, textAlign: 'center' }}>
-                    Click or Drag to Upload Payment Screenshot
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: brandColors.muted, textAlign: 'center' }}>
-                    Supports PNG, JPG, JPEG, WebP (Max 5MB)
-                  </Typography>
-                </Box>
-              )}
-
-              {uploadError && (
-                <Typography variant="caption" sx={{ color: '#DC2626', mt: 0.5, display: 'block', fontWeight: 600 }}>
-                  {uploadError}
-                </Typography>
-              )}
+                />
+              </Box>
             </Box>
 
-            {/* Validation Notice if button disabled */}
-            {!canSubmit && (
-              <Alert icon={<FiAlertCircle />} severity="warning" sx={{ width: '100%', mb: 2, borderRadius: '12px', fontSize: '0.8rem', py: 0.5 }}>
-                Fill UTR number & upload screenshot to proceed.
-              </Alert>
-            )}
+            {/* Submission Section */}
+            <Box sx={{ mt: 2 }}>
+              {!canSubmit && (
+                <Alert severity="info" sx={{ mb: 2, borderRadius: '12px', fontSize: '0.8rem', py: 0.5 }}>
+                  Please upload your payment screenshot to proceed.
+                </Alert>
+              )}
 
-            <Button
-              variant="contained"
-              size="large"
-              fullWidth
-              onClick={onSubmitBooking}
-              disabled={!canSubmit || isSubmitting}
-              startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <FiCheckCircle />}
-              sx={{
-                py: 1.8,
-                borderRadius: '14px',
-                fontWeight: 800,
-                fontSize: { xs: '0.875rem', sm: '0.975rem' },
-                textTransform: 'none',
-                backgroundColor: brandColors.primary,
-                boxShadow: canSubmit ? '0 8px 24px rgba(10,102,194,0.3)' : 'none',
-                '&:hover': { backgroundColor: '#084e96' }
-              }}
-            >
-              {isSubmitting ? 'Submitting Booking...' : 'Confirm Payment & Submit Booking'}
-            </Button>
+              <Button
+                variant="contained"
+                size="large"
+                fullWidth
+                onClick={onSubmitBooking}
+                disabled={!canSubmit || isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <FiCheckCircle />}
+                sx={{
+                  py: 1.6,
+                  borderRadius: '14px',
+                  fontWeight: 800,
+                  fontSize: { xs: '0.9rem', sm: '1rem' },
+                  textTransform: 'none',
+                  backgroundColor: brandColors.primary,
+                  boxShadow: canSubmit ? '0 8px 24px rgba(10,102,194,0.25)' : 'none',
+                  '&:hover': { backgroundColor: '#084e96' }
+                }}
+              >
+                {isSubmitting ? 'Submitting Booking...' : 'Confirm Payment & Submit Booking'}
+              </Button>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mt: 2, color: brandColors.muted }}>
-              <FiShield color={brandColors.success} size={15} />
-              <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.text, fontSize: '0.75rem' }}>
-                Screenshot sent to brandit.get@gmail.com for instant verification
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.8, mt: 1.8, color: brandColors.muted }}>
+                <FiShield color={brandColors.success} size={15} />
+                <Typography variant="caption" sx={{ fontWeight: 600, color: brandColors.muted, fontSize: '0.75rem' }}>
+                  Secure payment • Manual verification within 24 hours
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </Grid>
