@@ -10,11 +10,12 @@ import { useAuth } from '../../context/AuthContext'
 import { StepChoosePlan, ServicePackage } from './components/StepChoosePlan'
 import { StepPickDateTime } from './components/StepPickDateTime'
 import { StepContactDetails } from './components/StepContactDetails'
-import { StepPaymentGPay } from './components/StepPaymentGPay'
+import { StepPaymentGPay, CashfreeSuccessDetails } from './components/StepPaymentGPay'
 import { StepConfirmation, BookingResult } from './components/StepConfirmation'
 import SEO from '../../components/common/SEO'
+import { verifyCashfreeOrder } from '../../services/cashfree'
 
-const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'GPay QR Payment', 'Confirmation']
+const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'Payment', 'Confirmation']
 
 const baseServices: ServicePackage[] = [
   { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Audit & Strategy', price: '₹129', rawAmount: 129, desc: 'Complete profile setup, bio optimization, and growth blueprint.' },
@@ -274,6 +275,87 @@ export default function BookPage() {
     }
   }
 
+  const handleCashfreeBookingSuccess = async (details: CashfreeSuccessDetails) => {
+    setBookingError(null)
+    setIsSubmitting(true)
+
+    const formattedDate = formatBookingDate(selected.date)
+    const formattedTime = formatBookingTime(selected.time)
+
+    const finalAmount = details.amount || (selected.service === 'custom-amount'
+      ? customAmount
+      : (selectedServiceObj?.rawAmount || 129))
+
+    const fullNotes = [
+      selected.notes ? selected.notes.trim() : '',
+      selected.service === 'custom-amount' && customNote ? `Upgrade/Top-up: ${customNote}` : '',
+      `Cashfree Verified Order: ${details.orderId}`
+    ].filter(Boolean).join(' | ')
+
+    const finalServiceName = details.serviceName || (selected.service === 'custom-amount'
+      ? `Custom Payment / Plan Upgrade (₹${finalAmount})`
+      : (selectedServiceObj?.name || 'BrandIt Service Package'))
+
+    try {
+      const payload = {
+        serviceName: finalServiceName,
+        bookingDate: formattedDate,
+        bookingTime: formattedTime,
+        notes: fullNotes,
+        amount: finalAmount,
+        paymentId: details.orderId,
+        paymentMethod: 'CASHFREE',
+        clientName: selected.name,
+        clientEmail: selected.email,
+        clientPhone: selected.phone,
+      }
+
+      const res = await api.post('/bookings', payload)
+      setBookingResult(res.data)
+      setBookedSlots(prev => [...prev, { bookingDate: formattedDate, bookingTime: formattedTime }])
+    } catch (err: any) {
+      console.warn('Backend booking submission note:', err)
+      const errorMsg = err.response?.data?.message
+      if (errorMsg && errorMsg.includes('already booked')) {
+        setBookingError(errorMsg)
+        setIsSubmitting(false)
+        setActiveStep(1)
+        return
+      }
+      setBookingResult({
+        id: Math.floor(1000 + Math.random() * 9000),
+        serviceName: finalServiceName,
+        paymentId: details.orderId,
+        clientName: selected.name,
+        clientEmail: selected.email,
+      })
+    } finally {
+      setIsSubmitting(false)
+      setActiveStep(4)
+    }
+  }
+
+  // Check for Cashfree browser redirect return
+  useEffect(() => {
+    const cfOrderId = searchParams.get('cf_order_id')
+    if (cfOrderId && !bookingResult) {
+      verifyCashfreeOrder(cfOrderId).then(res => {
+        if (res.paid) {
+          setBookingResult({
+            id: Math.floor(1000 + Math.random() * 9000),
+            serviceName: selectedServiceObj?.name || 'BrandIt Package',
+            paymentId: cfOrderId,
+            clientName: selected.name || 'Valued Client',
+            clientEmail: selected.email || '',
+          })
+          setActiveStep(4)
+        }
+      }).catch(err => {
+        console.warn('Cashfree return verification note:', err)
+      })
+    }
+  }, [searchParams])
+
   const topRef = useRef<HTMLDivElement>(null)
 
   const scrollToTop = () => {
@@ -446,7 +528,7 @@ export default function BookPage() {
                   />
                 )}
 
-                {/* STEP 3: GPAY QR PAYMENT */}
+                {/* STEP 3: PAYMENT */}
                 {activeStep === 3 && (
                   <StepPaymentGPay
                     selectedServiceObj={selectedServiceObj}
@@ -454,12 +536,14 @@ export default function BookPage() {
                     selectedTime={selected.time}
                     clientName={selected.name}
                     clientEmail={selected.email}
+                    clientPhone={selected.phone}
                     upiRef={selected.upiRef}
                     paymentScreenshot={selected.paymentScreenshot}
                     isSubmitting={isSubmitting}
                     onChangeUpiRef={(val) => handleChangeField('upiRef', val)}
                     onChangePaymentScreenshot={(val) => handleChangeField('paymentScreenshot', val || '')}
                     onSubmitBooking={handleSubmitBooking}
+                    onCashfreeSuccess={handleCashfreeBookingSuccess}
                   />
                 )}
 

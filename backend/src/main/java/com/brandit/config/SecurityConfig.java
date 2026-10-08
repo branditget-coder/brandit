@@ -75,7 +75,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/public/live-visitors").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/public/bookings/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/bookings/public/**").permitAll()
-                .requestMatchers("/api/payments/create-session", "/api/payments/webhook").permitAll()
+                .requestMatchers("/api/payments/**").permitAll()
                 // Diagnostics & Health
                 .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
                 .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()

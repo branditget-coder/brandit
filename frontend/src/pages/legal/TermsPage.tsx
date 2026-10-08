@@ -46,7 +46,7 @@ export function TermsPage() {
 
           <Section title="3. Pricing, Billing & Payment Processing">
             <Typography variant="body1" sx={{ lineHeight: 1.8, color: brandColors.muted }}>
-              All prices are listed in INR. Payments are securely processed via authorized payment gateway partners (PayU / Stripe / Razorpay). By initiating a transaction, you authorize us to charge your selected payment instrument (Credit Card, Debit Card, Net Banking, UPI, or Wallet) for the agreed package amount.
+              All prices are listed in INR. Payments are securely processed via authorized payment gateway partners (Cashfree Payments India Pvt. Ltd.). By initiating a transaction, you authorize us to charge your selected payment instrument (Credit Card, Debit Card, Net Banking, UPI, or Wallet) for the agreed package amount.
             </Typography>
           </Section>
 

@@ -31,7 +31,7 @@ export default function RefundPage() {
             },
             {
               title: '3. Refund Mode & Processing Timeline',
-              body: 'All approved refunds will be credited back to the customer’s original mode of payment (Credit Card, Debit Card, Net Banking, UPI, or Wallet) via PayU Payment Gateway. Refunds are processed within 5 to 7 working days from the date of refund approval.'
+              body: 'All approved refunds will be credited back to the customer’s original mode of payment (Credit Card, Debit Card, Net Banking, UPI, or Wallet) via Cashfree Payment Gateway. Refunds are processed within 5 to 7 working days from the date of refund approval.'
             },
             {
               title: '4. Service Revisions & Support Guarantee',

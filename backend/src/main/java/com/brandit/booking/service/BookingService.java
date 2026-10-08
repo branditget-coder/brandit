@@ -27,6 +27,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final UserActivityLogRepository activityLogRepository;
     private final EmailService emailService;
+    private final com.brandit.payment.service.CashfreeService cashfreeService;
 
     @Transactional
     public BookingResponse createBooking(String userEmail, CreateBookingRequest request) {
@@ -37,6 +38,33 @@ public class BookingService {
             );
             if (alreadyBooked) {
                 throw new com.brandit.common.exception.DuplicateResourceException("This date and time slot (" + request.getBookingDate() + " at " + request.getBookingTime() + ") is already booked by another client. Please select a different slot.");
+            }
+        }
+
+        // Validate & verify Cashfree payment gateway transactions
+        if ("CASHFREE".equalsIgnoreCase(request.getPaymentMethod())) {
+            String paymentId = request.getPaymentId();
+            if (paymentId == null || paymentId.isBlank()) {
+                throw new IllegalArgumentException("Cashfree payment reference ID is required.");
+            }
+
+            // 1. Idempotency & Replay prevention: check if this order was already registered
+            java.util.Optional<Booking> existing = bookingRepository.findFirstByPaymentIdOrderByCreatedAtDesc(paymentId.trim());
+            if (existing.isPresent() && existing.get().getStatus() != Booking.Status.CANCELLED) {
+                return mapToResponse(existing.get());
+            }
+
+            // 2. Server-to-server verification with Cashfree API
+            var cfDetails = cashfreeService.verifyOrder(paymentId.trim());
+            if (!cfDetails.isPaid()) {
+                throw new IllegalArgumentException("Payment verification failed: Cashfree order " + paymentId + " has status '" + cfDetails.getOrderStatus() + "' and is not completed.");
+            }
+
+            // 3. Amount verification to prevent price tampering
+            if (request.getAmount() != null && cfDetails.getAmount() != null) {
+                if (cfDetails.getAmount().compareTo(request.getAmount()) < 0) {
+                    throw new IllegalArgumentException("Payment amount mismatch: Verified paid amount ₹" + cfDetails.getAmount() + " is less than package required amount ₹" + request.getAmount());
+                }
             }
         }
 
@@ -107,6 +135,110 @@ public class BookingService {
                 request.getPaymentScreenshot(),
                 saved.getId()
         );
+
+        return mapToResponse(saved);
+    }
+
+    @Transactional
+    public BookingResponse createCashfreeBookingAutomatically(
+            String orderId,
+            String clientEmail,
+            String clientName,
+            String clientPhone,
+            String serviceName,
+            String bookingDateStr,
+            String bookingTimeStr,
+            BigDecimal amount,
+            String notes
+    ) {
+        if (orderId == null || orderId.isBlank()) return null;
+
+        // Check if already created
+        java.util.Optional<Booking> existing = bookingRepository.findFirstByPaymentIdOrderByCreatedAtDesc(orderId.trim());
+        if (existing.isPresent() && existing.get().getStatus() != Booking.Status.CANCELLED) {
+            return mapToResponse(existing.get());
+        }
+
+        // Resolve user or fallback to system admin
+        String emailToUse = (clientEmail != null && !clientEmail.isBlank())
+                ? clientEmail.trim().toLowerCase()
+                : "client@go-brandit.com";
+
+        User user = userRepository.findByEmailIgnoreCase(emailToUse)
+                .orElseGet(() -> userRepository.findAll().stream().findFirst().orElse(null));
+
+        if (user == null) {
+            return null;
+        }
+
+        LocalDate dateToUse = LocalDate.now().plusDays(1);
+        if (bookingDateStr != null && !bookingDateStr.isBlank()) {
+            try {
+                dateToUse = LocalDate.parse(bookingDateStr.trim());
+            } catch (Exception ignored) {}
+        }
+
+        LocalTime timeToUse = LocalTime.of(10, 0);
+        if (bookingTimeStr != null && !bookingTimeStr.isBlank()) {
+            try {
+                String cleanTime = bookingTimeStr.trim();
+                if (cleanTime.length() == 5) cleanTime += ":00";
+                timeToUse = LocalTime.parse(cleanTime);
+            } catch (Exception ignored) {}
+        }
+
+        BigDecimal amountToUse = (amount != null && amount.compareTo(BigDecimal.ZERO) > 0)
+                ? amount
+                : new BigDecimal("129.00");
+
+        Booking booking = Booking.builder()
+                .user(user)
+                .serviceName(serviceName != null && !serviceName.isBlank() ? serviceName : "BrandIt Consultation Package")
+                .bookingDate(dateToUse)
+                .bookingTime(timeToUse)
+                .notes(notes != null ? notes : "Auto-generated from verified Cashfree transaction")
+                .amount(amountToUse)
+                .paymentId(orderId.trim())
+                .paymentMethod("CASHFREE")
+                .status(Booking.Status.CONFIRMED)
+                .distributed(false)
+                .build();
+
+        Booking saved = bookingRepository.save(booking);
+
+        activityLogRepository.save(UserActivityLog.builder()
+                .user(user)
+                .action("BOOKING_AUTO_CREATED_CASHFREE")
+                .metadataJson("Auto-confirmed booking for order " + orderId + " | Amount: ₹" + saved.getAmount())
+                .build());
+
+        try {
+            String recipientName = (clientName != null && !clientName.isBlank()) ? clientName : user.getFullName();
+            String priceStr = "₹" + saved.getAmount();
+
+            emailService.sendBookingConfirmation(
+                    emailToUse,
+                    recipientName,
+                    saved.getServiceName(),
+                    saved.getBookingDate().toString(),
+                    saved.getBookingTime().toString(),
+                    priceStr,
+                    saved.getPaymentId()
+            );
+
+            emailService.sendPaymentVerificationAdminNotification(
+                    recipientName,
+                    emailToUse,
+                    clientPhone,
+                    saved.getServiceName(),
+                    saved.getBookingDate().toString(),
+                    saved.getBookingTime().toString(),
+                    priceStr,
+                    saved.getPaymentId(),
+                    null,
+                    saved.getId()
+            );
+        } catch (Exception ignored) {}
 
         return mapToResponse(saved);
     }

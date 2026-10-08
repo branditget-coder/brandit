@@ -52,7 +52,7 @@ export default function PrivacyPage() {
 
           <Section title="4. Payment Security & Third-Party Processors">
             <Typography variant="body1" sx={{ lineHeight: 1.8, color: brandColors.muted }}>
-              All payment transactions are securely encrypted and processed by PCI-DSS compliant payment gateways (PayU Payments Private Limited / Stripe / Razorpay). BrandIt does NOT store sensitive card numbers, CVVs, or NetBanking passwords on our servers.
+              All payment transactions are securely encrypted and processed by PCI-DSS compliant payment gateways (Cashfree Payments India Pvt. Ltd. / Stripe / Razorpay). BrandIt does NOT store sensitive card numbers, CVVs, or NetBanking passwords on our servers.
             </Typography>
           </Section>
 
