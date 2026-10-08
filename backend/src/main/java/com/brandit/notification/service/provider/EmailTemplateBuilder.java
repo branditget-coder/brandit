@@ -121,10 +121,11 @@ public class EmailTemplateBuilder {
     public String buildBookingTemplate(String clientName, String serviceName, String bookingDate, String bookingTime, String price, String paymentId, String frontendUrl) {
         String dashboardLink = cleanUrl(frontendUrl) + "/dashboard";
         String txnRef = (paymentId != null && !paymentId.isBlank()) ? escape(paymentId) : "CONFIRMED";
+        boolean isCashfree = paymentId != null && paymentId.startsWith("order_cf_");
 
         return wrapHtmlTemplate("Booking Confirmation",
                 "<h2 style='color:#111827; margin-top:0; font-size:20px;'>Booking Confirmed, " + escape(clientName) + "! ✅</h2>" +
-                "<p>Your consultation booking with BrandIt has been successfully processed. Here is your official booking summary:</p>" +
+                "<p>Your consultation booking with BrandIt has been successfully processed and confirmed. Here is your official booking summary:</p>" +
 
                 "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                 "  <h3 style='margin:0 0 16px 0; color:#0A66C2; font-size:16px; border-bottom:1px solid #E2E8F0; padding-bottom:8px;'>📋 Booking Summary</h3>" +
@@ -136,7 +137,7 @@ public class EmailTemplateBuilder {
 
                 "  <div style='margin-bottom:12px;'>" +
                 "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Amount Paid</div>" +
-                "    <div style='font-size:15px; font-weight:700; color:#16A34A; margin-top:2px;'>" + escape(price) + "</div>" +
+                "    <div style='font-size:15px; font-weight:700; color:#16A34A; margin-top:2px;'>" + escape(price) + (isCashfree ? " <span style='font-size:12px; color:#059669; font-weight:600;'>(Paid via Cashfree)</span>" : "") + "</div>" +
                 "  </div>" +
 
                 "  <div style='margin-bottom:12px;'>" +
@@ -144,8 +145,13 @@ public class EmailTemplateBuilder {
                 "    <div style='font-size:15px; font-weight:700; color:#111827; margin-top:2px;'>" + escape(bookingDate) + " • " + escape(bookingTime) + " IST</div>" +
                 "  </div>" +
 
+                "  <div style='margin-bottom:12px;'>" +
+                "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Payment Status</div>" +
+                "    <div style='font-size:14px; font-weight:700; color:#10B981; margin-top:2px;'>✓ Paid &amp; Confirmed</div>" +
+                "  </div>" +
+
                 "  <div>" +
-                "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Transaction Ref</div>" +
+                "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>" + (isCashfree ? "Cashfree Order ID" : "Transaction Ref") + "</div>" +
                 "    <div style='font-size:13px; font-weight:600; font-family:monospace; color:#374151; margin-top:2px; word-break:break-all;'>" + txnRef + "</div>" +
                 "  </div>" +
                 "</div>" +
@@ -231,8 +237,36 @@ public class EmailTemplateBuilder {
                                                          String price, String upiRef, String screenshotBase64,
                                                          Long bookingId, String frontendUrl) {
         String baseUrl = cleanUrl(frontendUrl);
-        String imageUrl = null;
+        boolean isCashfree = (upiRef != null && upiRef.startsWith("order_cf_")) || (screenshotBase64 == null || screenshotBase64.isBlank());
 
+        if (isCashfree) {
+            String orderIdStr = (upiRef != null && !upiRef.isBlank()) ? escape(upiRef) : "CASHFREE_VERIFIED";
+            return wrapHtmlTemplate("New Booking Confirmed (Cashfree)",
+                    "<h2 style='color:#111827; margin-top:0; font-size:20px;'>🎉 New Booking Confirmed — Cashfree Payment</h2>" +
+                    "<p>A client has completed payment online via Cashfree Payment Gateway. The booking has been automatically confirmed:</p>" +
+
+                    "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
+                    "  <h3 style='margin:0 0 12px 0; color:#0A66C2; font-size:16px; border-bottom:1px solid #E2E8F0; padding-bottom:8px;'>👤 Client Details</h3>" +
+                    "  <p style='margin:4px 0;'><strong>Client Name:</strong> " + escape(clientName) + "</p>" +
+                    "  <p style='margin:4px 0; word-break:break-all;'><strong>Client Email:</strong> " + escape(clientEmail) + "</p>" +
+                    "  <p style='margin:4px 0;'><strong>Client Phone:</strong> " + (clientPhone != null ? escape(clientPhone) : "N/A") + "</p>" +
+                    "</div>" +
+
+                    "<div class='card' style='background-color:#ECFDF5; border:1px solid #A7F3D0; border-radius:12px; padding:18px 20px; margin:20px 0; color:#065F46; box-sizing:border-box; word-break:break-word;'>" +
+                    "  <h3 style='margin:0 0 12px 0; color:#065F46; font-size:16px; border-bottom:1px solid #A7F3D0; padding-bottom:8px;'>📌 Payment & Booking Info</h3>" +
+                    "  <p style='margin:4px 0;'><strong>Service Package:</strong> " + escape(serviceName) + "</p>" +
+                    "  <p style='margin:4px 0;'><strong>Amount Paid:</strong> " + escape(price) + "</p>" +
+                    "  <p style='margin:4px 0;'><strong>Scheduled Slot:</strong> " + escape(bookingDate) + " @ " + escape(bookingTime) + " IST</p>" +
+                    "  <p style='margin:4px 0;'><strong>Payment Status:</strong> <span style='background:#10B981; color:#fff; font-weight:700; padding:2px 8px; border-radius:6px; font-size:12px;'>✓ PAID &amp; CONFIRMED</span></p>" +
+                    "  <p style='margin:8px 0 0 0; font-size:15px;'><strong>Cashfree Order ID:</strong> <span style='font-family:monospace; background-color:#FFFFFF; padding:4px 10px; border-radius:6px; border:1px solid #10B981; font-weight:800; color:#065F46; word-break:break-all;'>" + orderIdStr + "</span></p>" +
+                    "</div>" +
+
+                    "<div style='text-align:center; margin-top:20px;'>" +
+                    "  <a href='" + baseUrl + "/admin/bookings' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:12px 24px; border-radius:8px; font-weight:700; font-size:14px; text-align:center; font-family:sans-serif;'>View in Admin Panel &rarr;</a>" +
+                    "</div>", frontendUrl);
+        }
+
+        String imageUrl = null;
         if (screenshotBase64 != null && (screenshotBase64.startsWith("http://") || screenshotBase64.startsWith("https://"))) {
             imageUrl = screenshotBase64;
         } else if (bookingId != null) {
@@ -246,9 +280,7 @@ public class EmailTemplateBuilder {
             }
         }
 
-        boolean hasScreenshot = (imageUrl != null) || (screenshotBase64 != null && !screenshotBase64.isBlank());
-
-        String imageHtml;
+        String imageHtml = "";
         if (imageUrl != null) {
             imageHtml = "<div style='margin-top:20px; text-align:center; background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px; box-sizing:border-box;'>" +
                         "  <p style='font-weight:700; color:#111827; margin:0 0 12px 0; font-size:15px;'>📷 Uploaded Payment Proof Screenshot:</p>" +
@@ -259,10 +291,6 @@ public class EmailTemplateBuilder {
                         "    <a href='" + imageUrl + "' target='_blank' rel='noopener noreferrer' style='display:inline-block; background-color:#0A66C2; color:#FFFFFF !important; text-decoration:none !important; padding:8px 16px; border-radius:6px; font-weight:600; font-size:13px; font-family:sans-serif;'>🔍 Click to View / Download Full Screenshot</a>" +
                         "  </div>" +
                         "</div>";
-        } else if (hasScreenshot) {
-            imageHtml = "<div style='margin-top:16px; padding:12px; background:#F1F5F9; border-radius:8px; text-align:center;'><p style='color:#0A66C2; font-weight:700; margin:0;'>✓ Payment Screenshot Uploaded by Client (Ref: " + escape(upiRef) + ")</p></div>";
-        } else {
-            imageHtml = "<p style='color:#DC2626; font-weight:600; text-align:center;'>No screenshot image provided.</p>";
         }
 
         return wrapHtmlTemplate("New Payment Submitted for Verification",

@@ -180,19 +180,18 @@ public class EmailService {
                                                           String serviceName, String bookingDate, String bookingTime,
                                                           String price, String upiRef, String screenshotBase64,
                                                           Long bookingId) {
-        String subject = "💳 Payment Submitted: " + clientName + " (" + price + ") — Ref: " + upiRef;
+        boolean isCashfree = (upiRef != null && upiRef.startsWith("order_cf_")) || (screenshotBase64 == null || screenshotBase64.isBlank());
+        String subject = isCashfree
+                ? "🎉 New Paid Booking: " + clientName + " (" + price + ") — Cashfree"
+                : "💳 Payment Submitted: " + clientName + " (" + price + ") — Ref: " + upiRef;
+
         String htmlBody = templateBuilder.buildPaymentVerificationAdminTemplate(
                 clientName, clientEmail, clientPhone, serviceName, bookingDate, bookingTime, price, upiRef, screenshotBase64, bookingId, frontendUrl
         );
 
-        // 1. Send to Customer Acquisition, HR, and Admin Team
+        // Send to Customer Acquisition, HR, and Admin Team ONLY
         for (String teamEmail : TEAM_NOTIFICATION_EMAILS) {
             sendEmailSync(teamEmail, subject, htmlBody);
-        }
-
-        // 2. Send copy to the client who pays as instant receipt
-        if (clientEmail != null && !clientEmail.isBlank() && TEAM_NOTIFICATION_EMAILS.stream().noneMatch(e -> e.equalsIgnoreCase(clientEmail))) {
-            sendEmailSync(clientEmail, "Payment Submission Receipt — BrandIt (" + serviceName + ")", htmlBody);
         }
     }
 

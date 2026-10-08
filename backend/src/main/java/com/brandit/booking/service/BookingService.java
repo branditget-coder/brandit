@@ -119,22 +119,24 @@ public class BookingService {
             );
         }
 
-        // Trigger payment verification alert email to official BrandIt team and client
-        String clientPhone = (request.getClientPhone() != null && !request.getClientPhone().isBlank()) 
-                ? request.getClientPhone() 
-                : (user != null ? user.getPhone() : null);
-        emailService.sendPaymentVerificationAdminNotification(
-                recipientName,
-                recipientEmail,
-                clientPhone,
-                saved.getServiceName(),
-                saved.getBookingDate().toString(),
-                saved.getBookingTime().toString(),
-                priceStr,
-                saved.getPaymentId(),
-                request.getPaymentScreenshot(),
-                saved.getId()
-        );
+        // Only trigger manual verification alert if a payment screenshot was provided
+        if (request.getPaymentScreenshot() != null && !request.getPaymentScreenshot().isBlank()) {
+            String clientPhone = (request.getClientPhone() != null && !request.getClientPhone().isBlank()) 
+                    ? request.getClientPhone() 
+                    : (user != null ? user.getPhone() : null);
+            emailService.sendPaymentVerificationAdminNotification(
+                    recipientName,
+                    recipientEmail,
+                    clientPhone,
+                    saved.getServiceName(),
+                    saved.getBookingDate().toString(),
+                    saved.getBookingTime().toString(),
+                    priceStr,
+                    saved.getPaymentId(),
+                    request.getPaymentScreenshot(),
+                    saved.getId()
+            );
+        }
 
         return mapToResponse(saved);
     }
@@ -225,19 +227,6 @@ public class BookingService {
                     priceStr,
                     saved.getPaymentId()
             );
-
-            emailService.sendPaymentVerificationAdminNotification(
-                    recipientName,
-                    emailToUse,
-                    clientPhone,
-                    saved.getServiceName(),
-                    saved.getBookingDate().toString(),
-                    saved.getBookingTime().toString(),
-                    priceStr,
-                    saved.getPaymentId(),
-                    null,
-                    saved.getId()
-            );
         } catch (Exception ignored) {}
 
         return mapToResponse(saved);
@@ -266,18 +255,20 @@ public class BookingService {
                 latest.getPaymentId()
         );
 
-        emailService.sendPaymentVerificationAdminNotification(
-                recipientName,
-                recipientEmail,
-                clientPhone,
-                latest.getServiceName(),
-                latest.getBookingDate() != null ? latest.getBookingDate().toString() : "TBD",
-                latest.getBookingTime() != null ? latest.getBookingTime().toString() : "TBD",
-                priceStr,
-                latest.getPaymentId(),
-                latest.getPaymentScreenshot(),
-                latest.getId()
-        );
+        if (latest.getPaymentScreenshot() != null && !latest.getPaymentScreenshot().isBlank()) {
+            emailService.sendPaymentVerificationAdminNotification(
+                    recipientName,
+                    recipientEmail,
+                    clientPhone,
+                    latest.getServiceName(),
+                    latest.getBookingDate() != null ? latest.getBookingDate().toString() : "TBD",
+                    latest.getBookingTime() != null ? latest.getBookingTime().toString() : "TBD",
+                    priceStr,
+                    latest.getPaymentId(),
+                    latest.getPaymentScreenshot(),
+                    latest.getId()
+            );
+        }
 
         return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + latest.getId() + " (" + latest.getServiceName() + ")";
     }
@@ -305,18 +296,20 @@ public class BookingService {
                 booking.getPaymentId()
         );
 
-        emailService.sendPaymentVerificationAdminNotification(
-                recipientName,
-                recipientEmail,
-                clientPhone,
-                booking.getServiceName(),
-                booking.getBookingDate() != null ? booking.getBookingDate().toString() : "TBD",
-                booking.getBookingTime() != null ? booking.getBookingTime().toString() : "TBD",
-                priceStr,
-                booking.getPaymentId(),
-                booking.getPaymentScreenshot(),
-                booking.getId()
-        );
+        if (booking.getPaymentScreenshot() != null && !booking.getPaymentScreenshot().isBlank()) {
+            emailService.sendPaymentVerificationAdminNotification(
+                    recipientName,
+                    recipientEmail,
+                    clientPhone,
+                    booking.getServiceName(),
+                    booking.getBookingDate() != null ? booking.getBookingDate().toString() : "TBD",
+                    booking.getBookingTime() != null ? booking.getBookingTime().toString() : "TBD",
+                    priceStr,
+                    booking.getPaymentId(),
+                    booking.getPaymentScreenshot(),
+                    booking.getId()
+            );
+        }
 
         return "Successfully re-dispatched confirmation & payment alert emails for Booking #" + booking.getId() + " (" + booking.getServiceName() + ") to " + recipientEmail;
     }
