@@ -255,6 +255,18 @@ public class CashfreeService {
 
                 boolean isPaid = "PAID".equalsIgnoreCase(orderStatus);
 
+                String customerName = null;
+                String customerEmail = null;
+                String customerPhone = null;
+                String orderNote = root.has("order_note") ? root.get("order_note").asText() : "BrandIt Package";
+
+                if (root.has("customer_details")) {
+                    JsonNode cd = root.get("customer_details");
+                    if (cd.has("customer_name")) customerName = cd.get("customer_name").asText();
+                    if (cd.has("customer_email")) customerEmail = cd.get("customer_email").asText();
+                    if (cd.has("customer_phone")) customerPhone = cd.get("customer_phone").asText();
+                }
+
                 log.info("Cashfree Order {} verified. Status: {}, Paid: {}", returnedOrderId, orderStatus, isPaid);
 
                 return CashfreeOrderDetails.builder()
@@ -264,6 +276,10 @@ public class CashfreeService {
                         .isPaid(isPaid)
                         .amount(BigDecimal.valueOf(amount))
                         .currency(currency)
+                        .customerName(customerName)
+                        .customerEmail(customerEmail)
+                        .customerPhone(customerPhone)
+                        .orderNote(orderNote)
                         .rawResponse(response.body())
                         .build();
             } else {
@@ -324,6 +340,10 @@ public class CashfreeService {
         private boolean isPaid;
         private BigDecimal amount;
         private String currency;
+        private String customerName;
+        private String customerEmail;
+        private String customerPhone;
+        private String orderNote;
         private String rawResponse;
     }
 }

@@ -173,12 +173,17 @@ public class PaymentController {
                 if (orderId != null && !orderId.isBlank()) {
                     CashfreeOrderDetails cfDetails = cashfreeService.verifyOrder(orderId.trim());
                     if (cfDetails.isPaid()) {
+                        String clientName = cfDetails.getCustomerName() != null ? cfDetails.getCustomerName() : "BrandIt Client";
+                        String clientEmail = cfDetails.getCustomerEmail() != null ? cfDetails.getCustomerEmail() : "client@go-brandit.com";
+                        String clientPhone = cfDetails.getCustomerPhone();
+                        String serviceName = cfDetails.getOrderNote() != null ? cfDetails.getOrderNote() : "BrandIt Package";
+
                         bookingService.createCashfreeBookingAutomatically(
                                 cfDetails.getOrderId(),
-                                null,
-                                null,
-                                null,
-                                "BrandIt Package",
+                                clientName,
+                                clientEmail,
+                                clientPhone,
+                                serviceName,
                                 null,
                                 null,
                                 cfDetails.getAmount(),
