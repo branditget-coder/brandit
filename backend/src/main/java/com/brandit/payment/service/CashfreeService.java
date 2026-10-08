@@ -148,15 +148,14 @@ public class CashfreeService {
 
         Map<String, Object> orderMeta = new HashMap<>();
         orderMeta.put("return_url", returnUrl);
+        orderMeta.put("notify_url", "https://brandit-backend.onrender.com/api/payments/cashfree/webhook");
         payload.put("order_meta", orderMeta);
 
-        String orderNote = "BrandIt - " + (serviceName.length() > 40 ? serviceName.substring(0, 40) : serviceName);
+        String cleanServiceName = serviceName.replaceAll("[^a-zA-Z0-9 ]", " ").replaceAll(" +", " ").trim();
+        if (cleanServiceName.isBlank()) cleanServiceName = "BrandIt Package";
+        if (cleanServiceName.length() > 40) cleanServiceName = cleanServiceName.substring(0, 40);
+        String orderNote = "BrandIt - " + cleanServiceName;
         payload.put("order_note", orderNote);
-
-        Map<String, String> orderTags = new HashMap<>();
-        String tagCtx = "BrandIt " + serviceName;
-        orderTags.put("checkout_context", tagCtx.length() > 60 ? tagCtx.substring(0, 60) : tagCtx);
-        payload.put("order_tags", orderTags);
 
         try {
             String jsonBody = objectMapper.writeValueAsString(payload);
