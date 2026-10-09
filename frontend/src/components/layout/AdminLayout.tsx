@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   Box, Drawer, List, ListItem, ListItemButton, ListItemIcon,
   ListItemText, Typography, Avatar, Divider, IconButton, alpha,
-  AppBar, Toolbar, Chip, CircularProgress, Alert
+  AppBar, Toolbar, Chip, CircularProgress, Alert, Button
 } from '@mui/material'
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -30,6 +30,7 @@ export default function AdminLayout() {
   const { user, isAuthenticated, isLoading, logout } = useAuth()
 
   const isAdmin = user && (user.role === 'ADMIN' || user.email === 'raghavdhir1510@gmail.com')
+  const adminInitials = user ? `${user.firstName?.[0] || 'A'}${user.lastName?.[0] || ''}`.toUpperCase() || 'AD' : 'RD'
 
   useEffect(() => {
     if (!isLoading) {
@@ -120,7 +121,7 @@ export default function AdminLayout() {
 
       <Box sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, p: 1.5, borderRadius: '14px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}`, width: '100%', overflow: 'hidden' }}>
-          <Avatar sx={{ width: 34, height: 34, flexShrink: 0, bgcolor: brandColors.primary, color: '#fff', fontSize: '0.8rem', fontWeight: 700 }}>RD</Avatar>
+          <Avatar sx={{ width: 34, height: 34, flexShrink: 0, bgcolor: brandColors.primary, color: '#fff', fontSize: '0.8rem', fontWeight: 700 }}>{adminInitials}</Avatar>
           <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
             <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.78rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user ? `${user.firstName} ${user.lastName}` : 'Raghav Dhir'}
@@ -209,14 +210,59 @@ export default function AdminLayout() {
       <Box sx={{ flexGrow: 1, minWidth: 0, overflowX: 'hidden', position: 'relative', zIndex: 1 }}>
         <AppBar position="sticky" elevation={0} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)', borderBottom: `1px solid rgba(229, 231, 235, 0.8)`, color: brandColors.text, boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.03)' }}>
           <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 } }}>
-            <IconButton sx={{ display: { md: 'none' } }} onClick={() => setMobileOpen(true)} aria-label="Open menu">
-              <FiMenu size={20} />
-            </IconButton>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <IconButton sx={{ display: { md: 'none' } }} onClick={() => setMobileOpen(true)} aria-label="Open menu">
+                <FiMenu size={20} />
+              </IconButton>
               <Chip label="Admin Portal" color="primary" size="small" sx={{ fontWeight: 700, borderRadius: '8px' }} />
-              <Typography variant="caption" sx={{ color: brandColors.muted }}>
+              <Typography variant="caption" sx={{ color: brandColors.muted, display: { xs: 'none', sm: 'inline' } }}>
                 Authorized for {user?.email}
               </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Button
+                component={RouterLink}
+                to="/"
+                size="small"
+                variant="text"
+                sx={{
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  color: brandColors.primary,
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  textTransform: 'none',
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: '8px',
+                  '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) }
+                }}
+              >
+                View Website &rarr;
+              </Button>
+              <Button
+                size="small"
+                onClick={handleLogout}
+                startIcon={<FiLogOut size={15} />}
+                sx={{
+                  color: '#EF4444',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  textTransform: 'none',
+                  px: 1.8,
+                  py: 0.6,
+                  borderRadius: '100px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.06)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(239, 68, 68, 0.14)',
+                    borderColor: '#EF4444',
+                  }
+                }}
+              >
+                Log Out
+              </Button>
             </Box>
           </Toolbar>
         </AppBar>

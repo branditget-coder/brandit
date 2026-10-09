@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   Box, Drawer, List, ListItem, ListItemButton, ListItemIcon,
   ListItemText, Typography, Avatar, Divider, IconButton,
-  useMediaQuery, useTheme, alpha, AppBar, Toolbar
+  useMediaQuery, useTheme, alpha, AppBar, Toolbar, Button, Chip
 } from '@mui/material'
 import { Outlet, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -208,7 +208,57 @@ export default function DashboardLayout() {
             >
               <FiMenu size={20} />
             </IconButton>
-            <Box />
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, ml: 'auto' }}>
+              <Button
+                component={RouterLink}
+                to="/"
+                size="small"
+                variant="text"
+                sx={{
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  color: brandColors.primary,
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  textTransform: 'none',
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: '8px',
+                  '&:hover': { backgroundColor: alpha(brandColors.primary, 0.08) }
+                }}
+              >
+                View Website &rarr;
+              </Button>
+              <Chip
+                avatar={<Avatar src={user?.avatarUrl} sx={{ bgcolor: brandColors.primary, color: '#fff', fontWeight: 700 }}>{userInitials}</Avatar>}
+                label={userName}
+                size="small"
+                sx={{ fontWeight: 700, backgroundColor: 'rgba(241, 245, 249, 0.9)', display: { xs: 'none', sm: 'inline-flex' } }}
+              />
+              <Button
+                size="small"
+                onClick={handleLogout}
+                startIcon={<FiLogOut size={15} />}
+                sx={{
+                  color: '#EF4444',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  textTransform: 'none',
+                  px: 1.8,
+                  py: 0.6,
+                  borderRadius: '100px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.06)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(239, 68, 68, 0.14)',
+                    borderColor: '#EF4444',
+                  }
+                }}
+              >
+                Log Out
+              </Button>
+            </Box>
           </Toolbar>
         </AppBar>
 

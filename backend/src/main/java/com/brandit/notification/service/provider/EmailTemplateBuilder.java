@@ -137,7 +137,7 @@ public class EmailTemplateBuilder {
 
                 "  <div style='margin-bottom:12px;'>" +
                 "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>Amount Paid</div>" +
-                "    <div style='font-size:15px; font-weight:700; color:#16A34A; margin-top:2px;'>" + escape(price) + (isCashfree ? " <span style='font-size:12px; color:#059669; font-weight:600;'>(Paid via Cashfree)</span>" : "") + "</div>" +
+                "    <div style='font-size:15px; font-weight:700; color:#16A34A; margin-top:2px;'>" + escape(price) + (isCashfree ? " <span style='font-size:12px; color:#059669; font-weight:600;'>(Paid Online)</span>" : "") + "</div>" +
                 "  </div>" +
 
                 "  <div style='margin-bottom:12px;'>" +
@@ -151,7 +151,7 @@ public class EmailTemplateBuilder {
                 "  </div>" +
 
                 "  <div>" +
-                "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>" + (isCashfree ? "Cashfree Order ID" : "Transaction Ref") + "</div>" +
+                "    <div style='font-size:12px; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.04em;'>" + (isCashfree ? "Payment Order ID" : "Transaction Ref") + "</div>" +
                 "    <div style='font-size:13px; font-weight:600; font-family:monospace; color:#374151; margin-top:2px; word-break:break-all;'>" + txnRef + "</div>" +
                 "  </div>" +
                 "</div>" +
@@ -241,9 +241,9 @@ public class EmailTemplateBuilder {
 
         if (isCashfree) {
             String orderIdStr = (upiRef != null && !upiRef.isBlank()) ? escape(upiRef) : "CASHFREE_VERIFIED";
-            return wrapHtmlTemplate("New Booking Confirmed (Cashfree)",
-                    "<h2 style='color:#111827; margin-top:0; font-size:20px;'>🎉 New Booking Confirmed — Cashfree Payment</h2>" +
-                    "<p>A client has completed payment online via Cashfree Payment Gateway. The booking has been automatically confirmed:</p>" +
+            return wrapHtmlTemplate("New Booking Confirmed (Online Payment)",
+                    "<h2 style='color:#111827; margin-top:0; font-size:20px;'>🎉 New Booking Confirmed — Online Payment</h2>" +
+                    "<p>A client has completed payment online via secure payment gateway. The booking has been automatically confirmed:</p>" +
 
                     "<div class='card' style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:18px 20px; margin:20px 0; box-sizing:border-box; word-break:break-word;'>" +
                     "  <h3 style='margin:0 0 12px 0; color:#0A66C2; font-size:16px; border-bottom:1px solid #E2E8F0; padding-bottom:8px;'>👤 Client Details</h3>" +
@@ -258,7 +258,7 @@ public class EmailTemplateBuilder {
                     "  <p style='margin:4px 0;'><strong>Amount Paid:</strong> " + escape(price) + "</p>" +
                     "  <p style='margin:4px 0;'><strong>Scheduled Slot:</strong> " + escape(bookingDate) + " @ " + escape(bookingTime) + " IST</p>" +
                     "  <p style='margin:4px 0;'><strong>Payment Status:</strong> <span style='background:#10B981; color:#fff; font-weight:700; padding:2px 8px; border-radius:6px; font-size:12px;'>✓ PAID &amp; CONFIRMED</span></p>" +
-                    "  <p style='margin:8px 0 0 0; font-size:15px;'><strong>Cashfree Order ID:</strong> <span style='font-family:monospace; background-color:#FFFFFF; padding:4px 10px; border-radius:6px; border:1px solid #10B981; font-weight:800; color:#065F46; word-break:break-all;'>" + orderIdStr + "</span></p>" +
+                    "  <p style='margin:8px 0 0 0; font-size:15px;'><strong>Payment Order ID:</strong> <span style='font-family:monospace; background-color:#FFFFFF; padding:4px 10px; border-radius:6px; border:1px solid #10B981; font-weight:800; color:#065F46; word-break:break-all;'>" + orderIdStr + "</span></p>" +
                     "</div>" +
 
                     "<div style='text-align:center; margin-top:20px;'>" +

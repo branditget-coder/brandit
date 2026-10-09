@@ -33,6 +33,34 @@ export function StepConfirmation({
   selectedServiceObj,
   bookingResult
 }: StepConfirmationProps) {
+  const isOnlinePayment = Boolean(
+    bookingResult?.paymentId &&
+    !upiRef &&
+    !bookingResult.paymentId.startsWith('GPAY_SCAN_') &&
+    !bookingResult.paymentId.startsWith('UPI_')
+  )
+
+  const receiptRows = isOnlinePayment
+    ? [
+        { label: 'BOOKING REFERENCE', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
+        { label: 'SERVICE PACKAGE', value: selectedServiceObj?.id === 'branding-network' ? `${selectedServiceObj?.name} (★ Best Seller)` : selectedServiceObj?.name },
+        { label: 'AMOUNT PAID', value: selectedServiceObj?.price },
+        { label: 'PAYMENT STATUS', value: '✓ Paid & Verified Online' },
+        { label: 'PAYMENT METHOD', value: 'Online Payment (Instant Verification)' },
+        { label: 'TRANSACTION / ORDER ID', value: bookingResult?.paymentId },
+        { label: 'SCHEDULED SLOT', value: `${selectedDate} @ ${selectedTime} IST` },
+        { label: 'CLIENT EMAIL', value: clientEmail },
+      ]
+    : [
+        { label: 'BOOKING REFERENCE', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
+        { label: 'SERVICE PACKAGE', value: selectedServiceObj?.id === 'branding-network' ? `${selectedServiceObj?.name} (★ Best Seller)` : selectedServiceObj?.name },
+        { label: 'AMOUNT PAYABLE', value: selectedServiceObj?.price },
+        { label: 'PAYMENT METHOD', value: 'GPay QR Code (Manual Verification)' },
+        { label: 'PAYMENT REF / UTR', value: upiRef || bookingResult?.paymentId || 'Direct GPay Scan' },
+        { label: 'SCHEDULED SLOT', value: `${selectedDate} @ ${selectedTime} IST` },
+        { label: 'CLIENT EMAIL', value: clientEmail },
+      ]
+
   return (
     <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', py: { xs: 4, md: 10 }, backgroundColor: brandColors.background }}>
       <Container maxWidth="sm" sx={{ px: { xs: 2, sm: 3 } }}>
@@ -42,34 +70,58 @@ export function StepConfirmation({
               <FiCheck size={36} color={brandColors.success} />
             </Box>
             
-            <Chip label="BOOKING REQUEST RECEIVED · MANUAL VERIFICATION PENDING" color="warning" size="small" sx={{ fontWeight: 700, mb: 2, height: 'auto', py: 0.5, '& .MuiChip-label': { whiteSpace: 'normal', fontSize: '0.72rem' } }} />
+            {isOnlinePayment ? (
+              <Chip
+                label="PAYMENT CONFIRMED · BOOKING CONFIRMED"
+                color="success"
+                size="small"
+                sx={{
+                  fontWeight: 800,
+                  mb: 2,
+                  height: 'auto',
+                  py: 0.6,
+                  backgroundColor: '#ECFDF5',
+                  color: '#065F46',
+                  border: '1px solid #A7F3D0',
+                  fontSize: '0.74rem',
+                  letterSpacing: '0.04em'
+                }}
+              />
+            ) : (
+              <Chip
+                label="BOOKING REQUEST RECEIVED · MANUAL VERIFICATION PENDING"
+                color="warning"
+                size="small"
+                sx={{ fontWeight: 700, mb: 2, height: 'auto', py: 0.5, '& .MuiChip-label': { whiteSpace: 'normal', fontSize: '0.72rem' } }}
+              />
+            )}
             
             <Typography variant="h3" sx={{ mb: 1.5, fontWeight: 800, fontSize: { xs: '1.6rem', sm: '2rem' } }}>
               Thank You, {clientName}!
             </Typography>
             
             <Typography variant="body1" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.7, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-              Your booking request for <strong>{selectedServiceObj?.name}</strong> ({selectedServiceObj?.price}) has been received successfully!
+              {isOnlinePayment
+                ? `Your consultation booking for ${selectedServiceObj?.name || 'BrandIt Package'} (${selectedServiceObj?.price}) is confirmed!`
+                : `Your booking request for ${selectedServiceObj?.name || 'BrandIt Package'} (${selectedServiceObj?.price}) has been received successfully!`}
             </Typography>
 
-            <Alert severity="info" sx={{ mb: 3, borderRadius: '14px', textAlign: 'left', fontSize: '0.85rem' }}>
-              <strong>Manual Payment Verification in Progress:</strong> We will verify your GPay UPI payment manually. Once verified, official confirmation and consultation details will be sent directly to your Gmail: <span style={{ wordBreak: 'break-all' }}><strong>{clientEmail}</strong></span>.
-            </Alert>
+            {isOnlinePayment ? (
+              <Alert severity="success" sx={{ mb: 3, borderRadius: '14px', textAlign: 'left', fontSize: '0.86rem' }}>
+                <strong>Instant Payment Successful:</strong> Your consultation slot has been confirmed automatically. Details, calendar invite, and video call link will be sent directly to your Gmail: <span style={{ wordBreak: 'break-all' }}><strong>{clientEmail}</strong></span>.
+              </Alert>
+            ) : (
+              <Alert severity="info" sx={{ mb: 3, borderRadius: '14px', textAlign: 'left', fontSize: '0.85rem' }}>
+                <strong>Manual Payment Verification in Progress:</strong> We will verify your GPay UPI payment manually. Once verified, official confirmation and consultation details will be sent directly to your Gmail: <span style={{ wordBreak: 'break-all' }}><strong>{clientEmail}</strong></span>.
+              </Alert>
+            )}
 
             {/* Responsive Receipt Box for Mobile & Desktop */}
             <Box sx={{ p: { xs: 2, sm: 3 }, borderRadius: '16px', backgroundColor: brandColors.background, border: `1px solid ${brandColors.border}`, mb: 3, textAlign: 'left' }}>
               <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mb: 1.5, fontWeight: 700, letterSpacing: '0.05em' }}>
-                BOOKING DETAILS & RECEIPT
+                BOOKING DETAILS &amp; RECEIPT
               </Typography>
-              {[
-                { label: 'BOOKING REFERENCE', value: `#BID-${bookingResult?.id || Math.floor(1000 + Math.random() * 9000)}` },
-                { label: 'SERVICE PACKAGE', value: selectedServiceObj?.id === 'branding-network' ? `${selectedServiceObj?.name} (★ Best Seller)` : selectedServiceObj?.name },
-                { label: 'AMOUNT PAYABLE', value: selectedServiceObj?.price },
-                { label: 'PAYMENT METHOD', value: 'GPay QR Code (Manual Verification)' },
-                { label: 'PAYMENT REF / UTR', value: upiRef || bookingResult?.paymentId || 'Direct GPay Scan' },
-                { label: 'SCHEDULED SLOT', value: `${selectedDate} @ ${selectedTime} IST` },
-                { label: 'CLIENT EMAIL', value: clientEmail },
-              ].map(r => (
+              {receiptRows.map(r => (
                 <Box
                   key={r.label}
                   sx={{
@@ -89,7 +141,7 @@ export function StepConfirmation({
                   <Typography
                     variant="caption"
                     sx={{
-                      color: brandColors.text,
+                      color: r.label === 'PAYMENT STATUS' ? brandColors.success : brandColors.text,
                       fontWeight: 700,
                       fontSize: '0.825rem',
                       textAlign: { xs: 'left', sm: 'right' },

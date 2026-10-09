@@ -289,7 +289,7 @@ export default function BookPage() {
     const fullNotes = [
       selected.notes ? selected.notes.trim() : '',
       selected.service === 'custom-amount' && customNote ? `Upgrade/Top-up: ${customNote}` : '',
-      `Cashfree Verified Order: ${details.orderId}`
+      `Online Verified Order: ${details.orderId}`
     ].filter(Boolean).join(' | ')
 
     const finalServiceName = details.serviceName || (selected.service === 'custom-amount'
