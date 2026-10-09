@@ -101,7 +101,7 @@ export function StepPaymentGPay({
             serviceName: selectedServiceObj?.name,
             bookingDate: selectedDate,
             bookingTime: selectedTime,
-            notes: `Booked via Cashfree modal for ${selectedDate} at ${selectedTime}`,
+            notes: `Booked online for ${selectedDate} at ${selectedTime}`,
           })
           if (verifyResp.paid) {
             if (onCashfreeSuccess) {
@@ -115,7 +115,7 @@ export function StepPaymentGPay({
             setCashfreeError('Payment status is pending. If your account was debited, your booking will be confirmed momentarily.')
           }
         } catch (vErr) {
-          console.warn('Cashfree backend verification note:', vErr)
+          console.warn('Backend verification note:', vErr)
           if (onCashfreeSuccess) {
             onCashfreeSuccess({
               orderId: orderResp.orderId,
@@ -128,8 +128,8 @@ export function StepPaymentGPay({
         }
       })
     } catch (err: any) {
-      console.error('Error starting Cashfree checkout:', err)
-      const msg = err.response?.data?.message || err.message || 'Unable to open Cashfree payment gateway. Please try again.'
+      console.error('Error starting checkout:', err)
+      const msg = err.response?.data?.message || err.message || 'Unable to open secure payment checkout. Please try again.'
       setCashfreeError(msg)
       setIsCashfreeLoading(false)
     }
@@ -143,7 +143,7 @@ export function StepPaymentGPay({
           Complete Payment
         </Typography>
         <Typography variant="body2" sx={{ color: brandColors.muted, fontSize: '0.95rem' }}>
-          Instant, encrypted payment processing powered by official Cashfree Payment Gateway.
+          Instant, 256-bit encrypted checkout. Fast and seamless payment processing.
         </Typography>
       </Box>
 
@@ -264,7 +264,7 @@ export function StepPaymentGPay({
 
               {/* Accepted Payment Modes Badges */}
               <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, display: 'block', mb: 1, letterSpacing: '0.04em' }}>
-                ACCEPTED PAYMENT METHODS VIA CASHFREE:
+                ACCEPTED PAYMENT METHODS:
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, mb: 3 }}>
                 {[
@@ -296,7 +296,7 @@ export function StepPaymentGPay({
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, color: brandColors.muted }}>
                 <FiLock size={15} color={brandColors.success} />
                 <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                  Official Merchant Account • Powered by Cashfree Payments India Pvt. Ltd.
+                  100% Secure &amp; Verified Checkout • End-to-End Encrypted
                 </Typography>
               </Box>
             </Box>
@@ -351,7 +351,7 @@ export function StepPaymentGPay({
                   }
                 }}
               >
-                {isCashfreeLoading ? 'Opening Cashfree...' : `Pay ₹${payableAmount} via Cashfree`}
+                {isCashfreeLoading ? 'Opening Checkout...' : `Pay ₹${payableAmount}`}
               </Button>
 
               <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', mt: 2, fontSize: '0.74rem' }}>
