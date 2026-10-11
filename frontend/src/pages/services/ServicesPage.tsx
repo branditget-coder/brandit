@@ -25,14 +25,14 @@ const services = [
     price: '₹499', period: '/ month',
     description: 'Our most popular end-to-end growth package. Includes profile setup, 8 posts/month, plus proactive cold messaging, targeted outreach, and follow-ups to turn profile views into opportunities.',
     deliverables: ['Everything in Profile Setup + Branding Plan', '8 Strategy-Backed Posts / month', 'Cold Messaging & Outreach Campaign', 'Connection Growth & Lead Follow-ups', '1-on-1 Strategic Network Positioning'],
-    color: '#FFF7ED', iconColor: '#F59E0B',
+    color: '#EFF6FF', iconColor: brandColors.secondary,
   },
   {
     icon: FiCompass, id: 'linkedin-consulting', title: 'LinkedIn Consulting & Advisory',
     price: '₹249', period: '/ month*',
     description: 'Dedicated 1-on-1 strategic consulting for executives, founders, and ambitious career seekers. Note: Pricing amendments can be made depending on how frequently you need consulting.',
     deliverables: ['1-on-1 Strategic Consultation Sessions', 'Career Brand Positioning Review', 'Content Strategy & Campaign Feedback', 'Customized Frequency & Schedule Options'],
-    color: '#F5F3FF', iconColor: '#7C3AED',
+    color: '#FFF7ED', iconColor: '#D97706',
   },
 ]
 
@@ -73,17 +73,17 @@ export default function ServicesPage() {
                       p: 4,
                       borderRadius: '24px',
                       border: s.id === 'branding-network'
-                        ? '2px solid rgba(124, 58, 237, 0.5)'
+                        ? `2px solid ${alpha(brandColors.primary, 0.45)}`
                         : `1px solid ${brandColors.border}`,
-                      backgroundColor: s.id === 'branding-network' ? '#FAF5FF' : '#fff',
-                      boxShadow: s.id === 'branding-network' ? '0 16px 45px rgba(124, 58, 237, 0.12)' : 'none',
+                      backgroundColor: s.id === 'branding-network' ? '#F0F7FF' : '#fff',
+                      boxShadow: s.id === 'branding-network' ? '0 16px 45px rgba(10, 102, 194, 0.12)' : 'none',
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
                       position: 'relative',
                       transition: 'all 0.25s ease',
                       '&:hover': {
-                        boxShadow: s.id === 'branding-network' ? '0 20px 50px rgba(124, 58, 237, 0.22)' : '0 12px 40px rgba(0,0,0,0.08)',
+                        boxShadow: s.id === 'branding-network' ? '0 20px 50px rgba(10, 102, 194, 0.22)' : '0 12px 40px rgba(0,0,0,0.08)',
                         transform: 'translateY(-3px)',
                       }
                     }}
@@ -102,12 +102,13 @@ export default function ServicesPage() {
                               px: 1.3,
                               py: 0.4,
                               borderRadius: '100px',
-                              background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                              background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
+                              border: '1px solid rgba(255, 255, 255, 0.25)',
                               color: '#fff',
                               fontSize: '0.72rem',
                               fontWeight: 800,
                               letterSpacing: '0.04em',
-                              boxShadow: '0 2px 10px rgba(124, 58, 237, 0.35)',
+                              boxShadow: '0 2px 10px rgba(10, 102, 194, 0.35)',
                             }}
                           >
                             <FiStar size={11} fill="#FDE047" color="#FDE047" />
@@ -118,11 +119,11 @@ export default function ServicesPage() {
                           label={`${s.price} ${s.period}`}
                           size="medium"
                           sx={{
-                            backgroundColor: s.id === 'branding-network' ? 'rgba(124, 58, 237, 0.12)' : alpha(s.iconColor, 0.08),
-                            color: s.id === 'branding-network' ? '#7C3AED' : s.iconColor,
+                            backgroundColor: s.id === 'branding-network' ? alpha(brandColors.primary, 0.1) : alpha(s.iconColor, 0.08),
+                            color: s.id === 'branding-network' ? brandColors.primary : s.iconColor,
                             fontWeight: 800,
                             fontSize: '0.9rem',
-                            border: s.id === 'branding-network' ? '1px solid rgba(124, 58, 237, 0.3)' : 'none',
+                            border: s.id === 'branding-network' ? `1px solid ${alpha(brandColors.primary, 0.25)}` : 'none',
                           }}
                         />
                       </Box>
@@ -148,12 +149,12 @@ export default function ServicesPage() {
                         endIcon={<FiArrowRight />}
                         sx={{
                           ...(s.id === 'branding-network' ? {
-                            background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
-                            boxShadow: '0 8px 24px rgba(124, 58, 237, 0.35)',
+                            background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
+                            boxShadow: '0 8px 24px rgba(10, 102, 194, 0.35)',
                             fontWeight: 800,
                             '&:hover': {
-                              background: 'linear-gradient(135deg, #6D28D9 0%, #1D4ED8 100%)',
-                              boxShadow: '0 10px 28px rgba(124, 58, 237, 0.5)',
+                              background: 'linear-gradient(135deg, #0850A0 0%, #1D4ED8 100%)',
+                              boxShadow: '0 10px 28px rgba(10, 102, 194, 0.5)',
                             }
                           } : {
                             backgroundColor: brandColors.primary,

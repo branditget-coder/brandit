@@ -53,22 +53,22 @@ export function StepChoosePlan({
                 p: { xs: 2, sm: 2.5 },
                 borderRadius: '16px',
                 border: isBestSeller
-                  ? (isSelected ? '2px solid #7C3AED' : '2px solid rgba(124, 58, 237, 0.4)')
+                  ? (isSelected ? `2px solid ${brandColors.primary}` : `2px solid ${alpha(brandColors.primary, 0.45)}`)
                   : `2px solid ${isSelected ? brandColors.primary : brandColors.border}`,
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
                 position: 'relative',
                 backgroundColor: isBestSeller
-                  ? (isSelected ? 'rgba(124, 58, 237, 0.05)' : '#FAFAFE')
+                  ? (isSelected ? alpha(brandColors.primary, 0.06) : '#F0F7FF')
                   : (isSelected ? alpha(brandColors.primary, 0.03) : '#fff'),
                 boxShadow: isBestSeller
-                  ? (isSelected ? '0 12px 32px rgba(124, 58, 237, 0.18)' : '0 4px 16px rgba(124, 58, 237, 0.08)')
+                  ? (isSelected ? '0 12px 32px rgba(10, 102, 194, 0.18)' : '0 4px 16px rgba(10, 102, 194, 0.08)')
                   : (isSelected ? '0 4px 16px rgba(10, 102, 194, 0.08)' : 'none'),
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 1.5,
                 '&:hover': {
-                  borderColor: isBestSeller ? '#7C3AED' : brandColors.primary,
+                  borderColor: brandColors.primary,
                   transform: 'translateY(-2px)',
                 }
               }}
@@ -81,13 +81,13 @@ export function StepChoosePlan({
                     </Box>
                   )}
                   {isBestSeller && (
-                    <Box sx={{ width: 28, height: 28, borderRadius: '8px', background: 'linear-gradient(135deg, #7C3AED, #2563EB)', color: '#FDE047', display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 0.2, flexShrink: 0, boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)' }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: '8px', background: 'linear-gradient(135deg, #0A66C2, #2563EB)', color: '#FDE047', display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 0.2, flexShrink: 0, boxShadow: '0 4px 12px rgba(10, 102, 194, 0.3)' }}>
                       <FiStar size={16} fill="#FDE047" />
                     </Box>
                   )}
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      <Typography variant="body1" sx={{ fontWeight: 800, color: isBestSeller ? '#1E1B4B' : brandColors.text }}>
+                      <Typography variant="body1" sx={{ fontWeight: 800, color: brandColors.text }}>
                         {s.name}
                       </Typography>
                       {isBestSeller && (
@@ -99,12 +99,13 @@ export function StepChoosePlan({
                             px: 1.2,
                             py: 0.25,
                             borderRadius: '100px',
-                            background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                            background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
+                            border: '1px solid rgba(255, 255, 255, 0.25)',
                             color: '#fff',
                             fontSize: '0.68rem',
                             fontWeight: 800,
                             letterSpacing: '0.04em',
-                            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.35)',
+                            boxShadow: '0 2px 8px rgba(10, 102, 194, 0.35)',
                           }}
                         >
                           <FiStar size={10} fill="#FDE047" color="#FDE047" />
@@ -112,7 +113,7 @@ export function StepChoosePlan({
                         </Box>
                       )}
                     </Box>
-                    <Typography variant="body2" sx={{ color: isBestSeller ? '#475569' : brandColors.muted, fontSize: '0.825rem', mt: 0.3 }}>
+                    <Typography variant="body2" sx={{ color: brandColors.muted, fontSize: '0.825rem', mt: 0.3 }}>
                       {s.desc}
                     </Typography>
                   </Box>
@@ -121,15 +122,15 @@ export function StepChoosePlan({
                   label={isCustom ? `₹${customAmount || 0}` : s.price}
                   sx={{
                     background: isBestSeller
-                      ? (isSelected ? 'linear-gradient(135deg, #7C3AED, #2563EB)' : alpha('#7C3AED', 0.12))
+                      ? (isSelected ? 'linear-gradient(135deg, #0A66C2, #2563EB)' : alpha(brandColors.primary, 0.1))
                       : (isSelected ? brandColors.primary : alpha(brandColors.primary, 0.1)),
                     color: isBestSeller
-                      ? (isSelected ? '#fff' : '#7C3AED')
+                      ? (isSelected ? '#fff' : brandColors.primary)
                       : (isSelected ? '#fff' : brandColors.primary),
                     fontWeight: 800,
                     fontSize: '0.9rem',
                     px: 1,
-                    border: isBestSeller && !isSelected ? '1px solid rgba(124, 58, 237, 0.3)' : 'none',
+                    border: isBestSeller && !isSelected ? `1px solid ${alpha(brandColors.primary, 0.25)}` : 'none',
                   }}
                 />
               </Box>

@@ -144,7 +144,7 @@ export default function PricingSection() {
                     p: { xs: 3, sm: 3.5 },
                     borderRadius: '24px',
                     border: plan.popular
-                      ? `1.5px solid rgba(124, 58, 237, 0.65)`
+                      ? `1.5px solid ${brandColors.primary}`
                       : `1px solid rgba(255, 255, 255, 0.9)`,
                     backgroundColor: plan.popular
                       ? '#0F172A'
@@ -156,16 +156,16 @@ export default function PricingSection() {
                     flexDirection: 'column',
                     position: 'relative',
                     boxShadow: plan.popular
-                      ? '0 20px 50px -10px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                      ? '0 20px 50px -10px rgba(10, 102, 194, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
                       : '0 10px 30px -4px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
                     transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                     '&:hover': {
                       transform: 'translateY(-4px)',
                       boxShadow: plan.popular
-                        ? '0 28px 60px -10px rgba(124, 58, 237, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25)'
+                        ? '0 28px 60px -10px rgba(10, 102, 194, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25)'
                         : '0 20px 40px -8px rgba(10, 102, 194, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
                       borderColor: plan.popular
-                        ? '#7C3AED'
+                        ? brandColors.secondary
                         : alpha(brandColors.primary, 0.35),
                     }
                   }}
@@ -183,8 +183,8 @@ export default function PricingSection() {
                         px: 1.8,
                         py: 0.45,
                         borderRadius: '20px',
-                        background: 'linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)',
-                        boxShadow: '0 8px 20px -2px rgba(124, 58, 237, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+                        background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
+                        boxShadow: '0 8px 20px -2px rgba(10, 102, 194, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
                         border: '1px solid rgba(255, 255, 255, 0.3)',
                         color: '#fff',
                         fontWeight: 800,
@@ -195,7 +195,7 @@ export default function PricingSection() {
                       }}
                     >
                       <FiStar size={12} fill="#FDE047" color="#FDE047" />
-                      <span>Best Seller✨</span>
+                      <span>BEST SELLER</span>
                     </Box>
                   )}
 

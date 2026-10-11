@@ -43,8 +43,8 @@ const services = [
       'Targeted Cold Messaging & Outbound Sequences',
       'Follow-Up Execution & Inbound Opportunity Management',
     ],
-    color: '#F5F3FF',
-    iconColor: '#7C3AED',
+    color: '#EFF6FF',
+    iconColor: brandColors.secondary,
     id: 'branding-network',
   },
   {
@@ -106,13 +106,13 @@ export default function ServicesSection() {
                     p: { xs: 3, sm: 4 },
                     borderRadius: '20px',
                     border: service.id === 'branding-network'
-                      ? '2px solid rgba(124, 58, 237, 0.45)'
+                      ? `2px solid ${alpha(brandColors.primary, 0.45)}`
                       : `1px solid ${brandColors.border}`,
                     backgroundColor: service.id === 'branding-network'
-                      ? '#FAF5FF'
+                      ? '#F0F7FF'
                       : '#fff',
                     boxShadow: service.id === 'branding-network'
-                      ? '0 12px 36px rgba(124, 58, 237, 0.1)'
+                      ? '0 12px 36px rgba(10, 102, 194, 0.12)'
                       : 'none',
                     height: '100%',
                     display: 'flex',
@@ -121,8 +121,10 @@ export default function ServicesSection() {
                     transition: 'all 0.25s ease',
                     position: 'relative',
                     '&:hover': {
-                      boxShadow: `0 16px 40px -4px ${alpha(service.iconColor, 0.2)}, 0 4px 12px rgba(15, 23, 42, 0.04)`,
-                      borderColor: service.id === 'branding-network' ? '#7C3AED' : alpha(service.iconColor, 0.4),
+                      boxShadow: service.id === 'branding-network'
+                        ? '0 16px 40px -4px rgba(10, 102, 194, 0.25), 0 4px 12px rgba(15, 23, 42, 0.04)'
+                        : `0 16px 40px -4px ${alpha(service.iconColor, 0.2)}, 0 4px 12px rgba(15, 23, 42, 0.04)`,
+                      borderColor: service.id === 'branding-network' ? brandColors.primary : alpha(service.iconColor, 0.4),
                       transform: 'translateY(-3px)',
                     },
                   }}
@@ -153,17 +155,17 @@ export default function ServicesSection() {
                           py: 0.5,
                           borderRadius: '100px',
                           backgroundColor: service.id === 'branding-network' ? 'transparent' : service.color,
-                          background: service.id === 'branding-network' ? 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)' : undefined,
-                          border: service.id === 'branding-network' ? 'none' : `1px solid ${alpha(service.iconColor, 0.25)}`,
+                          background: service.id === 'branding-network' ? 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)' : undefined,
+                          border: service.id === 'branding-network' ? '1px solid rgba(255, 255, 255, 0.25)' : `1px solid ${alpha(service.iconColor, 0.25)}`,
                           color: service.id === 'branding-network' ? '#fff' : service.iconColor,
                           fontSize: '0.72rem',
                           fontWeight: 800,
-                          letterSpacing: '0.02em',
-                          boxShadow: service.id === 'branding-network' ? '0 4px 12px rgba(124, 58, 237, 0.35)' : 'none',
+                          letterSpacing: '0.04em',
+                          boxShadow: service.id === 'branding-network' ? '0 4px 12px rgba(10, 102, 194, 0.35)' : 'none',
                         }}
                       >
-                        {service.id === 'branding-network' && <FiStar size={12} fill="#FDE047" color="#FDE047" />}
-                        {service.id === 'branding-network' ? 'Best Seller' : service.badge}
+                        {service.id === 'branding-network' && <FiStar size={11} fill="#FDE047" color="#FDE047" />}
+                        {service.id === 'branding-network' ? 'BEST SELLER' : service.badge}
                       </Box>
                     </Box>
 
@@ -199,16 +201,16 @@ export default function ServicesSection() {
                     endIcon={<FiArrowRight />}
                     sx={{
                       ...(service.id === 'branding-network' ? {
-                        background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)',
+                        background: 'linear-gradient(135deg, #0A66C2 0%, #2563EB 100%)',
                         color: '#fff',
                         fontWeight: 750,
                         borderRadius: '10px',
                         px: 3,
                         py: 1,
-                        boxShadow: '0 6px 18px rgba(124, 58, 237, 0.3)',
+                        boxShadow: '0 6px 18px rgba(10, 102, 194, 0.3)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #6D28D9 0%, #1D4ED8 100%)',
-                          boxShadow: '0 8px 24px rgba(124, 58, 237, 0.45)',
+                          background: 'linear-gradient(135deg, #0850A0 0%, #1D4ED8 100%)',
+                          boxShadow: '0 8px 24px rgba(10, 102, 194, 0.45)',
                         }
                       } : {
                         borderColor: brandColors.border,
