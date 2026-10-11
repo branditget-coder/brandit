@@ -18,10 +18,10 @@ import { verifyCashfreeOrder } from '../../services/cashfree'
 const steps = ['Choose Plan', 'Pick Date & Time', 'Your Details', 'Payment', 'Confirmation']
 
 const baseServices: ServicePackage[] = [
-  { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Audit & Strategy', price: '₹129', rawAmount: 129, desc: 'Complete profile setup, bio optimization, and growth blueprint.' },
-  { id: 'branding-basic', name: 'Profile Setup + Personal Branding', duration: 'Monthly Program', price: '₹349 / mo', rawAmount: 349, desc: 'Full profile setup + 8 strategy-backed posts/month (2 posts/week).' },
-  { id: 'branding-network', name: 'Branding + Network Growth Engine', duration: 'Monthly Program', price: '₹499 / mo', rawAmount: 499, desc: 'Profile setup, 8 posts/mo, cold outreach, messages & follow-ups.' },
-  { id: 'linkedin-consulting', name: 'LinkedIn Consulting & Advisory', duration: '1-on-1 Sessions', price: '₹249 / mo*', rawAmount: 249, desc: 'Dedicated 1-on-1 career strategy (customizable frequency).' },
+  { id: 'setup-advice', name: 'Profile Setup + Account Building Advice', duration: 'One-Time Makeover & Strategy', price: '₹129', rawAmount: 129, desc: 'Complete profile makeover: banner design, bio rewrite & keyword optimization.' },
+  { id: 'branding-basic', name: 'Profile Setup + Personal Branding', duration: 'Monthly Program', price: '₹349 / mo', rawAmount: 349, desc: 'Full profile makeover + 8 done-for-you posts written for you every month.' },
+  { id: 'branding-network', name: 'Branding + Network Growth Engine', duration: 'Monthly Program', price: '₹499 / mo', rawAmount: 499, desc: 'Full branding + proactive cold messages sent to recruiters & decision-makers.' },
+  { id: 'linkedin-consulting', name: 'LinkedIn Consulting & Advisory', duration: '1-on-1 Sessions', price: '₹249 / mo*', rawAmount: 249, desc: 'Private 1-on-1 live call with an expert for career advice & live profile review.' },
 ]
 
 const planAliases: Record<string, string> = {
