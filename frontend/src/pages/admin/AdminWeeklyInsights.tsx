@@ -33,7 +33,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#EEF2FF; color:#4F46E5; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">✨ MONDAY QUICK WIN</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">The 3-Second LinkedIn Hook That Attracts Recruiters</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Ever feel like your profile gets lost in the crowd? Most LinkedIn headlines are totally invisible because they only list a dry job title. Here are 3 quick tweaks you can make in 2 minutes:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Ever feel like your profile gets lost in the crowd? Most LinkedIn headlines are totally invisible because they only list a dry job title. Here are 3 quick tweaks you can make in 2 minutes:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🎯 <strong>Use the 3-Part Hook:</strong> [Role] + [Who You Help] + [Tangible Win].<br><span style="color:#64748B;">Example: <em>Lead Designer | Helping SaaS teams turn clicks into happy paying users</em></span></p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">📸 <strong>Friendly Smiling Photo:</strong> Profiles with a warm smile and clean background get <strong>14x more views</strong>.</p>
@@ -60,7 +60,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#FEF3C7; color:#B45309; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">📄 RESUME MAKEOVER</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">Pass the 6-Second Recruiter Glance</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Recruiters review hundreds of resumes every single week. If your CV is a dense block of text, it gets skipped. Here's how to stand out instantly:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Recruiters review hundreds of resumes every single week. If your CV is a dense block of text, it gets skipped. Here's how to stand out instantly:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">💥 <strong>Ditch Fuzzy Buzzwords:</strong> Replace 'hard worker' and 'responsible for' with action verbs like <em>spearheaded</em>, <em>accelerated</em>, and <em>built</em>.</p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">📊 <strong>The Number Rule:</strong> Add a metric to your bullet points. <em>'Trained staff'</em> ➔ <em>'Trained 8 team members and boosted team productivity by 25%'</em>.</p>
@@ -87,7 +87,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#ECFDF5; color:#047857; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">🚀 NETWORKING MAGIC</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">How to Message Anyone and Actually Get a Reply</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Cold outreach fails when you ask for favors immediately (*'Can you refer me to your boss?'*). It succeeds when you lead with genuine appreciation:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Cold outreach fails when you ask for favors immediately (*'Can you refer me to your boss?'*). It succeeds when you lead with genuine appreciation:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🎁 <strong>Give Before You Ask:</strong> Start by complimenting a specific post, article, or project they shipped recently.</p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">⏱️ <strong>The 4-Sentence Rule:</strong> Keep it bite-sized. Busy professionals answer short, thoughtful notes 10x faster than long paragraphs.</p>
@@ -114,7 +114,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#FEF3C7; color:#D97706; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">💡 INTERVIEW SECRET</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">Turn Tough Questions into Big Wins</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Getting hit with a curveball question can make your heart race. But great interviewers don't expect you to have every answer memorized—they want to see how you solve problems under pressure.</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Getting hit with a curveball question can make your heart race. But great interviewers don't expect you to have every answer memorized—they want to see how you solve problems under pressure.</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🌉 <strong>The Bridge Phrase:</strong> Instead of saying 'I don't know', say: <em>'I haven't tackled that exact scenario yet, but here is how I would break down the problem...'</em></p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🗣️ <strong>Think Out Loud:</strong> Walk them through your thought process. Companies hire collaborative problem-solvers, not walking encyclopedias.</p>
@@ -141,7 +141,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#F5F3FF; color:#7C3AED; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">✨ BRAND ON AUTOPILOT</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">15 Minutes a Week is All It Takes</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Think personal branding means posting three times a day? Absolutely not. You can build incredible career leverage in just 15 minutes across the week:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Think personal branding means posting three times a day? Absolutely not. You can build incredible career leverage in just 15 minutes across the week:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">📅 <strong>Monday (5 Mins):</strong> Share 1 real lesson from your workday last week. Real stories beat generic advice 100% of the time.</p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">💬 <strong>Wednesday (5 Mins):</strong> Leave 2 thoughtful, value-add comments on top industry posts. Their audience becomes your audience.</p>
@@ -168,7 +168,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#FEF3C7; color:#B45309; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">💰 CAREER LEVERAGE</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">Never Leave Money on the Table</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Over 60% of professionals accept their first job offer without negotiating simply because asking feels awkward. Here is how to negotiate without friction:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Over 60% of professionals accept their first job offer without negotiating simply because asking feels awkward. Here is how to negotiate without friction:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🛑 <strong>Never Say 'Yes' Immediately:</strong> Always say: <em>'Thank you so much! I am thrilled. May I have 24 hours to review the full offer package?'</em></p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🎯 <strong>The Magic Phrase:</strong> <em>'Based on my track record delivering [Key Win] and current market benchmarks, is there room to adjust base compensation to [Target]?'</em></p>
@@ -195,7 +195,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#EFF6FF; color:#2563EB; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">⚡ MINDSET RESET</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">You Are More Qualified Than You Think</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Ever feel like you just got lucky and someday someone will 'figure it out'? That's imposter syndrome talking, and it affects over 75% of high performers. Here's your antidote:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Ever feel like you just got lucky and someday someone will 'figure it out'? That's imposter syndrome talking, and it affects over 75% of high performers. Here's your antidote:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">📁 <strong>The 'Brag Sheet' Folder:</strong> Create a folder on your phone or drive. Save screenshots of nice client messages, compliments, and project wins.</p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">🌱 <strong>Reframe the Doubt:</strong> Feeling slightly out of your comfort zone doesn't mean you're fake—it means you are expanding into a bigger role.</p>
@@ -222,7 +222,7 @@ const FRESH_PRESETS: WeeklyEdition[] = [
   <span style="display:inline-block; background-color:#ECFDF5; color:#047857; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;">🎯 EXECUTIVE PRESENCE</span>
 </div>
 <h3 style="color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;">Level Up Your Virtual Presence in 60 Seconds</h3>
-<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Monday! 👋 Over 70% of human trust is established through non-verbal cues. On Zoom and Meet calls, these 3 quick adjustments instantly make you look senior and credible:</p>
+<p style="font-size:15px; color:#334155; line-height:1.6; margin-top:0;">Happy Sunday! ☕ Over 70% of human trust is established through non-verbal cues. On Zoom and Meet calls, these 3 quick adjustments instantly make you look senior and credible:</p>
 <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;">
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">👁️ <strong>Camera at Eye Level:</strong> Prop your laptop on books or a stand. Looking straight into the camera conveys authority, while looking down makes you appear disengaged.</p>
   <p style="margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;">💡 <strong>Front Lighting Only:</strong> Always ensure your primary light source is in front of your face, never behind your back where you turn into a shadow.</p>
@@ -316,7 +316,7 @@ export default function AdminWeeklyInsights() {
       setContentHtml(upcomingEdition.contentHtml)
       setSnackbar({
         open: true,
-        message: `Loaded this Monday's edition: "${upcomingEdition.title}"`,
+        message: `Loaded this Sunday's edition: "${upcomingEdition.title}"`,
         severity: 'success'
       })
     }
@@ -407,7 +407,7 @@ export default function AdminWeeklyInsights() {
             />
           </Box>
           <Typography variant="body1" sx={{ color: brandColors.muted }}>
-            Delivering fresh, easy-to-read, catchy career and personal branding emails with high-res visuals every Monday.
+            Delivering fresh, easy-to-read, catchy career, placement, and personal branding emails with high-res visuals every Sunday.
           </Typography>
         </Box>
 
@@ -443,8 +443,8 @@ export default function AdminWeeklyInsights() {
                 <FiClock size={24} />
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.04em' }}>AUTO MONDAY ROTATION</Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#7C3AED' }}>Every Mon @ 9:00 AM IST</Typography>
+                <Typography variant="caption" sx={{ color: brandColors.muted, fontWeight: 700, letterSpacing: '0.04em' }}>AUTO SUNDAY ROTATION</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#7C3AED' }}>Every Sun @ 11:00 AM IST</Typography>
               </Box>
             </CardContent>
           </Card>
@@ -483,7 +483,7 @@ export default function AdminWeeklyInsights() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                     <Chip
                       icon={<FiCalendar size={12} />}
-                      label="AUTOMATED MONDAY EDITION"
+                      label="AUTOMATED SUNDAY EDITION"
                       size="small"
                       sx={{ bgcolor: '#0A66C2', color: '#fff', fontWeight: 800, fontSize: '0.68rem' }}
                     />
@@ -740,7 +740,7 @@ export default function AdminWeeklyInsights() {
             <Box sx={{ p: 3 }}>
               <Box sx={{ textAlign: 'center', mb: 2 }}>
                 <Typography variant="caption" sx={{ fontWeight: 800, color: '#0A66C2', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block' }}>
-                  ✨ BrandIt Monday Spark • Weekly Digest
+                  ⚡ BrandIt Sunday Spark • Placement & Career Digest
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#64748B' }}>
                   A fresh, easy 60-second read curated for your subscribers

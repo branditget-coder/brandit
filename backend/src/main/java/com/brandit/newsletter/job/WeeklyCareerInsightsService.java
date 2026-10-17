@@ -54,14 +54,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#EEF2FF; color:#4F46E5; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>✨ MONDAY QUICK WIN</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>The 3-Second LinkedIn Hook That Attracts Recruiters</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Ever feel like your profile gets lost in the crowd? Most LinkedIn headlines are totally invisible because they only list a dry job title. Here are 3 quick tweaks you can make in 2 minutes:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Ever feel like your profile gets lost in the crowd? Most LinkedIn headlines are totally invisible because they only list a dry job title. Here are 3 quick tweaks you can make in 2 minutes:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🎯 <strong>Use the 3-Part Hook:</strong> [Role] + [Who You Help] + [Tangible Win].<br><span style='color:#64748B;'>Example: <em>Lead Designer | Helping SaaS teams turn clicks into happy paying users</em></span></p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>📸 <strong>Friendly Smiling Photo:</strong> Profiles with a warm smile and clean background get <strong>14x more views</strong>.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>⚡ <strong>Pin Your Proof:</strong> Put your proudest case study or recommendation right in your Featured section.</p>" +
                         "</div>" +
                         "<div style='background-color:#F0FDF4; border:1px solid #BBF7D0; border-left:4px solid #16A34A; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#15803D; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#15803D; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#166534; font-size:13px;'>Open your LinkedIn profile right now and update your headline before your coffee gets cold!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Go crush this week! 🚀<br><strong>— The BrandIt Team</strong></p>"
@@ -85,14 +85,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#FEF3C7; color:#B45309; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>📄 RESUME MAKEOVER</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>Pass the 6-Second Recruiter Glance</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Recruiters review hundreds of resumes every single week. If your CV is a dense block of text, it gets skipped. Here's how to stand out instantly:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Recruiters review hundreds of resumes every single week. If your CV is a dense block of text, it gets skipped. Here's how to stand out instantly:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>💥 <strong>Ditch Fuzzy Buzzwords:</strong> Replace 'hard worker' and 'responsible for' with action verbs like <em>spearheaded</em>, <em>accelerated</em>, and <em>built</em>.</p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>📊 <strong>The Number Rule:</strong> Add a metric to your bullet points. <em>'Trained staff'</em> ➔ <em>'Trained 8 team members and boosted team productivity by 25%'</em>.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>✂️ <strong>Keep It Tight (1–2 Pages):</strong> Clean, scannable layouts get 3x more interview callbacks than cluttered 4-page documents.</p>" +
                         "</div>" +
                         "<div style='background-color:#EFF6FF; border:1px solid #BFDBFE; border-left:4px solid #2563EB; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#1D4ED8; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#1D4ED8; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#1E40AF; font-size:13px;'>Pick one bullet point on your resume today and add a percentage or number to it!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>You've got this! 🚀<br><strong>— The BrandIt Team</strong></p>"
@@ -116,14 +116,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#ECFDF5; color:#047857; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>🚀 NETWORKING MAGIC</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>How to Message Anyone and Actually Get a Reply</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Cold outreach fails when you ask for favors immediately (*'Can you refer me to your boss?'*). It succeeds when you lead with genuine appreciation:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Cold outreach fails when you ask for favors immediately (*'Can you refer me to your boss?'*). It succeeds when you lead with genuine appreciation:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🎁 <strong>Give Before You Ask:</strong> Start by complimenting a specific post, article, or project they shipped recently.</p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>⏱️ <strong>The 4-Sentence Rule:</strong> Keep it bite-sized. Busy professionals answer short, thoughtful notes 10x faster than long paragraphs.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>🕊️ <strong>The Zero-Pressure Ending:</strong> Close with: <em>'No need to reply, just wanted to say thank you for sharing that insight!'</em> (Ironically, this generates the highest reply rate).</p>" +
                         "</div>" +
                         "<div style='background-color:#FDF2F8; border:1px solid #FBCFE8; border-left:4px solid #DB2777; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#BE185D; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#BE185D; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#9D174D; font-size:13px;'>Send 1 sincere, no-strings-attached compliment to someone you admire in your industry today!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Build meaningful connections! ✨<br><strong>— The BrandIt Team</strong></p>"
@@ -147,14 +147,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#FEF3C7; color:#D97706; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>💡 INTERVIEW SECRET</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>Turn Tough Questions into Big Wins</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Getting hit with a curveball question can make your heart race. But great interviewers don't expect you to have every answer memorized—they want to see how you solve problems under pressure.</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Getting hit with a curveball question can make your heart race. But great interviewers don't expect you to have every answer memorized—they want to see how you solve problems under pressure.</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🌉 <strong>The Bridge Phrase:</strong> Instead of saying 'I don't know', say: <em>'I haven't tackled that exact scenario yet, but here is how I would break down the problem...'</em></p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🗣️ <strong>Think Out Loud:</strong> Walk them through your thought process. Companies hire collaborative problem-solvers, not walking encyclopedias.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>⏱️ <strong>Embrace the 3-Second Pause:</strong> Don't rush to speak immediately. A short pause makes you appear calm, thoughtful, and executive.</p>" +
                         "</div>" +
                         "<div style='background-color:#F0FDF4; border:1px solid #BBF7D0; border-left:4px solid #16A34A; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#15803D; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#15803D; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#166534; font-size:13px;'>Practice pausing 3 seconds before answering your next phone or video call today!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Confidence looks great on you! 🚀<br><strong>— The BrandIt Team</strong></p>"
@@ -178,14 +178,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#F5F3FF; color:#7C3AED; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>✨ BRAND ON AUTOPILOT</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>15 Minutes a Week is All It Takes</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Think personal branding means posting three times a day? Absolutely not. You can build incredible career leverage in just 15 minutes across the week:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Think personal branding means posting three times a day? Absolutely not. You can build incredible career leverage in just 15 minutes across the week:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>📅 <strong>Monday (5 Mins):</strong> Share 1 real lesson from your workday last week. Real stories beat generic advice 100% of the time.</p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>💬 <strong>Wednesday (5 Mins):</strong> Leave 2 thoughtful, value-add comments on top industry posts. Their audience becomes your audience.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>🤝 <strong>Friday (5 Mins):</strong> Send 3 warm connection requests to peers working at companies you respect.</p>" +
                         "</div>" +
                         "<div style='background-color:#FDF4FF; border:1px solid #F0ABFC; border-left:4px solid #C026D3; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#A21CAF; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#A21CAF; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#86198F; font-size:13px;'>Find one inspiring post in your feed right now and write a 2-sentence thoughtful comment!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Make yourself visible! 🌟<br><strong>— The BrandIt Team</strong></p>"
@@ -209,14 +209,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#FEF3C7; color:#B45309; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>💰 CAREER LEVERAGE</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>Never Leave Money on the Table</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Over 60% of professionals accept their first job offer without negotiating simply because asking feels awkward. Here is how to negotiate without friction:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Over 60% of professionals accept their first job offer without negotiating simply because asking feels awkward. Here is how to negotiate without friction:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🛑 <strong>Never Say 'Yes' Immediately:</strong> Always say: <em>'Thank you so much! I am thrilled. May I have 24 hours to review the full offer package?'</em></p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🎯 <strong>The Magic Phrase:</strong> <em>'Based on my track record delivering [Key Win] and current market benchmarks, is there room to adjust base compensation to [Target]?'</em></p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>🤫 <strong>The Power of Silence:</strong> Once you ask your question, stop talking. Wait for them to respond first.</p>" +
                         "</div>" +
                         "<div style='background-color:#EFF6FF; border:1px solid #BFDBFE; border-left:4px solid #2563EB; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#1D4ED8; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#1D4ED8; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#1E40AF; font-size:13px;'>Check the average market salary benchmark for your role on Levels.fyi or Glassdoor today!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Know your true worth! 💼<br><strong>— The BrandIt Team</strong></p>"
@@ -240,14 +240,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#EFF6FF; color:#2563EB; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>⚡ MINDSET RESET</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>You Are More Qualified Than You Think</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Ever feel like you just got lucky and someday someone will 'figure it out'? That's imposter syndrome talking, and it affects over 75% of high performers. Here's your antidote:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Ever feel like you just got lucky and someday someone will 'figure it out'? That's imposter syndrome talking, and it affects over 75% of high performers. Here's your antidote:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>📁 <strong>The 'Brag Sheet' Folder:</strong> Create a folder on your phone or drive. Save screenshots of nice client messages, compliments, and project wins.</p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>🌱 <strong>Reframe the Doubt:</strong> Feeling slightly out of your comfort zone doesn't mean you're fake—it means you are expanding into a bigger role.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>🤝 <strong>Shift Focus Outward:</strong> Whenever self-doubt creeps in, ask: <em>'How can I help a teammate win today?'</em> Action cures anxiety every time.</p>" +
                         "</div>" +
                         "<div style='background-color:#F0FDF4; border:1px solid #BBF7D0; border-left:4px solid #16A34A; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#15803D; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#15803D; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#166534; font-size:13px;'>Write down 2 accomplishments you pulled off last month and acknowledge your hard work!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Keep moving forward with pride! 💪<br><strong>— The BrandIt Team</strong></p>"
@@ -271,14 +271,14 @@ public class WeeklyCareerInsightsService {
                         "  <span style='display:inline-block; background-color:#ECFDF5; color:#047857; font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:0.05em; text-transform:uppercase;'>🎯 EXECUTIVE PRESENCE</span>" +
                         "</div>" +
                         "<h3 style='color:#0F172A; font-size:20px; font-weight:800; margin:6px 0 14px 0; line-height:1.3;'>Level Up Your Virtual Presence in 60 Seconds</h3>" +
-                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Monday! 👋 Over 70% of human trust is established through non-verbal cues. On Zoom and Meet calls, these 3 quick adjustments instantly make you look senior and credible:</p>" +
+                        "<p style='font-size:15px; color:#334155; line-height:1.6; margin-top:0;'>Happy Sunday! ☕ Over 70% of human trust is established through non-verbal cues. On Zoom and Meet calls, these 3 quick adjustments instantly make you look senior and credible:</p>" +
                         "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px 18px; margin:16px 0;'>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>👁️ <strong>Camera at Eye Level:</strong> Prop your laptop on books or a stand. Looking straight into the camera conveys authority, while looking down makes you appear disengaged.</p>" +
                         "  <p style='margin:0 0 10px 0; color:#1E293B; font-size:14px; line-height:1.6;'>💡 <strong>Front Lighting Only:</strong> Always ensure your primary light source is in front of your face, never behind your back where you turn into a shadow.</p>" +
                         "  <p style='margin:0; color:#1E293B; font-size:14px; line-height:1.6;'>🎯 <strong>Look at the Lens When Delivering Points:</strong> When stating your main proposal, look straight into the camera lens dot. To the viewer, it feels like direct eye contact.</p>" +
                         "</div>" +
                         "<div style='background-color:#FEF3C7; border:1px solid #FCD34D; border-left:4px solid #D97706; border-radius:10px; padding:12px 16px; margin:16px 0;'>" +
-                        "  <p style='margin:0; font-weight:700; color:#B45309; font-size:14px;'>⚡ 2-Minute Monday Challenge:</p>" +
+                        "  <p style='margin:0; font-weight:700; color:#B45309; font-size:14px;'>⚡ 2-Minute Sunday Challenge:</p>" +
                         "  <p style='margin:4px 0 0 0; color:#92400E; font-size:13px;'>Raise your laptop screen by 2–3 inches right now before your next video meeting!</p>" +
                         "</div>" +
                         "<p style='font-size:14px; color:#64748B; margin:16px 0 0 0;'>Command the virtual room! 🎙️<br><strong>— The BrandIt Team</strong></p>"
@@ -310,13 +310,13 @@ public class WeeklyCareerInsightsService {
     }
 
     /**
-     * Automated Weekly Scheduler: Runs every Monday at 9:00 AM IST (0 0 9 * * MON).
-     * Automatically picks this Monday's fresh, catchy, image-rich email and dispatches it.
+     * Automated Weekly Scheduler: Runs every Sunday at 11:00 AM IST (0 0 11 * * SUN).
+     * Dispatches high-impact placement insights right when students prepare for the upcoming week.
      */
-    @Scheduled(cron = "${app.insights.cron:0 0 9 * * MON}")
+    @Scheduled(cron = "${app.insights.cron:0 0 11 * * SUN}")
     public void scheduleWeeklyCareerInsights() {
         WeeklyInsightEdition edition = getEditionForCurrentWeek();
-        log.info("⏰ Triggering Automated Monday Weekly Insights broadcast for edition: [{}] (Week #{})", edition.getTitle(), edition.getWeekNumber());
+        log.info("⏰ Triggering Automated Sunday Weekly Insights broadcast for edition: [{}] (Week #{})", edition.getTitle(), edition.getWeekNumber());
 
         List<Newsletter> subscribers = newsletterRepository.findByActiveTrue();
         if (subscribers.isEmpty()) {
@@ -324,7 +324,7 @@ public class WeeklyCareerInsightsService {
             return;
         }
 
-        log.info("Sending Fresh Monday Insight [{}] to {} active subscribed accounts.", edition.getTitle(), subscribers.size());
+        log.info("Sending Fresh Sunday Placement Insight [{}] to {} active subscribed accounts.", edition.getTitle(), subscribers.size());
         int sentCount = 0;
         for (Newsletter subscriber : subscribers) {
             try {
@@ -335,10 +335,10 @@ public class WeeklyCareerInsightsService {
             }
         }
 
-        log.info("✅ Automated Monday Career Insights broadcast complete. Successfully dispatched to {}/{} accounts.", sentCount, subscribers.size());
+        log.info("✅ Automated Sunday Career Insights broadcast complete. Successfully dispatched to {}/{} accounts.", sentCount, subscribers.size());
         try {
             userActivityLogRepository.save(UserActivityLog.builder()
-                    .action("AUTOMATED_WEEKLY_INSIGHTS_BROADCAST")
+                    .action("AUTOMATED_SUNDAY_INSIGHTS_BROADCAST")
                     .metadataJson("{\"subscribersCount\":" + subscribers.size() +
                             ",\"sentCount\":" + sentCount +
                             ",\"editionId\":\"" + edition.getId() + "\"" +

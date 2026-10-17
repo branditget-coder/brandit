@@ -319,8 +319,8 @@ public class EmailTemplateBuilder {
         String baseUrl = cleanUrl(frontendUrl);
         return wrapHtmlTemplate(subject,
                 "<div style='text-align:center; margin-bottom:16px;'>" +
-                "  <p style='margin:0; font-size:12px; font-weight:700; color:#0A66C2; text-transform:uppercase; letter-spacing:0.08em;'>✨ BrandIt Monday Spark • Weekly Digest</p>" +
-                "  <p style='margin:4px 0 0 0; color:#64748B; font-size:13px;'>A fresh, easy 60-second read curated for <strong>" + escape(recipientEmail) + "</strong></p>" +
+                "  <p style='margin:0; font-size:12px; font-weight:700; color:#0A66C2; text-transform:uppercase; letter-spacing:0.08em;'>⚡ BrandIt Sunday Spark • Placement & Career Digest</p>" +
+                "  <p style='margin:4px 0 0 0; color:#64748B; font-size:13px;'>Curated high-impact insights for <strong>" + escape(recipientEmail) + "</strong></p>" +
                 "</div>" +
                 "<div class='card' style='background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:22px; margin:16px 0; box-sizing:border-box; word-break:break-word; font-size:15px; line-height:1.7; box-shadow:0 4px 16px rgba(0,0,0,0.03);'>" +
                 contentHtml +
