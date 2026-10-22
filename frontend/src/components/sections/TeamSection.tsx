@@ -1,13 +1,13 @@
 import { Box, Container, Typography, Grid, Avatar, Chip, alpha } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiPhone } from 'react-icons/fi'
+import { FiMail } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 
 const team = [
   {
     name: 'Raghav Dhir',
     role: 'Lead Tech Strategist',
-    phone: '+91 8264452182',
+    email: 'raghavdhir1510@gmail.com',
     avatar: 'RD',
     image: '/assets/team/raghav.jpg',
     objectPosition: 'center 15%',
@@ -17,7 +17,7 @@ const team = [
   {
     name: 'Hritika Seth',
     role: 'LinkedIn Manager and Consultant',
-    phone: '+91 8708231539',
+    email: 'sethhritika@gmail.com',
     avatar: 'HS',
     image: '/assets/team/hritika.jpg',
     objectPosition: 'center 20%',
@@ -27,7 +27,7 @@ const team = [
   {
     name: 'Kritika Dhawan',
     role: 'Customer Outreach & Operations',
-    phone: '+91 6284318951',
+    email: 'dhawankritika866@gmail.com',
     avatar: 'KD',
     image: '/assets/team/kritika.jpg',
     objectPosition: 'center 20%',
@@ -37,7 +37,7 @@ const team = [
   {
     name: 'Stuti Sharma',
     role: 'Human Resource',
-    phone: '+91 9015470950',
+    email: 'bhardwajstuti101@gmail.com',
     avatar: 'SS',
     image: '/assets/team/stuti.jpg',
     objectPosition: 'center 25%',
@@ -47,7 +47,7 @@ const team = [
   {
     name: 'Yash',
     role: 'Accounting and Finance',
-    phone: '+91 9024469496',
+    email: 'yashjainnn13@gmail.com',
     avatar: 'Y',
     image: '/assets/team/yash.jpg',
     objectPosition: 'center 15%',
@@ -135,11 +135,11 @@ export default function TeamSection({ backgroundColor = brandColors.background }
                     {member.bio}
                   </Typography>
                   <Chip
-                    icon={<FiPhone size={12} />}
-                    label={member.phone}
+                    icon={<FiMail size={12} />}
+                    label={member.email}
                     size="small"
                     component="a"
-                    href={`tel:${member.phone.replace(/\s+/g, '')}`}
+                    href={`mailto:${member.email}`}
                     clickable
                     sx={{
                       backgroundColor: alpha(brandColors.primary, 0.06),
@@ -147,7 +147,12 @@ export default function TeamSection({ backgroundColor = brandColors.background }
                       fontWeight: 600,
                       fontSize: '0.78rem',
                       py: 0.5,
-                      px: 0.5,
+                      px: 0.8,
+                      maxWidth: '100%',
+                      '& .MuiChip-label': {
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      },
                       '&:hover': { backgroundColor: alpha(brandColors.primary, 0.14) },
                     }}
                   />
