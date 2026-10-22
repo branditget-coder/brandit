@@ -4,7 +4,7 @@ import {
   TextField, InputAdornment, alpha, Paper
 } from '@mui/material'
 import { motion } from 'framer-motion'
-import { FiCheck, FiArrowRight, FiZap, FiInfo, FiSliders, FiRefreshCw, FiStar } from 'react-icons/fi'
+import { FiCheck, FiArrowRight, FiZap, FiInfo, FiSliders, FiStar } from 'react-icons/fi'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { brandColors } from '../../theme'
 
@@ -79,28 +79,16 @@ const plans = [
   },
 ]
 
-const upgradeScenarios = [
-  { from: '₹249 Consulting', to: '₹349 Setup + Branding', diff: 100, note: 'Upgrade from ₹249 Consulting to ₹349 Branding Plan' },
-  { from: '₹129 Profile Setup', to: '₹349 Setup + Branding', diff: 220, note: 'Upgrade from ₹129 Setup to ₹349 Branding Plan' },
-  { from: '₹349 Setup + Branding', to: '₹499 Network Growth', diff: 150, note: 'Upgrade from ₹349 Branding to ₹499 Network Growth' },
-  { from: '₹129 Profile Setup', to: '₹499 Network Growth', diff: 370, note: 'Upgrade from ₹129 Setup to ₹499 Network Growth' },
-]
+const quickTopupAmounts = [50, 100, 200, 500, 1000]
 
 export default function PricingSection() {
   const navigate = useNavigate()
   const [customAmount, setCustomAmount] = useState<string>('100')
-  const [customNote, setCustomNote] = useState<string>('Plan Upgrade Difference (₹249 to ₹349)')
 
   const parsedAmount = Math.max(1, parseInt(customAmount, 10) || 0)
 
-  const handleApplyPreset = (diff: number, note: string) => {
-    setCustomAmount(diff.toString())
-    setCustomNote(note)
-  }
-
   const handleProceedCustom = () => {
-    const encodedNote = encodeURIComponent(customNote.trim() || 'Custom Plan Upgrade / Differential Payment')
-    navigate(`/book?plan=custom-amount&amount=${parsedAmount}&note=${encodedNote}`)
+    navigate(`/book?plan=custom-amount&amount=${parsedAmount}`)
   }
 
   return (
@@ -270,7 +258,7 @@ export default function PricingSection() {
           ))}
         </Grid>
 
-        {/* ── INTERACTIVE CUSTOM AMOUNT & PLAN UPGRADE SECTION ── */}
+        {/* ── INTERACTIVE CUSTOM TOP-UP SECTION ── */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -308,56 +296,56 @@ export default function PricingSection() {
                     <FiSliders size={20} />
                   </Box>
                   <Typography variant="h5" sx={{ fontWeight: 800, color: brandColors.text }}>
-                    Switching Plans or Need a Custom Top-Up?
+                    Custom Top-Up for Any Amount
                   </Typography>
                 </Box>
 
                 <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3, lineHeight: 1.6 }}>
-                  If you already purchased a plan (e.g. <strong>₹249 Consulting</strong>) and wish to switch to the <strong>₹349 Branding Plan</strong>, you only need to pay the remaining <strong>₹100</strong> difference. Choose a quick upgrade below or enter your exact custom amount.
+                  Need custom advisory hours, tailored services, or want to pay an agreed amount? Enter any price you wish and pay directly with instant confirmation.
                 </Typography>
 
-                {/* Quick Upgrade Presets */}
+                {/* Quick Select Chips */}
                 <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, letterSpacing: '0.04em', display: 'block', mb: 1.5 }}>
-                  POPULAR PLAN SWITCH SCENARIOS:
+                  QUICK SELECT AMOUNT:
                 </Typography>
-                <Grid container spacing={1.5}>
-                  {upgradeScenarios.map((sc, idx) => (
-                    <Grid item xs={12} sm={6} key={idx}>
-                      <Box
-                        onClick={() => handleApplyPreset(sc.diff, sc.note)}
+                <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap sx={{ mb: 3 }}>
+                  {quickTopupAmounts.map((amt) => {
+                    const isSelected = customAmount === amt.toString()
+                    return (
+                      <Chip
+                        key={amt}
+                        label={`₹${amt}`}
+                        clickable
+                        onClick={() => setCustomAmount(amt.toString())}
+                        variant={isSelected ? 'filled' : 'outlined'}
+                        color="primary"
                         sx={{
-                          p: 1.5,
-                          borderRadius: '14px',
-                          border: customAmount === sc.diff.toString()
-                            ? `2px solid ${brandColors.primary}`
-                            : `1px solid ${brandColors.border}`,
-                          backgroundColor: customAmount === sc.diff.toString()
-                            ? alpha(brandColors.primary, 0.08)
-                            : '#fff',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          '&:hover': {
-                            borderColor: brandColors.primary,
-                            backgroundColor: alpha(brandColors.primary, 0.04),
-                          },
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          px: 1,
+                          py: 2,
+                          borderRadius: '10px',
+                          borderWidth: isSelected ? '2px' : '1px',
                         }}
-                      >
-                        <Box sx={{ overflow: 'hidden', mr: 1 }}>
-                          <Typography variant="caption" sx={{ color: brandColors.muted, display: 'block', fontSize: '0.72rem' }}>
-                            {sc.from} → {sc.to}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: brandColors.text, fontSize: '0.85rem' }}>
-                            Pay ₹{sc.diff} difference
-                          </Typography>
-                        </Box>
-                        <FiRefreshCw size={14} color={brandColors.primary} style={{ flexShrink: 0 }} />
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
+                      />
+                    )
+                  })}
+                </Stack>
+
+                <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap sx={{ color: brandColors.muted, fontSize: '0.85rem' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <FiCheck color={brandColors.primary} />
+                    <span>Any price accepted</span>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <FiCheck color={brandColors.primary} />
+                    <span>Instant booking sync</span>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <FiCheck color={brandColors.primary} />
+                    <span>Official receipt</span>
+                  </Box>
+                </Stack>
               </Grid>
 
               {/* Right Column: Interactive Custom Amount Input & Checkout */}
@@ -376,7 +364,7 @@ export default function PricingSection() {
                   </Typography>
 
                   {/* Amount Input */}
-                  <Box sx={{ mb: 2 }}>
+                  <Box sx={{ mb: 3 }}>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, display: 'block', mb: 0.8 }}>
                       AMOUNT PAYABLE (INR)
                     </Typography>
@@ -401,26 +389,6 @@ export default function PricingSection() {
                           borderRadius: '14px',
                           fontSize: '1.25rem',
                           fontWeight: 800,
-                        },
-                      }}
-                    />
-                  </Box>
-
-                  {/* Upgrade Note / Reason */}
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.muted, display: 'block', mb: 0.8 }}>
-                      REASON / PREVIOUS PLAN (OPTIONAL)
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      value={customNote}
-                      onChange={(e) => setCustomNote(e.target.value)}
-                      placeholder="e.g. Upgraded from ₹249 plan to ₹349 plan"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '12px',
-                          fontSize: '0.85rem',
                         },
                       }}
                     />

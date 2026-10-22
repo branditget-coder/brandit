@@ -33,10 +33,10 @@ export function StepChoosePlan({
   return (
     <Box>
       <Typography variant="h5" sx={{ mb: 1, color: brandColors.text, fontWeight: 700, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-        Which service package or plan upgrade do you need?
+        Which service package do you need?
       </Typography>
       <Typography variant="body2" sx={{ color: brandColors.muted, mb: 3 }}>
-        Select a standard package below or choose the custom amount / plan upgrade option to pay any custom amount.
+        Select a standard package below or choose custom top-up to pay any custom amount.
       </Typography>
 
       <Stack spacing={2}>
@@ -135,7 +135,7 @@ export function StepChoosePlan({
                 />
               </Box>
 
-              {/* Inline Custom Amount and Note Editor when custom-amount is selected */}
+              {/* Inline Custom Amount Editor when custom-amount is selected */}
               {isCustom && isSelected && (
                 <Box
                   onClick={(e) => e.stopPropagation()}
@@ -147,12 +147,14 @@ export function StepChoosePlan({
                     border: `1px solid ${brandColors.border}`,
                     display: 'flex',
                     flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
                     gap: 2,
                   }}
                 >
-                  <Box sx={{ width: { xs: '100%', sm: '40%' } }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, display: 'block', mb: 0.5 }}>
-                      Custom Amount (₹) *
+                  <Box sx={{ width: { xs: '100%', sm: 260 } }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, display: 'block', mb: 0.6 }}>
+                      Enter Custom Amount (₹) *
                     </Typography>
                     <TextField
                       fullWidth
@@ -160,6 +162,7 @@ export function StepChoosePlan({
                       type="number"
                       value={customAmount}
                       onChange={(e) => onChangeCustomAmount && onChangeCustomAmount(Math.max(1, parseInt(e.target.value, 10) || 0))}
+                      placeholder="e.g. 100"
                       inputProps={{ min: 1 }}
                       InputProps={{
                         startAdornment: (
@@ -172,18 +175,19 @@ export function StepChoosePlan({
                     />
                   </Box>
 
-                  <Box sx={{ width: { xs: '100%', sm: '60%' } }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: brandColors.text, display: 'block', mb: 0.5 }}>
-                      Upgrade Reason / Note
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      value={customNote}
-                      onChange={(e) => onChangeCustomNote && onChangeCustomNote(e.target.value)}
-                      placeholder="e.g. Upgrading from ₹249 to ₹349 plan"
-                      sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
-                    />
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', pt: { sm: 2 } }}>
+                    {[50, 100, 200, 500].map(amt => (
+                      <Chip
+                        key={amt}
+                        label={`₹${amt}`}
+                        size="small"
+                        clickable
+                        onClick={() => onChangeCustomAmount && onChangeCustomAmount(amt)}
+                        variant={customAmount === amt ? 'filled' : 'outlined'}
+                        color={customAmount === amt ? 'primary' : 'default'}
+                        sx={{ fontWeight: 700 }}
+                      />
+                    ))}
                   </Box>
                 </Box>
               )}

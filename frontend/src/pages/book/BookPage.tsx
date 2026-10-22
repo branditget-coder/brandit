@@ -107,13 +107,13 @@ export default function BookPage() {
     ...baseServices,
     {
       id: 'custom-amount',
-      name: 'Custom Amount / Plan Upgrade',
-      duration: 'Flexible Top-Up / Plan Upgrade',
+      name: 'Custom Top-Up',
+      duration: 'Custom Amount',
       price: `₹${customAmount}`,
       rawAmount: customAmount,
-      desc: customNote ? `Upgrade note: ${customNote}` : 'Enter custom amount for plan switching, upgrade differences, or advisory top-ups.',
+      desc: 'Enter any custom amount to pay directly.',
     },
-  ], [customAmount, customNote])
+  ], [customAmount])
 
   // Pre-populate logged-in user profile details
   useEffect(() => {
@@ -227,12 +227,11 @@ export default function BookPage() {
 
     const fullNotes = [
       selected.notes ? selected.notes.trim() : '',
-      selected.service === 'custom-amount' && customNote ? `Upgrade/Top-up: ${customNote}` : '',
       `UPI Reference: ${selected.upiRef || 'Direct GPay QR Scan'}`
     ].filter(Boolean).join(' | ')
 
     const finalServiceName = selected.service === 'custom-amount'
-      ? `Custom Payment / Plan Upgrade (₹${finalAmount})`
+      ? `Custom Top-Up (₹${finalAmount})`
       : (selectedServiceObj?.name || 'BrandIt Service Package')
 
     try {
@@ -288,12 +287,11 @@ export default function BookPage() {
 
     const fullNotes = [
       selected.notes ? selected.notes.trim() : '',
-      selected.service === 'custom-amount' && customNote ? `Upgrade/Top-up: ${customNote}` : '',
       `Online Verified Order: ${details.orderId}`
     ].filter(Boolean).join(' | ')
 
     const finalServiceName = details.serviceName || (selected.service === 'custom-amount'
-      ? `Custom Payment / Plan Upgrade (₹${finalAmount})`
+      ? `Custom Top-Up (₹${finalAmount})`
       : (selectedServiceObj?.name || 'BrandIt Service Package'))
 
     try {
