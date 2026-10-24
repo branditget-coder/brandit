@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FiTarget, FiHeart, FiUsers } from 'react-icons/fi'
 import { brandColors } from '../../theme'
 import TeamSection from '../../components/sections/TeamSection'
+import OurStorySection from '../../components/sections/OurStorySection'
 import SEO from '../../components/common/SEO'
 
 const values = [
@@ -59,6 +60,9 @@ export default function AboutPage() {
           </Grid>
         </Container>
       </Box>
+
+      {/* Our Story Section */}
+      <OurStorySection />
 
       {/* Team Section */}
       <TeamSection backgroundColor={brandColors.background} />

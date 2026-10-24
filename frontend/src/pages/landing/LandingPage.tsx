@@ -1,8 +1,8 @@
 import SEO from '../../components/common/SEO'
 import HeroSection from '../../components/sections/HeroSection'
-import TrustedBySection from '../../components/sections/TrustedBySection'
 import PricingSection from '../../components/sections/PricingSection'
 import WhyBrandItSection from '../../components/sections/WhyBrandItSection'
+import OurStorySection from '../../components/sections/OurStorySection'
 import TestimonialsSection from '../../components/sections/TestimonialsSection'
 import TeamSection from '../../components/sections/TeamSection'
 import FAQSection from '../../components/sections/FAQSection'
@@ -18,9 +18,9 @@ export default function LandingPage() {
         canonicalUrl="https://go-brandit.vercel.app/"
       />
       <HeroSection />
-      <TrustedBySection />
       <PricingSection />
       <WhyBrandItSection />
+      <OurStorySection />
       <TestimonialsSection />
       <TeamSection />
       <FAQSection />

@@ -6,11 +6,20 @@ export default function ScrollToTop() {
 
   useEffect(() => {
     if (hash) {
-      const element = document.querySelector(hash)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
-        return
+      const scroll = () => {
+        const element = document.querySelector(hash)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' })
+          return true
+        }
+        return false
       }
+
+      if (!scroll()) {
+        const timer = setTimeout(scroll, 120)
+        return () => clearTimeout(timer)
+      }
+      return
     }
     window.scrollTo({
       top: 0,

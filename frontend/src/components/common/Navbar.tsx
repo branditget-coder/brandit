@@ -7,7 +7,9 @@ import {
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   FiMenu, FiX, FiUser, FiArrowRight, FiLogOut,
-  FiGrid, FiChevronDown, FiShield, FiCalendar
+  FiGrid, FiChevronDown, FiShield, FiCalendar,
+  FiBriefcase, FiTag, FiCamera, FiStar, FiBookOpen,
+  FiUsers, FiMail
 } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { brandColors } from '../../theme'
@@ -15,12 +17,13 @@ import BrandLogo from './BrandLogo'
 import { useAuth } from '../../context/AuthContext'
 
 const navLinks = [
-  { label: 'Services', href: '/services' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Testimonials', href: '/testimonials' },
-  { label: 'Blogs & Guides', href: '/blogs' },
-  { label: 'About & Team', href: '/about' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Services', desktopLabel: 'Services', href: '/services', icon: FiBriefcase },
+  { label: 'Pricing', desktopLabel: 'Pricing', href: '/pricing', icon: FiTag },
+  { label: 'Our Story', desktopLabel: 'Our Story', href: '/#our-story', icon: FiCamera },
+  { label: 'Testimonials', desktopLabel: 'Reviews', href: '/testimonials', icon: FiStar },
+  { label: 'Blogs & Guides', desktopLabel: 'Blogs', href: '/blogs', icon: FiBookOpen },
+  { label: 'About & Team', desktopLabel: 'About', href: '/about', icon: FiUsers },
+  { label: 'Contact', desktopLabel: 'Contact', href: '/contact', icon: FiMail },
 ]
 
 export default function Navbar() {
@@ -64,6 +67,26 @@ export default function Navbar() {
     handleCloseUserMenu()
     logout()
     navigate('/')
+  }
+
+  const isLinkActive = (href: string) => {
+    if (href.includes('#')) {
+      const hash = '#' + href.split('#')[1]
+      return location.pathname === '/' && location.hash === hash
+    }
+    return location.pathname === href
+  }
+
+  const handleLinkClick = (href: string) => {
+    if (href.includes('#')) {
+      const hash = '#' + href.split('#')[1]
+      if (location.pathname === '/') {
+        const el = document.querySelector(hash)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    }
   }
 
   return (
@@ -115,58 +138,114 @@ export default function Navbar() {
                 <BrandLogo variant="dark" size="medium" />
               </motion.div>
 
-              {/* Desktop Nav Links with Prominent Readable Text */}
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.75, position: 'relative' }}>
+              {/* Desktop Nav Links: Responsive Capsule Dock (Adaptive Icons & Labels) */}
+              <Box
+                sx={{
+                  display: { xs: 'none', md: 'flex' },
+                  alignItems: 'center',
+                  gap: { md: 0.4, lg: 0.6 },
+                  position: 'relative',
+                  backgroundColor: 'rgba(241, 245, 249, 0.5)',
+                  p: 0.5,
+                  borderRadius: '100px',
+                  border: '1px solid rgba(226, 232, 240, 0.7)',
+                }}
+              >
                 {navLinks.map((link) => {
-                  const active = location.pathname === link.href
+                  const active = isLinkActive(link.href)
                   return (
                     <Box key={link.label} sx={{ position: 'relative' }}>
-                      <Button
-                        component={RouterLink}
-                        to={link.href}
-                        sx={{
-                          color: active ? brandColors.primary : '#0F172A',
-                          fontWeight: active ? 750 : 600,
-                          fontSize: { md: '0.91rem', lg: '0.96rem' },
-                          letterSpacing: '-0.01em',
-                          fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
-                          px: { md: 1.5, lg: 2 },
-                          py: 0.85,
-                          borderRadius: '100px',
-                          backgroundColor: active ? alpha(brandColors.primary, 0.09) : 'transparent',
-                          border: active ? `1px solid ${alpha(brandColors.primary, 0.2)}` : '1px solid transparent',
-                          transition: 'all 0.25s ease',
-                          position: 'relative',
-                          zIndex: 1,
-                          '&:hover': {
-                            backgroundColor: alpha(brandColors.primary, 0.07),
-                            color: brandColors.primary,
+                      <Tooltip
+                        title={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, py: 0.2 }}>
+                            <link.icon size={13} />
+                            <span>{link.label}</span>
+                          </Box>
+                        }
+                        arrow
+                        placement="bottom"
+                        slotProps={{
+                          tooltip: {
+                            sx: {
+                              bgcolor: '#0F172A',
+                              color: '#FFFFFF',
+                              borderRadius: '8px',
+                              fontSize: '0.76rem',
+                              fontWeight: 600,
+                              boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                              display: { xs: 'none', md: 'block', xl: 'none' },
+                            },
+                          },
+                          arrow: {
+                            sx: {
+                              color: '#0F172A',
+                              display: { xs: 'none', md: 'block', xl: 'none' },
+                            },
                           },
                         }}
                       >
-                        {active && (
+                        <Button
+                          component={RouterLink}
+                          to={link.href}
+                          onClick={() => handleLinkClick(link.href)}
+                          sx={{
+                            color: active ? brandColors.primary : '#334155',
+                            fontWeight: active ? 750 : 600,
+                            fontSize: { md: '0.82rem', lg: '0.88rem' },
+                            letterSpacing: '-0.01em',
+                            fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
+                            px: { md: active ? 1.2 : 0.85, lg: 1.15, xl: 1.5 },
+                            py: 0.6,
+                            minWidth: { md: active ? 'auto' : 34, lg: 'auto' },
+                            height: 35,
+                            borderRadius: '100px',
+                            backgroundColor: active ? '#FFFFFF' : 'transparent',
+                            boxShadow: active ? '0 2px 8px rgba(10, 102, 194, 0.12)' : 'none',
+                            border: active ? `1px solid ${alpha(brandColors.primary, 0.22)}` : '1px solid transparent',
+                            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                            position: 'relative',
+                            zIndex: 1,
+                            textTransform: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: { md: 0.5, lg: 0.65 },
+                            whiteSpace: 'nowrap',
+                            '&:hover': {
+                              backgroundColor: active ? '#FFFFFF' : alpha(brandColors.primary, 0.08),
+                              color: brandColors.primary,
+                              transform: 'translateY(-1px)',
+                            },
+                          }}
+                        >
+                          <link.icon
+                            size={15}
+                            style={{
+                              flexShrink: 0,
+                              color: active ? brandColors.primary : 'inherit',
+                            }}
+                          />
+                          {/* Label visible: On lg/xl always; on md only if active */}
                           <Box
                             component="span"
                             sx={{
-                              width: 7,
-                              height: 7,
-                              borderRadius: '50%',
-                              backgroundColor: brandColors.primary,
-                              mr: 1,
-                              display: 'inline-block',
-                              boxShadow: `0 0 8px ${brandColors.primary}`,
+                              display: {
+                                xs: 'none',
+                                md: active ? 'inline' : 'none',
+                                lg: 'inline',
+                              },
                             }}
-                          />
-                        )}
-                        {link.label}
-                      </Button>
+                          >
+                            {link.desktopLabel}
+                          </Box>
+                        </Button>
+                      </Tooltip>
                     </Box>
                   )
                 })}
               </Box>
 
               {/* CTA Buttons */}
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.2 }}>
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.8, flexShrink: 0 }}>
                 {isAuthenticated && user ? (
                   <>
                     {/* Dashboard Shortcut Button */}
@@ -417,27 +496,25 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Button
                         component={RouterLink}
                         to="/login"
-                        startIcon={<FiUser size={16} />}
                         sx={{
-                          color: '#0F172A',
-                          fontWeight: 700,
-                          fontSize: '0.925rem',
-                          fontFamily: '"Plus Jakarta Sans", sans-serif',
-                          px: 2.5,
-                          py: 0.9,
+                          color: '#334155',
+                          fontWeight: 650,
+                          fontSize: '0.86rem',
+                          fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
+                          px: { md: 1.3, lg: 1.7 },
+                          py: 0.6,
+                          height: 35,
                           borderRadius: '100px',
-                          backgroundColor: 'rgba(241, 245, 249, 0.8)',
-                          border: '1px solid rgba(203, 213, 225, 0.8)',
-                          backdropFilter: 'blur(8px)',
+                          textTransform: 'none',
+                          whiteSpace: 'nowrap',
                           transition: 'all 0.2s ease',
                           '&:hover': {
-                            backgroundColor: 'rgba(241, 245, 249, 1)',
+                            backgroundColor: alpha(brandColors.primary, 0.08),
                             color: brandColors.primary,
-                            borderColor: alpha(brandColors.primary, 0.4),
                           },
                         }}
                       >
@@ -445,27 +522,29 @@ export default function Navbar() {
                       </Button>
                     </motion.div>
 
-                    <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                       <Button
                         component={RouterLink}
                         to="/book"
                         variant="contained"
-                        endIcon={<FiArrowRight size={16} />}
+                        endIcon={<FiArrowRight size={14} />}
                         sx={{
-                          px: 3,
-                          py: 0.95,
+                          px: { md: 1.8, lg: 2.2 },
+                          py: 0.6,
+                          height: 35,
                           borderRadius: '100px',
-                          fontWeight: 750,
-                          fontSize: '0.95rem',
-                          fontFamily: '"Plus Jakarta Sans", sans-serif',
+                          fontWeight: 700,
+                          fontSize: '0.86rem',
+                          fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
                           textTransform: 'none',
+                          whiteSpace: 'nowrap',
                           backgroundColor: brandColors.primary,
                           backgroundImage: `linear-gradient(135deg, ${brandColors.primary} 0%, #2563EB 100%)`,
-                          boxShadow: '0 6px 20px rgba(10, 102, 194, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                          transition: 'all 0.25s ease',
+                          boxShadow: '0 3px 12px rgba(10, 102, 194, 0.28)',
+                          transition: 'all 0.2s ease',
                           '&:hover': {
                             backgroundImage: `linear-gradient(135deg, #0850A0 0%, #1D4ED8 100%)`,
-                            boxShadow: '0 8px 25px rgba(10, 102, 194, 0.48)',
+                            boxShadow: '0 5px 16px rgba(10, 102, 194, 0.38)',
                             transform: 'translateY(-1px)',
                           },
                         }}
@@ -539,44 +618,43 @@ export default function Navbar() {
 
         <List disablePadding>
           {navLinks.map((link) => {
-            const active = location.pathname === link.href
+            const active = isLinkActive(link.href)
             return (
               <ListItem key={link.label} disablePadding sx={{ mb: 1 }}>
                 <Button
                   component={RouterLink}
                   to={link.href}
                   fullWidth
+                  onClick={() => {
+                    setMobileOpen(false)
+                    handleLinkClick(link.href)
+                  }}
+                  startIcon={
+                    <link.icon
+                      size={18}
+                      style={{
+                        color: active ? brandColors.primary : '#64748B',
+                      }}
+                    />
+                  }
                   sx={{
                     justifyContent: 'flex-start',
                     px: 2.2,
-                    py: 1.4,
+                    py: 1.3,
                     borderRadius: '100px',
                     color: active ? brandColors.primary : brandColors.text,
-                    fontWeight: active ? 700 : 500,
-                    fontSize: '0.95rem',
+                    fontWeight: active ? 750 : 550,
+                    fontSize: '0.94rem',
                     fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
-                    backgroundColor: active ? alpha(brandColors.primary, 0.08) : 'rgba(255, 255, 255, 0.5)',
-                    border: active ? `1px solid ${alpha(brandColors.primary, 0.2)}` : '1px solid rgba(226, 232, 240, 0.6)',
+                    backgroundColor: active ? alpha(brandColors.primary, 0.09) : 'rgba(255, 255, 255, 0.6)',
+                    border: active ? `1px solid ${alpha(brandColors.primary, 0.25)}` : '1px solid rgba(226, 232, 240, 0.7)',
                     '&:hover': {
-                      backgroundColor: alpha(brandColors.primary, 0.06),
+                      backgroundColor: alpha(brandColors.primary, 0.08),
                       color: brandColors.primary,
                     },
                   }}
                 >
-                  {active && (
-                    <Box
-                      component="span"
-                      sx={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        backgroundColor: brandColors.primary,
-                        mr: 1.2,
-                        display: 'inline-block',
-                      }}
-                    />
-                  )}
-                  {link.label}
+                  <span>{link.label}</span>
                 </Button>
               </ListItem>
             )

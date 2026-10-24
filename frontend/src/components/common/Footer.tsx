@@ -13,6 +13,7 @@ const footerLinks = {
   ],
   Company: [
     { label: 'About Us & Team', href: '/about' },
+    { label: 'Our Story', href: '/#our-story' },
     { label: 'Blogs & Articles', href: '/blogs' },
     { label: 'Our Process', href: '/about#process' },
     { label: 'Pricing & Plans', href: '/pricing' },
@@ -131,7 +132,13 @@ export default function Footer() {
                     component={RouterLink}
                     to={link.href}
                     onClick={() => {
-                      if (!link.href.includes('#')) {
+                      if (link.href.includes('#')) {
+                        const hash = '#' + link.href.split('#')[1]
+                        const el = document.querySelector(hash)
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth' })
+                        }
+                      } else {
                         window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
                       }
                     }}
